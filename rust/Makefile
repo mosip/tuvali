@@ -1,10 +1,10 @@
-ios_inc_dir=../ios/include
-ios_libs_dir=../ios/libs
-ios_generated_src_dir=../ios/generated
+ios_inc_dir=./ios/include
+ios_libs_dir=./ios/libs
+ios_generated_src_dir=./ios/generated
 
 shared_lib_dir=./rustlib-binding
-shared_lib_output_dir=$(shared_lib_dir)/output
 
+shared_lib_output_dir=$(shared_lib_dir)/output
 shared_lib_ios_output=$(shared_lib_output_dir)/ios
 shared_lib_android_output=$(shared_lib_output_dir)/android
 shared_lib_android_jni_output=$(shared_lib_output_dir)/android/jniLibs
@@ -12,8 +12,8 @@ shared_lib_generated_headers=$(shared_lib_output_dir)/headers
 shared_lib_generated_java_files=$(shared_lib_output_dir)/java_files
 shared_lib_generated_java_source_dir=$(shared_lib_generated_java_files)/src/main/java/io/mosip
 
-android_root=../android
-android_app_src_main=$(android_root)/src/main
+android_root=./android
+android_app_src_main=$(android_root)/app/src/main
 android_jni_libs_dir=$(android_app_src_main)/jniLibs
 
 setup_dirs:

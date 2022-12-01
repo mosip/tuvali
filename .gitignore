@@ -71,5 +71,6 @@ ios/include/
 ios/libs
 ios/generated/
 android/src/main/jniLibs/
-rust/target/
+rust/purerust/target/
+rust/rustlib_binding/target/
 
