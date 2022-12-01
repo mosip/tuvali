@@ -17,6 +17,30 @@ const Openid4vpBle = NativeModules.Openid4vpBle
       }
     );
 
-export function multiply(a: number, b: number): Promise<number> {
-  return Openid4vpBle.multiply(a, b);
-}
+const Wallet = NativeModules.Wallet
+  ? NativeModules.Wallet
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      }
+    );
+
+const Verifier = NativeModules.Verifier
+  ? NativeModules.Verifier
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(LINKING_ERROR);
+        },
+      }
+    );
+
+export default {
+  Openid4vpBle,
+  Wallet,
+  Verifier,
+};

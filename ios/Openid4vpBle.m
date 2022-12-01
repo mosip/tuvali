@@ -12,3 +12,25 @@ RCT_EXTERN_METHOD(multiply:(float)a withB:(float)b
 }
 
 @end
+
+@interface RCT_EXTERN_MODULE(Wallet, NSObject)
+
+RCT_EXTERN_METHOD(getModuleName:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
+@end
+
+@interface RCT_EXTERN_MODULE(Verifier, NSObject)
+
+RCT_EXTERN_METHOD(getModuleName:(RCTPromiseResolveBlock)resolve
+                  withRejecter:(RCTPromiseRejectBlock)reject)
+
++ (BOOL)requiresMainQueueSetup
+{
+    return NO;
+}
+@end

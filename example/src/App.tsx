@@ -1,18 +1,23 @@
 import * as React from 'react';
 
 import { StyleSheet, View, Text } from 'react-native';
-import { multiply } from 'react-native-openid4vp-ble';
+import openBle from 'react-native-openid4vp-ble';
+
+const { Wallet, Verifier } = openBle;
 
 export default function App() {
-  const [result, setResult] = React.useState<number | undefined>();
+  const [walletName, setWalletName] = React.useState<string>();
+  const [verifierName, setVerifierName] = React.useState<string>();
 
   React.useEffect(() => {
-    multiply(3, 7).then(setResult);
+    Wallet.getModuleName().then((name: string) => setWalletName(name));
+    Verifier.getModuleName().then((name: string) => setVerifierName(name));
   }, []);
 
   return (
     <View style={styles.container}>
-      <Text>Result: {result}</Text>
+      <Text>Wallet Name: {walletName}</Text>
+      <Text>Verifier Name: {verifierName}</Text>
     </View>
   );
 }
