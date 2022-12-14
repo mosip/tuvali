@@ -17,30 +17,6 @@ const Openid4vpBle = NativeModules.Openid4vpBle
       }
     );
 
-const Wallet = NativeModules.Wallet
-  ? NativeModules.Wallet
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
-const Verifier = NativeModules.Verifier
-  ? NativeModules.Verifier
-  : new Proxy(
-      {},
-      {
-        get() {
-          throw new Error(LINKING_ERROR);
-        },
-      }
-    );
-
 export default {
   Openid4vpBle,
-  Wallet,
-  Verifier,
 };
