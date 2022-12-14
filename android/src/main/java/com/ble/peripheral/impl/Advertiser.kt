@@ -1,4 +1,4 @@
-package com.ble.peripheral
+package com.ble.peripheral.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothManager
@@ -20,14 +20,16 @@ class Advertiser(
 ) {
   private var advertiser: BluetoothLeAdvertiser
   private var advertiseSettings: AdvertiseSettings
+  private lateinit var onAdvStartSuccessCallback: () -> Unit
+  private lateinit var onAdvStartFailureCallback: (Int) -> Unit
 
   private val advertiseCallbackImpl = object : AdvertiseCallback() {
     override fun onStartSuccess(settingsInEffect: AdvertiseSettings?) {
-      super.onStartSuccess(settingsInEffect)
+      onAdvStartSuccessCallback()
     }
 
     override fun onStartFailure(errorCode: Int) {
-      super.onStartFailure(errorCode)
+      onAdvStartFailureCallback(errorCode)
     }
   }
 
@@ -44,22 +46,32 @@ class Advertiser(
     serviceUUID: UUID,
     scanRespUUID: UUID,
     advPayload: String,
-    scanRespPayload: String
+    scanRespPayload: String,
+    onStartSuccess: () -> Unit,
+    onStartFailure: (Int) -> Unit
   ) {
-    // starts advertisement
+    onAdvStartSuccessCallback = onStartSuccess
+    onAdvStartFailureCallback = onStartFailure
     advertiser.startAdvertising(
       getSettings(),
-      advertiseData(serviceUUID, advPayload.toByteArray()),
-      advertiseData(scanRespUUID, scanRespPayload.toByteArray()),
+      advertiseData(serviceUUID, advPayload.toByteArray(), true),
+      advertiseData(scanRespUUID, scanRespPayload.toByteArray(), false),
       advertiseCallbackImpl
     )
   }
 
-  private fun advertiseData(serviceUUID: UUID?, payload: ByteArray): AdvertiseData? {
+  private fun advertiseData(
+    serviceUUID: UUID?,
+    payload: ByteArray,
+    includeServiceUUID: Boolean
+  ): AdvertiseData? {
     val parcelUuid = ParcelUuid(serviceUUID)
-    return AdvertiseData.Builder()
+    val advDataBuilder = AdvertiseData.Builder()
       .setIncludeDeviceName(false)
-      .addServiceUuid(parcelUuid)
+    if (includeServiceUUID) {
+      advDataBuilder.addServiceUuid(parcelUuid)
+    }
+    return advDataBuilder
       .addServiceData(parcelUuid, payload)
       .build()
   }

@@ -1,22 +1,61 @@
 package com.openid4vpble
 
-import com.facebook.react.bridge.ReactApplicationContext
-import com.facebook.react.bridge.ReactContextBaseJavaModule
-import com.facebook.react.bridge.ReactMethod
-import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.*
+import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
+import com.verifier.Verifier
+import com.wallet.Wallet
+
 
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
+  private val verifier = Verifier(reactContext, this::listenForResponse)
+  private val wallet = Wallet(reactContext)
 
   override fun getName(): String {
     return NAME
   }
 
-  // Example method
-  // See https://reactnative.dev/docs/native-modules-android
   @ReactMethod
-  fun multiply(a: Double, b: Double, promise: Promise) {
-    promise.resolve(a * b)
+  fun getConnectionParameters(): String {
+    return verifier.generateKeyPair()
+  }
+
+  @ReactMethod
+  fun getConnectionParametersDebug(): String {
+    return verifier.generateKeyPair()
+  }
+
+  @ReactMethod
+  fun setConnectionParameters(params: String) {
+    // TODO: Set this on wallet
+  }
+
+  @ReactMethod
+  fun createConnection(mode: String, callback: Callback) {
+    // TODO: Based on mode call corresponding module
+    verifier.startAdvertisement("OVPMOSIP", callback)
+  }
+
+  @ReactMethod
+  fun destroyConnection() {
+    // TODO: Find the mode and call close
+  }
+
+
+  @ReactMethod
+  fun send(message: String, callback: Callback) {
+    // TODO: Find the mode and call send
+  }
+
+
+  private fun emitEvent(eventName: String, data: WritableMap?) {
+    reactApplicationContext
+      .getJSModule(RCTDeviceEventEmitter::class.java)
+      .emit(eventName, data)
+  }
+
+  private fun listenForResponse(data: String) {
+    //emitEvent("NEARBY_EVENT", data)
   }
 
   //  noop: () => void;

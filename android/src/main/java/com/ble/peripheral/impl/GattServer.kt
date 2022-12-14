@@ -1,4 +1,4 @@
-package com.ble.peripheral
+package com.ble.peripheral.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
