@@ -13,8 +13,10 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
   private var peripheral: Peripheral
 
   //TODO: Update UUIDs as per specification
-  private val SERVICE_UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
-  private val SCAN_RESPONSE_SERVICE_UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+  companion object {
+    val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
+    val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+  }
 
   private enum class PeripheralCallbacks {
     ADV_SUCCESS_CALLBACK,

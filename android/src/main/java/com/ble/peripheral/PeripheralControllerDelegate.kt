@@ -3,15 +3,15 @@ package com.ble.peripheral
 import android.content.Context
 import com.ble.peripheral.impl.Advertiser
 import com.ble.peripheral.impl.GattServer
-import com.ble.statemessage.AdvertisementStartFailureMessage
-import com.ble.statemessage.AdvertisementStartMessage
-import com.ble.statemessage.AdvertisementStartSuccessMessage
-import com.ble.statemessage.IMessage
+import com.ble.peripheral.statemessage.AdvertisementStartFailureMessage
+import com.ble.peripheral.statemessage.AdvertisementStartMessage
+import com.ble.peripheral.statemessage.AdvertisementStartSuccessMessage
+import com.ble.peripheral.statemessage.IPeripheralMessage
 
 class PeripheralControllerDelegate(context: Context) {
   private var advertiser: Advertiser
   private var gattServer: GattServer
-  private lateinit var messageSender: ISendMessage
+  private lateinit var messageSender: IPeripheralSendMessage
 
   init {
     gattServer = GattServer(context)
@@ -19,7 +19,7 @@ class PeripheralControllerDelegate(context: Context) {
     gattServer.start()
   }
 
-  fun setHandlerThread(messageSender: ISendMessage) {
+  fun setHandlerThread(messageSender: IPeripheralSendMessage) {
     this.messageSender = messageSender
   }
 
@@ -35,14 +35,12 @@ class PeripheralControllerDelegate(context: Context) {
   }
 
   private fun onAdvertisementStartSuccess() {
-    val advertisementStartSuccessMessage =
-      AdvertisementStartSuccessMessage(IMessage.PeripheralStates.ADV_START_SUCCESS)
+    val advertisementStartSuccessMessage = AdvertisementStartSuccessMessage()
     messageSender.sendMessage(advertisementStartSuccessMessage)
   }
 
   private fun onAdvertisementStartFailure(errorCode: Int) {
-    val advertisementStartFailureMessage =
-      AdvertisementStartFailureMessage(IMessage.PeripheralStates.ADV_START_FAILURE, errorCode)
+    val advertisementStartFailureMessage = AdvertisementStartFailureMessage(errorCode)
     messageSender.sendMessage(advertisementStartFailureMessage)
   }
 }
