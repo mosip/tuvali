@@ -15,17 +15,17 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     return NAME
   }
 
-  @ReactMethod
+  @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
     return verifier.generateKeyPair()
   }
 
-  @ReactMethod
+  @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParametersDebug(): String {
     return verifier.generateKeyPair()
   }
 
-  @ReactMethod
+  @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
     // TODO: Set this on wallet
   }
@@ -36,17 +36,15 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     verifier.startAdvertisement("OVPMOSIP", callback)
   }
 
-  @ReactMethod
+  @ReactMethod(isBlockingSynchronousMethod = true)
   fun destroyConnection() {
     // TODO: Find the mode and call close
   }
-
 
   @ReactMethod
   fun send(message: String, callback: Callback) {
     // TODO: Find the mode and call send
   }
-
 
   private fun emitEvent(eventName: String, data: WritableMap?) {
     reactApplicationContext
