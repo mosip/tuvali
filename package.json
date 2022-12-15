@@ -41,13 +41,13 @@
     "ios",
     "android"
   ],
-  "repository": "https://github.com/mohammed-strive/react-native-openid4vp-ble",
-  "author": "Mohammed Jaffer <mohammed.strive@outlook.com> (https://github.com/mohammed-strive)",
+  "repository": "https://github.com/mosip/tuvali",
+  "author": "MOSIP",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/mohammed-strive/react-native-openid4vp-ble/issues"
+    "url": "https://github.com/mosip/tuvali/issues"
   },
-  "homepage": "https://github.com/mohammed-strive/react-native-openid4vp-ble#readme",
+  "homepage": "https://github.com/mosip/tuvali#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/"
   },
