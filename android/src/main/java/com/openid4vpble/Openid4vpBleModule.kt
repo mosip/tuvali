@@ -9,7 +9,7 @@ import com.wallet.Wallet
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val verifier = Verifier(reactContext, this::listenForResponse)
-  private val wallet = Wallet(reactContext)
+  private val wallet = Wallet(reactContext, this::listenForResponse)
 
   override fun getName(): String {
     return NAME

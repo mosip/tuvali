@@ -1,16 +1,15 @@
-package com.ble.central
+package com.ble.central.impl
 
 import android.content.Context
-import com.ble.central.impl.GattClient
-import com.ble.central.impl.Scanner
-import com.ble.central.statemessage.*
+import com.ble.central.state.IMessageSender
+import com.ble.central.state.message.ScanStartFailureMessage
+import com.ble.central.state.message.ScanStartMessage
+import com.ble.central.state.message.ScanStartSuccessMessage
 
-import com.ble.peripheral.IPeripheralSendMessage
-
-class CentralControllerDelegate(context: Context) {
+class Controller(context: Context) {
   private var scanner: Scanner
   private var gattClient: GattClient
-  private lateinit var messageSender: ICentralSendMessage
+  private lateinit var messageSender: IMessageSender
 
   init {
     gattClient = GattClient(context)
@@ -18,7 +17,7 @@ class CentralControllerDelegate(context: Context) {
     gattClient.init()
   }
 
-  fun setHandlerThread(messageSender: ICentralSendMessage) {
+  fun setHandlerThread(messageSender: IMessageSender) {
     this.messageSender = messageSender
   }
 

@@ -1,4 +1,4 @@
-package com.ble
+package com.ble.central
 
 interface ICentralListener {
   fun onScanStartedSuccessfully()

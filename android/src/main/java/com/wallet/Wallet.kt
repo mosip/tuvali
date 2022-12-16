@@ -2,8 +2,8 @@ package com.wallet
 
 import android.content.Context
 import android.util.Log
-import com.ble.Central
-import com.ble.ICentralListener
+import com.ble.central.Central
+import com.ble.central.ICentralListener
 import com.facebook.react.bridge.Callback
 import com.verifier.Verifier
 
@@ -13,8 +13,8 @@ class Wallet(context: Context, private val responseListener: (String) -> Unit): 
   private var central: Central
 
   private enum class CentralCallbacks {
-    ADV_SUCCESS_CALLBACK,
-    ADV_FAILURE_CALLBACK
+    SCAN_SUCCESS_CALLBACK,
+    SCAN_FAILURE_CALLBACK
   }
   private val callbacks = mutableMapOf<CentralCallbacks, Callback>()
 
@@ -27,7 +27,7 @@ class Wallet(context: Context, private val responseListener: (String) -> Unit): 
   }
 
   fun startScanning(advIdentifier: String, successCallback: Callback) {
-    callbacks[CentralCallbacks.ADV_SUCCESS_CALLBACK] = successCallback
+    callbacks[CentralCallbacks.SCAN_SUCCESS_CALLBACK] = successCallback
     central.scan(
       Verifier.SERVICE_UUID,
       Verifier.SCAN_RESPONSE_SERVICE_UUID,
@@ -36,7 +36,7 @@ class Wallet(context: Context, private val responseListener: (String) -> Unit): 
   }
 
   override fun onScanStartedSuccessfully() {
-    val successCallback = callbacks[CentralCallbacks.ADV_SUCCESS_CALLBACK]
+    val successCallback = callbacks[CentralCallbacks.SCAN_SUCCESS_CALLBACK]
     successCallback?.let { it() }
   }
 
