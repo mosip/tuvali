@@ -67,3 +67,14 @@ yarn example android
  - ios
  - example (example app)
 ```
+
+## Integrate and compile with Inji (Local)
+#### On Tuvali repo
+1. Compile Tuvali with `yarn` command
+2. Public Tuvali to local Yalc repo with `yalc publish`
+
+### On Inji repo
+1. Add locally published Tuvali repo to INJI with `yalc add react-native-openid4vp-ble`
+2. `npm install`
+3. Open app from CLI `npm run android:mosip`. Optionally can run from Android studio as well.
+

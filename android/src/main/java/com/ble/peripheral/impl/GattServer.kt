@@ -1,10 +1,7 @@
 package com.ble.peripheral.impl
 
 import android.annotation.SuppressLint
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.BluetoothGattServer
-import android.bluetooth.BluetoothGattServerCallback
-import android.bluetooth.BluetoothManager
+import android.bluetooth.*
 import android.content.Context
 
 @SuppressLint("MissingPermission")

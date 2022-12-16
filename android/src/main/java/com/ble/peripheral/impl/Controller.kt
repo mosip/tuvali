@@ -1,17 +1,17 @@
-package com.ble.peripheral
+package com.ble.peripheral.impl
 
 import android.content.Context
 import com.ble.peripheral.impl.Advertiser
 import com.ble.peripheral.impl.GattServer
-import com.ble.peripheral.statemessage.AdvertisementStartFailureMessage
-import com.ble.peripheral.statemessage.AdvertisementStartMessage
-import com.ble.peripheral.statemessage.AdvertisementStartSuccessMessage
-import com.ble.peripheral.statemessage.IPeripheralMessage
+import com.ble.peripheral.state.IMessageSender
+import com.ble.peripheral.state.message.AdvertisementStartFailureMessage
+import com.ble.peripheral.state.message.AdvertisementStartMessage
+import com.ble.peripheral.state.message.AdvertisementStartSuccessMessage
 
-class PeripheralControllerDelegate(context: Context) {
+class Controller(context: Context) {
   private var advertiser: Advertiser
   private var gattServer: GattServer
-  private lateinit var messageSender: IPeripheralSendMessage
+  private lateinit var messageSender: IMessageSender
 
   init {
     gattServer = GattServer(context)
@@ -19,7 +19,7 @@ class PeripheralControllerDelegate(context: Context) {
     gattServer.start()
   }
 
-  fun setHandlerThread(messageSender: IPeripheralSendMessage) {
+  fun setHandlerThread(messageSender: IMessageSender) {
     this.messageSender = messageSender
   }
 

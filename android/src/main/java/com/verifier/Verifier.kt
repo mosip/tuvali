@@ -2,12 +2,13 @@ package com.verifier
 
 import android.content.Context
 import android.util.Log
-import com.ble.IPeripheralListener
-import com.ble.Peripheral
+import com.ble.peripheral.IPeripheralListener
+import com.ble.peripheral.Peripheral
 import com.facebook.react.bridge.Callback
 import java.util.*
 
-class Verifier(context: Context, private val responseListener: (String) -> Unit): IPeripheralListener {
+class Verifier(context: Context, private val responseListener: (String) -> Unit):
+  IPeripheralListener {
   private val logTag = "Verifier"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
   private var peripheral: Peripheral
