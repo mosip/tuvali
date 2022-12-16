@@ -44,6 +44,7 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
   }
 
   override fun onAdvertisementStartSuccessful() {
+    Log.d(logTag, "onAdvertisementStartSuccess")
     val successCallback = callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK]
     successCallback?.let { it() }
   }

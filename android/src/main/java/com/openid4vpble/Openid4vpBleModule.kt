@@ -1,5 +1,6 @@
 package com.openid4vpble
 
+import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.verifier.Verifier
@@ -8,6 +9,7 @@ import com.wallet.Wallet
 
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
+  private val logTag = "Openid4vpBleModule"
   private val verifier = Verifier(reactContext, this::listenForResponse)
   private val wallet = Wallet(reactContext, this::listenForResponse)
 
@@ -33,6 +35,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
     // TODO: Based on mode call corresponding module
+    Log.d(logTag, "createConnection: received request")
     verifier.startAdvertisement("OVPMOSIP", callback)
   }
 
