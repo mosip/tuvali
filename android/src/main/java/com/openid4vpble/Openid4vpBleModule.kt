@@ -35,8 +35,15 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
     // TODO: Based on mode call corresponding module
-    Log.d(logTag, "createConnection: received request")
-    verifier.startAdvertisement("OVPMOSIP", callback)
+    Log.d(logTag, "createConnection: received request with mode $mode")
+    when(mode) {
+      "advertiser" -> {
+        verifier.startAdvertisement("OVPMOSIP", callback)
+      }
+      "discoverer" -> {
+        wallet.startScanning("OVPMOSIP", callback)
+      }
+    }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
