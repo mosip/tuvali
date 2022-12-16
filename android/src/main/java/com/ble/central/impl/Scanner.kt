@@ -11,6 +11,6 @@ class Scanner(context: Context) {
     onScanStartSuccess: () -> Unit,
     onScanStartFailure  : (Int) -> Unit
   ) {
-    TODO("Not yet implemented")
+  //    TODO("Not yet implemented")
   }
 }
