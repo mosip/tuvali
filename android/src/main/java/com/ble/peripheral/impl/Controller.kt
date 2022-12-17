@@ -1,6 +1,5 @@
 package com.ble.peripheral.impl
 
-import android.bluetooth.BluetoothGatt
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import com.ble.peripheral.state.IMessageSender
@@ -14,6 +13,7 @@ class Controller(context: Context) {
   init {
     gattServer = GattServer(context)
     advertiser = Advertiser(context)
+    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
   }
 
   fun setHandlerThread(messageSender: IMessageSender) {
@@ -38,9 +38,6 @@ class Controller(context: Context) {
   private fun onServiceAdded(status: Int) {
     val gattServiceAddedMessage = GattServiceAddedMessage(status)
     messageSender.sendMessage(gattServiceAddedMessage)
-    if (gattServiceAddedMessage.status == BluetoothGatt.GATT_SUCCESS) {
-      gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
-    }
   }
 
   private fun onAdvertisementStartSuccess() {

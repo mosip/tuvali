@@ -10,9 +10,10 @@ import com.wallet.Wallet
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val logTag = "Openid4vpBleModule"
-  private val verifier = Verifier(reactContext, this::listenForResponse)
-  private val wallet = Wallet(reactContext, this::listenForResponse)
-  private lateinit var activeMode: ModeOfOperation
+  private val verifier = Verifier(reactContext, this::emitNearbyEvent)
+
+  //  private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+  private var activeMode: ModeOfOperation? = null
 
   enum class ModeOfOperation {
     Verifier,
@@ -41,14 +42,14 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
     Log.d(logTag, "createConnection: received request with mode $mode")
-    when(mode) {
+    when (mode) {
       "advertiser" -> {
         updateModeOfModeration(ModeOfOperation.Verifier)
         verifier.startAdvertisement("OVPMOSIP", callback)
       }
       "discoverer" -> {
         updateModeOfModeration(ModeOfOperation.Wallet)
-        wallet.startScanning("OVPMOSIP", callback)
+//        wallet.startScanning("OVPMOSIP", callback)
       }
     }
   }
@@ -69,8 +70,19 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       .emit(eventName, data)
   }
 
-  private fun listenForResponse(data: String) {
-    //emitEvent("NEARBY_EVENT", data)
+  private fun emitNearbyEvent(eventType: String, data: Map<String, String>) {
+    val dataMap = Arguments.createMap()
+    data.forEach { dataMap.putString(it.key, it.value) }
+    val writableMap = Arguments.createMap()
+    writableMap.putString("data", "$eventType\n{\"deviceName\": \"Verifier\"}")
+    writableMap.putString("type", "msg")
+    emitEvent("EVENT_NEARBY", writableMap)
+  }
+
+  private fun emitLogEvent(eventType: String, data: Map<String, String>) {
+    val writableMap = Arguments.createMap()
+    data.forEach { writableMap.putString(it.key, it.value) }
+    emitEvent("EVENT_LOG", writableMap)
   }
 
   private fun updateModeOfModeration(newMode: ModeOfOperation) {

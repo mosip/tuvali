@@ -6,8 +6,9 @@ import com.ble.central.Central
 import com.ble.central.ICentralListener
 import com.facebook.react.bridge.Callback
 import com.verifier.Verifier
+import kotlin.reflect.KFunction1
 
-class Wallet(context: Context, private val responseListener: (String) -> Unit) : ICentralListener {
+class Wallet(context: Context, private val responseListener: (String, Map<String, String>)-> Unit) : ICentralListener {
   private val logTag = "Wallet"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97984"
   private var central: Central

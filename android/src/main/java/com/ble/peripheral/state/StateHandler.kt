@@ -58,6 +58,7 @@ class StateHandler(
         val deviceConnectedMessage = msg.obj as DeviceConnectedMessage
         Log.d(logTag, "on device connected: status: ${deviceConnectedMessage.status}, newState: ${deviceConnectedMessage.newState}")
         currentState = States.ConnectedToDevice
+        peripheralListener.onDeviceConnected()
         //TODO: Send this info to higher layer
       }
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {

@@ -9,7 +9,7 @@ import android.util.Log
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private val logTag = "GattServer"
   private lateinit var gattServer: BluetoothGattServer
-  private lateinit var bluetoothDevice: BluetoothDevice
+  private var bluetoothDevice: BluetoothDevice? = null
 
   private lateinit var onServiceAddedCallback: (Int) -> Unit
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
@@ -41,10 +41,12 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
 
   override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
     Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState")
-    if(newState == BluetoothProfile.STATE_CONNECTED){
-      bluetoothDevice.let { device }
+    bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
+      onDeviceConnectedCallback(status, newState)
+      device
     } else {
-      bluetoothDevice.let { null }
+      onDeviceNotConnectedCallback(status, newState)
+      null
     }
   }
 

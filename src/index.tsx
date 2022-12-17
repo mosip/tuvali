@@ -1,4 +1,4 @@
-import { NativeModules, Platform } from 'react-native';
+import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import type { OpenIDBLEShare } from './types/bleshare';
 
 const LINKING_ERROR =
@@ -17,6 +17,14 @@ const Openid4vpBle: OpenIDBLEShare = NativeModules.Openid4vpBle
         },
       }
     );
+
+if (Platform.OS === 'android') {
+  const eventEmitter = new NativeEventEmitter();
+  Openid4vpBle.handleNearbyEvents = (callback) =>
+    eventEmitter.addListener('EVENT_NEARBY', callback);
+  Openid4vpBle.handleLogEvents = (callback) =>
+    eventEmitter.addListener('EVENT_LOG', callback);
+}
 
 export default {
   Openid4vpBle,

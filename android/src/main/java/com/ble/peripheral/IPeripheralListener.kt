@@ -6,4 +6,5 @@ interface IPeripheralListener {
   fun onAdvertisementStartSuccessful()
   fun onAdvertisementStartFailed(errorCode: Int)
   fun onReceivedWrite(uuid: UUID, value: ByteArray?)
+  fun onDeviceConnected()
 }

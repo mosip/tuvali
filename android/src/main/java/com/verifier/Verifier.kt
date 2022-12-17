@@ -8,13 +8,14 @@ import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.Peripheral
 import com.facebook.react.bridge.Callback
 import java.util.*
+import kotlin.reflect.KFunction1
 
-class Verifier(context: Context, private val responseListener: (String) -> Unit):
+class Verifier(context: Context, private val responseListener: (String, Map<String, String>) -> Unit) :
   IPeripheralListener {
   private val logTag = "Verifier"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
-  private lateinit var walletPubKey: ByteArray
-  private lateinit var iv: ByteArray
+  private lateinit var walletPubKey: String
+  private lateinit var iv: String
   private var peripheral: Peripheral
 
   //TODO: Update UUIDs as per specification
@@ -28,6 +29,7 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
     ADV_SUCCESS_CALLBACK,
     ADV_FAILURE_CALLBACK
   }
+
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
 
   init {
@@ -44,7 +46,8 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
     val identityChar = BluetoothGattCharacteristic(
       IDENTITY_CHARACTERISTIC_UUID,
       BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or BluetoothGattCharacteristic.PROPERTY_WRITE,
-      BluetoothGattCharacteristic.PERMISSION_WRITE)
+      BluetoothGattCharacteristic.PERMISSION_WRITE
+    )
 
     service.addCharacteristic(identityChar)
     return service
@@ -54,7 +57,6 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
     return publicKey
   }
 
-  // TODO: Need identifier from higher layer to form adv payload
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
     callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK] = successCallback
     peripheral.start(
@@ -77,13 +79,30 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     if (uuid == IDENTITY_CHARACTERISTIC_UUID) {
-      //TODO: Split up data for IV
-      walletPubKey.let { value }
+      val identityValue = value.toString()
+      var identitySubstrings = listOf<String>()
+      if (identityValue !== "") {
+        identitySubstrings = identityValue.split("_", limit =  2)
+      }
+      if (identitySubstrings.size > 1) {
+        iv = identitySubstrings[0]
+        walletPubKey = identitySubstrings[1]
+      }
+      // TODO: Validate pub key, how to handle if not valid?
+      if (walletPubKey != "") {
+        responseListener("exchange-sender-info", mapOf(Pair("deviceName", "Verifier")))
+      }
     }
   }
 
+  // TODO: Can remove this
+  override fun onDeviceConnected() {
+    Log.d(logTag, "onDeviceConnected: sending event")
+    responseListener("exchange-sender-info", mapOf(Pair("deviceName", "Verifier")))
+  }
+
   private fun getAdvPayload(advIdentifier: String): String {
-    return advIdentifier + "_" + publicKey.substring(0,5)
+    return advIdentifier + "_" + publicKey.substring(0, 5)
   }
 
   private fun getScanRespPayload(): String {

@@ -14,19 +14,16 @@ import java.util.*
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   private val controller: Controller =
     Controller(context)
-  private lateinit var messageSender: IMessageSender
-
-  private val handlerThread: HandlerThread = object : HandlerThread("PeripheralHandlerThread", Process.THREAD_PRIORITY_DEFAULT) {
-    override fun onLooperPrepared() {
-      messageSender = StateHandler(this.looper, controller, peripheralListener)
-      controller.setHandlerThread(messageSender)
-    }
-  }
+  private var messageSender: IMessageSender
+  private val handlerThread: HandlerThread = HandlerThread("PeripheralHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   init {
     //TODO: Call quit once instance is done
     handlerThread.start()
+    messageSender = StateHandler(handlerThread.looper, controller, peripheralListener)
+    controller.setHandlerThread(messageSender)
   }
+
 
   fun start(serviceUUID: UUID, scanRespUUID: UUID, advPayload: String, scanRespPayload: String) {
     val advStartMsg = AdvertisementStartMessage(
