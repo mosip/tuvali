@@ -10,7 +10,7 @@ import com.facebook.react.bridge.Callback
 import java.util.*
 import kotlin.reflect.KFunction1
 
-class Verifier(context: Context, private val responseListener: (String, Map<String, String>) -> Unit) :
+class Verifier(context: Context, private val responseListener: (String, String) -> Unit) :
   IPeripheralListener {
   private val logTag = "Verifier"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
@@ -90,7 +90,7 @@ class Verifier(context: Context, private val responseListener: (String, Map<Stri
       }
       // TODO: Validate pub key, how to handle if not valid?
       if (walletPubKey != "") {
-        responseListener("exchange-sender-info", mapOf(Pair("deviceName", "Verifier")))
+        responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
       }
     }
   }
@@ -98,7 +98,7 @@ class Verifier(context: Context, private val responseListener: (String, Map<Stri
   // TODO: Can remove this
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
-    responseListener("exchange-sender-info", mapOf(Pair("deviceName", "Verifier")))
+    responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
   }
 
   private fun getAdvPayload(advIdentifier: String): String {

@@ -4,18 +4,17 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.verifier.Verifier
-import com.wallet.Wallet
 
 
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val logTag = "Openid4vpBleModule"
   private val verifier = Verifier(reactContext, this::emitNearbyEvent)
-
   //  private val wallet = Wallet(reactContext, this::emitNearbyEvent)
-  private var activeMode: ModeOfOperation? = null
 
+  private var activeMode: ModeOfOperation = ModeOfOperation.UnInitialised
   enum class ModeOfOperation {
+    UnInitialised,
     Verifier,
     Wallet
   }
@@ -44,11 +43,11 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     Log.d(logTag, "createConnection: received request with mode $mode")
     when (mode) {
       "advertiser" -> {
-        updateModeOfModeration(ModeOfOperation.Verifier)
+        updateModeOfOperation(ModeOfOperation.Verifier)
         verifier.startAdvertisement("OVPMOSIP", callback)
       }
       "discoverer" -> {
-        updateModeOfModeration(ModeOfOperation.Wallet)
+        updateModeOfOperation(ModeOfOperation.Wallet)
 //        wallet.startScanning("OVPMOSIP", callback)
       }
     }
@@ -62,6 +61,13 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun send(message: String, callback: Callback) {
     // TODO: Find the mode and call send
+    Log.d(logTag, "send: message $message")
+    val messageSplits = message.split("\n", limit = 2)
+    when(messageSplits[0]) {
+      "exchange-receiver-info" -> {
+        callback()
+      }
+    }
   }
 
   private fun emitEvent(eventName: String, data: WritableMap?) {
@@ -70,11 +76,9 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       .emit(eventName, data)
   }
 
-  private fun emitNearbyEvent(eventType: String, data: Map<String, String>) {
-    val dataMap = Arguments.createMap()
-    data.forEach { dataMap.putString(it.key, it.value) }
+  private fun emitNearbyEvent(eventType: String, data: String) {
     val writableMap = Arguments.createMap()
-    writableMap.putString("data", "$eventType\n{\"deviceName\": \"Verifier\"}")
+    writableMap.putString("data", "$eventType\n${data}")
     writableMap.putString("type", "msg")
     emitEvent("EVENT_NEARBY", writableMap)
   }
@@ -85,11 +89,19 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     emitEvent("EVENT_LOG", writableMap)
   }
 
-  private fun updateModeOfModeration(newMode: ModeOfOperation) {
+  private fun updateModeOfOperation(newMode: ModeOfOperation) {
     if (activeMode != newMode) {
       destroyConnection()
     }
     activeMode = newMode
+  }
+
+  private fun getPeerModeOfOperation(): ModeOfOperation {
+    return when(activeMode) {
+      ModeOfOperation.Wallet -> ModeOfOperation.Verifier
+      ModeOfOperation.Verifier -> ModeOfOperation.Wallet
+      else -> ModeOfOperation.UnInitialised
+    }
   }
 
   //  noop: () => void;
