@@ -13,7 +13,7 @@ class Controller(context: Context) {
   init {
     gattServer = GattServer(context)
     advertiser = Advertiser(context)
-    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
+    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onRead)
   }
 
   fun setHandlerThread(messageSender: IMessageSender) {
@@ -63,5 +63,10 @@ class Controller(context: Context) {
   private fun onReceivedWrite(characteristic: BluetoothGattCharacteristic?, value: ByteArray?) {
     val receivedWriteMessage = ReceivedWriteMessage(characteristic, value)
     messageSender.sendMessage(receivedWriteMessage)
+  }
+
+  private fun onRead(characteristic: BluetoothGattCharacteristic?, isRead: Boolean) {
+    val onReadMessage = OnReadMessage(characteristic, isRead)
+    messageSender.sendMessage(onReadMessage)
   }
 }

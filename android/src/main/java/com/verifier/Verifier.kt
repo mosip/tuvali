@@ -1,14 +1,11 @@
 package com.verifier
 
-import android.bluetooth.BluetoothGattCharacteristic
-import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.util.Log
 import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.Peripheral
 import com.facebook.react.bridge.Callback
 import java.util.*
-import kotlin.reflect.KFunction1
 
 class Verifier(context: Context, private val responseListener: (String, String) -> Unit) :
   IPeripheralListener {
@@ -22,7 +19,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
     val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
-    val IDENTITY_CHARACTERISTIC_UUID: UUID = UUID.fromString("00002030-0000-1000-8000-00805f9b34fb")
   }
 
   private enum class PeripheralCallbacks {
@@ -34,23 +30,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   init {
     peripheral = Peripheral(context, this@Verifier)
-    peripheral.setupService(createPeripheralService())
-  }
-
-  private fun createPeripheralService(): BluetoothGattService {
-    val service = BluetoothGattService(
-      SERVICE_UUID,
-      BluetoothGattService.SERVICE_TYPE_PRIMARY
-    )
-
-    val identityChar = BluetoothGattCharacteristic(
-      IDENTITY_CHARACTERISTIC_UUID,
-      BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or BluetoothGattCharacteristic.PROPERTY_WRITE,
-      BluetoothGattCharacteristic.PERMISSION_WRITE
-    )
-
-    service.addCharacteristic(identityChar)
-    return service
+    val gattService = GattService()
+    peripheral.setupService(gattService.create())
   }
 
   fun generateKeyPair(): String {
@@ -78,11 +59,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
-    if (uuid == IDENTITY_CHARACTERISTIC_UUID) {
+    if (uuid == GattService.IDENTITY_CHARACTERISTIC_UUID) {
       val identityValue = value.toString()
       var identitySubstrings = listOf<String>()
       if (identityValue !== "") {
-        identitySubstrings = identityValue.split("_", limit =  2)
+        identitySubstrings = identityValue.split("_", limit = 2)
       }
       if (identitySubstrings.size > 1) {
         iv = identitySubstrings[0]
@@ -91,8 +72,15 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       // TODO: Validate pub key, how to handle if not valid?
       if (walletPubKey != "") {
         responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
+        peripheral.enableCommunication()
       }
+    } else {
+
     }
+  }
+
+  override fun onRead(uuid: UUID?, read: Boolean) {
+    TODO("Not yet implemented")
   }
 
   // TODO: Can remove this

@@ -19,7 +19,8 @@ class StateHandler(
   enum class States {
     GattServerReady,
     Advertising,
-    ConnectedToDevice
+    ConnectedToDevice,
+    CommunicationReady
   }
 
   private lateinit var currentState: States
@@ -59,7 +60,6 @@ class StateHandler(
         Log.d(logTag, "on device connected: status: ${deviceConnectedMessage.status}, newState: ${deviceConnectedMessage.newState}")
         currentState = States.ConnectedToDevice
         peripheralListener.onDeviceConnected()
-        //TODO: Send this info to higher layer
       }
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {
         val deviceNotConnectedMessage = msg.obj as DeviceNotConnectedMessage
@@ -69,7 +69,22 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
         val receivedWriteMessage = msg.obj as ReceivedWriteMessage
         Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")
-        //TODO: Send this info to higher layer
+        if (receivedWriteMessage.characteristic != null) {
+          peripheralListener.onReceivedWrite(receivedWriteMessage.characteristic.uuid, receivedWriteMessage.data)
+        }
+      }
+
+      IMessage.PeripheralMessageTypes.ON_READ.ordinal -> {
+        val onReadMessage = msg.obj as OnReadMessage
+        Log.d(logTag, "on Read: characteristicUUID: ${onReadMessage.characteristic?.uuid}, isReadSuccessful: ${onReadMessage.isRead}")
+        if (onReadMessage.characteristic != null) {
+          peripheralListener.onRead(onReadMessage.characteristic.uuid, onReadMessage.isRead)
+        }
+      }
+
+      IMessage.PeripheralMessageTypes.ENABLE_COMMUNICATION.ordinal -> {
+        currentState = States.CommunicationReady
+        Log.d(logTag, "enabled communication")
       }
     }
   }

@@ -15,12 +15,19 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
+  private lateinit var onReadCallback: (BluetoothGattCharacteristic?, Boolean) -> Unit
 
 
-  fun start(onDeviceConnected: (Int, Int) -> Unit, onDeviceNotConnected: (Int, Int) -> Unit, onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit) {
+  fun start(
+    onDeviceConnected: (Int, Int) -> Unit,
+    onDeviceNotConnected: (Int, Int) -> Unit,
+    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit,
+    onRead: (BluetoothGattCharacteristic?, Boolean) -> Unit
+  ) {
     onDeviceConnectedCallback = onDeviceConnected
     onDeviceNotConnectedCallback = onDeviceNotConnected
     onReceivedWriteCallback = onReceivedWrite
+    onReadCallback = onRead
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
   }
@@ -61,6 +68,36 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   ) {
     Log.d(logTag, "onCharacteristicWriteRequest: requestId: ${requestId}, preparedWrite: ${preparedWrite}, responseNeeded: ${responseNeeded}, offset: ${offset}, dataSize: ${value?.size}")
     onReceivedWriteCallback(characteristic, value)
+    if (responseNeeded) {
+      gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+    }
+  }
+
+  override fun onCharacteristicReadRequest(
+    device: BluetoothDevice?,
+    requestId: Int,
+    offset: Int,
+    characteristic: BluetoothGattCharacteristic?
+  ) {
+    val isSuccessful = gattServer.sendResponse(
+      device,
+      requestId,
+      BluetoothGatt.GATT_SUCCESS,
+      offset,
+      characteristic?.value
+    )
+    onReadCallback(characteristic, isSuccessful)
+  }
+
+  override fun onDescriptorWriteRequest(
+    device: BluetoothDevice?,
+    requestId: Int,
+    descriptor: BluetoothGattDescriptor?,
+    preparedWrite: Boolean,
+    responseNeeded: Boolean,
+    offset: Int,
+    value: ByteArray?
+  ) {
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }

@@ -9,6 +9,8 @@ abstract class IMessage(val commandType: PeripheralMessageTypes) {
     ADV_START_FAILURE,
     DEVICE_CONNECTED,
     DEVICE_NOT_CONNECTED,
-    RECEIVED_WRITE
+    RECEIVED_WRITE,
+    ON_READ,
+    ENABLE_COMMUNICATION
   }
 }
