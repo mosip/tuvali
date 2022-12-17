@@ -12,6 +12,12 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   private val logTag = "Openid4vpBleModule"
   private val verifier = Verifier(reactContext, this::listenForResponse)
   private val wallet = Wallet(reactContext, this::listenForResponse)
+  private lateinit var activeMode: ModeOfOperation
+
+  enum class ModeOfOperation {
+    Verifier,
+    Wallet
+  }
 
   override fun getName(): String {
     return NAME
@@ -34,13 +40,14 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
-    // TODO: Based on mode call corresponding module
     Log.d(logTag, "createConnection: received request with mode $mode")
     when(mode) {
       "advertiser" -> {
+        updateModeOfModeration(ModeOfOperation.Verifier)
         verifier.startAdvertisement("OVPMOSIP", callback)
       }
       "discoverer" -> {
+        updateModeOfModeration(ModeOfOperation.Wallet)
         wallet.startScanning("OVPMOSIP", callback)
       }
     }
@@ -64,6 +71,13 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   private fun listenForResponse(data: String) {
     //emitEvent("NEARBY_EVENT", data)
+  }
+
+  private fun updateModeOfModeration(newMode: ModeOfOperation) {
+    if (activeMode != newMode) {
+      destroyConnection()
+    }
+    activeMode = newMode
   }
 
   //  noop: () => void;

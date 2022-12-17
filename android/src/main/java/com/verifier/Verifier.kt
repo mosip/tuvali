@@ -1,5 +1,7 @@
 package com.verifier
 
+import android.bluetooth.BluetoothGattCharacteristic
+import android.bluetooth.BluetoothGattService
 import android.content.Context
 import android.util.Log
 import com.ble.peripheral.IPeripheralListener
@@ -11,12 +13,15 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
   IPeripheralListener {
   private val logTag = "Verifier"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
+  private lateinit var walletPubKey: ByteArray
+  private lateinit var iv: ByteArray
   private var peripheral: Peripheral
 
   //TODO: Update UUIDs as per specification
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
     val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+    val IDENTITY_CHARACTERISTIC_UUID: UUID = UUID.fromString("00002030-0000-1000-8000-00805f9b34fb")
   }
 
   private enum class PeripheralCallbacks {
@@ -27,6 +32,22 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
 
   init {
     peripheral = Peripheral(context, this@Verifier)
+    peripheral.setupService(createPeripheralService())
+  }
+
+  private fun createPeripheralService(): BluetoothGattService {
+    val service = BluetoothGattService(
+      SERVICE_UUID,
+      BluetoothGattService.SERVICE_TYPE_PRIMARY
+    )
+
+    val identityChar = BluetoothGattCharacteristic(
+      IDENTITY_CHARACTERISTIC_UUID,
+      BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or BluetoothGattCharacteristic.PROPERTY_WRITE,
+      BluetoothGattCharacteristic.PERMISSION_WRITE)
+
+    service.addCharacteristic(identityChar)
+    return service
   }
 
   fun generateKeyPair(): String {
@@ -52,6 +73,13 @@ class Verifier(context: Context, private val responseListener: (String) -> Unit)
 
   override fun onAdvertisementStartFailed(errorCode: Int) {
     Log.d(logTag, "onAdvertisementStartFailed: $errorCode")
+  }
+
+  override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
+    if (uuid == IDENTITY_CHARACTERISTIC_UUID) {
+      //TODO: Split up data for IV
+      walletPubKey.let { value }
+    }
   }
 
   private fun getAdvPayload(advIdentifier: String): String {

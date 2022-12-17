@@ -78,3 +78,6 @@ yarn example android
 2. `npm install`
 3. Open app from CLI `npm run android:mosip`. Optionally can run from Android studio as well.
 
+### Running INJI from Android Studio (workaround)
+1. Bump up android gradle plugin to min of 4.2.2 (Ref: https://github.com/facebook/react-native/issues/35337)
+

@@ -1,12 +1,10 @@
 package com.ble.peripheral.impl
 
+import android.bluetooth.BluetoothGatt
+import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
-import com.ble.peripheral.impl.Advertiser
-import com.ble.peripheral.impl.GattServer
 import com.ble.peripheral.state.IMessageSender
-import com.ble.peripheral.state.message.AdvertisementStartFailureMessage
-import com.ble.peripheral.state.message.AdvertisementStartMessage
-import com.ble.peripheral.state.message.AdvertisementStartSuccessMessage
+import com.ble.peripheral.state.message.*
 
 class Controller(context: Context) {
   private var advertiser: Advertiser
@@ -16,11 +14,14 @@ class Controller(context: Context) {
   init {
     gattServer = GattServer(context)
     advertiser = Advertiser(context)
-    gattServer.start()
   }
 
   fun setHandlerThread(messageSender: IMessageSender) {
     this.messageSender = messageSender
+  }
+
+  fun setupGattService(gattServiceMessage: SetupGattServiceMessage) {
+    gattServer.addService(gattServiceMessage.service, this::onServiceAdded)
   }
 
   fun startAdvertisement(advertisementStartMessage: AdvertisementStartMessage) {
@@ -34,6 +35,14 @@ class Controller(context: Context) {
     )
   }
 
+  private fun onServiceAdded(status: Int) {
+    val gattServiceAddedMessage = GattServiceAddedMessage(status)
+    messageSender.sendMessage(gattServiceAddedMessage)
+    if (gattServiceAddedMessage.status == BluetoothGatt.GATT_SUCCESS) {
+      gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
+    }
+  }
+
   private fun onAdvertisementStartSuccess() {
     val advertisementStartSuccessMessage = AdvertisementStartSuccessMessage()
     messageSender.sendMessage(advertisementStartSuccessMessage)
@@ -42,5 +51,20 @@ class Controller(context: Context) {
   private fun onAdvertisementStartFailure(errorCode: Int) {
     val advertisementStartFailureMessage = AdvertisementStartFailureMessage(errorCode)
     messageSender.sendMessage(advertisementStartFailureMessage)
+  }
+
+  private fun onDeviceConnected(status: Int, newState: Int) {
+    val deviceConnectedMessage = DeviceConnectedMessage(status, newState)
+    messageSender.sendMessage(deviceConnectedMessage)
+  }
+
+  private fun onDeviceNotConnected(status: Int, newState: Int) {
+    val deviceNotConnectedMessage = DeviceNotConnectedMessage(status, newState)
+    messageSender.sendMessage(deviceNotConnectedMessage)
+  }
+
+  private fun onReceivedWrite(characteristic: BluetoothGattCharacteristic?, value: ByteArray?) {
+    val receivedWriteMessage = ReceivedWriteMessage(characteristic, value)
+    messageSender.sendMessage(receivedWriteMessage)
   }
 }
