@@ -7,6 +7,7 @@ import android.util.Log
 import com.ble.central.state.IMessageSender
 import com.ble.central.state.message.*
 import com.openid4vpble.Openid4vpBleModule
+import java.util.UUID
 
 class Controller(context: Context) {
   private var scanner: Scanner
@@ -40,6 +41,22 @@ class Controller(context: Context) {
     gattClient.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
   }
 
+  fun write(writeMessage: WriteMessage) {
+    gattClient.write(writeMessage.device, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
+  }
+
+  private fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
+    val writeSuccessMessage = WriteSuccessMessage(device, charUUID)
+
+    messageSender.sendMessage(writeSuccessMessage)
+  }
+
+  private fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, errorCode: Int) {
+    val writeFailedMessage = WriteFailedMessage(device, charUUID, errorCode)
+
+    messageSender.sendMessage(writeFailedMessage)
+  }
+
   private fun onDeviceFound(device: BluetoothDevice) {
     val deviceFoundMessage = DeviceFoundMessage(device)
     Log.d(Openid4vpBleModule.LOG_TAG, "Sent message to on device found" )
@@ -62,4 +79,5 @@ class Controller(context: Context) {
     val scanStartFailureMessage = ScanStartFailureMessage(errorCode)
     messageSender.sendMessage(scanStartFailureMessage)
   }
+
 }

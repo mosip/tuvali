@@ -40,12 +40,28 @@ class StateHandler(
         controller.connect(connectDeviceMessage.device)
       }
       IMessage.CentralStates.DEVICE_CONNECTED.ordinal -> {
+        val deviceConnectedMessage = msg.obj as DeviceConnectedMessage
+
         Log.d(logTag, "device connected successfully")
-        listener.onDeviceConnected()
+        listener.onDeviceConnected(deviceConnectedMessage.device)
       }
       IMessage.CentralStates.DEVICE_DISCONNECTED.ordinal -> {
         Log.d(logTag, "device disconnected successfully")
         listener.onDeviceDisconnected()
+      }
+      IMessage.CentralStates.WRITE.ordinal -> {
+      Log.d(logTag, "device disconnected successfully")
+      controller.write(msg.obj as WriteMessage)
+    }
+      IMessage.CentralStates.WRITE_SUCCESS.ordinal -> {
+        val writeSuccessMessage = msg.obj as WriteSuccessMessage;
+        Log.d(logTag, "wrote to ${writeSuccessMessage.charUUID} successfully")
+        listener.onWriteSuccess(writeSuccessMessage.device, writeSuccessMessage.charUUID)
+      }
+      IMessage.CentralStates.WRITE_FAILED.ordinal -> {
+        val writeFailedMessage = msg.obj as WriteFailedMessage;
+        Log.d(logTag, "write failed successfully for ${writeFailedMessage.charUUID} due to ${writeFailedMessage.err}")
+        listener.onWriteFailed(writeFailedMessage.device, writeFailedMessage.charUUID, writeFailedMessage.err)
       }
     }
   }

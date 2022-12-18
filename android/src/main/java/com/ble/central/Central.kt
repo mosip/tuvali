@@ -9,6 +9,7 @@ import com.ble.central.state.IMessageSender
 import com.ble.central.state.message.ScanStartMessage
 import com.ble.central.state.StateHandler
 import com.ble.central.state.message.ConnectDeviceMessage
+import com.ble.central.state.message.WriteMessage
 import java.util.*
 
 class Central(context: Context, centralLister: ICentralListener) {
@@ -32,6 +33,12 @@ class Central(context: Context, centralLister: ICentralListener) {
     val connectDeviceMessage = ConnectDeviceMessage(device)
 
     messageSender.sendMessage(connectDeviceMessage)
+  }
+
+  fun write(device: BluetoothDevice, serviceUuid: UUID, charUUID: UUID, data: String) {
+    val writeMessage = WriteMessage(device, serviceUuid, charUUID, data)
+
+    messageSender.sendMessage(writeMessage)
   }
 
 }

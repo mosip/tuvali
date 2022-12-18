@@ -6,7 +6,9 @@ import android.util.Log
 import com.ble.central.Central
 import com.ble.central.ICentralListener
 import com.facebook.react.bridge.Callback
+import com.verifier.GattService
 import com.verifier.Verifier
+import java.util.*
 
 class Wallet(context: Context, private val responseListener: (String, String) -> Unit) : ICentralListener {
   private val logTag = "Wallet"
@@ -48,11 +50,12 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     central.connect(device)
   }
 
-  override fun onDeviceConnected() {
+  override fun onDeviceConnected(device: BluetoothDevice) {
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
 
     connectionEstablishedCallBack?.let {
       it()
+      central.write(device, Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${IV}_$publicKey")
 
       //TODO: Why this is getting called multiple times?. (Calling callback multiple times raises a exception)
       callbacks.remove(CentralCallbacks.CONNECTION_ESTABLISHED)
@@ -60,7 +63,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onDeviceDisconnected() {
-    TODO("Not yet implemented")
+      //TODO "Not yet implemented"
   }
 
   override fun onKeyExchanged() {
@@ -70,10 +73,18 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     connectionEstablishedCallback?.let { it() }
   }
 
+  override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
+    Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
+  }
+
+  override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
+    Log.d(logTag, "Wrote to $charUUID successfully")
+
+    responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier dummy\"}")
+  }
+
   fun setVerifierKey(walletPk: String) {
     this.walletPk = walletPk
-
-    responseListener("RECEIVE_DEVICE_INFO", "{\"deviceName\": \"Wallet dummy\"}")
   }
 
 }

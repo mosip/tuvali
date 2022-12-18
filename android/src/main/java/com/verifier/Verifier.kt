@@ -7,9 +7,13 @@ import android.util.Log
 import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.Peripheral
 import com.facebook.react.bridge.Callback
+<<<<<<< HEAD
 import com.verifier.transfer.ITransferListener
 import com.verifier.transfer.TransferHandler
 import com.verifier.transfer.message.*
+=======
+import java.nio.charset.Charset
+>>>>>>> b960051 (chore(#305): (wip) Write wallet's PK  to verifier)
 import java.util.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
@@ -76,7 +80,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
         GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-          val identityValue = value.toString()
+          val identityValue = value!!.decodeToString()
           var identitySubstrings = listOf<String>()
           if (identityValue !== "") {
             identitySubstrings = identityValue.split("_", limit = 2)
