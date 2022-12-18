@@ -4,13 +4,13 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.verifier.Verifier
+import com.wallet.Wallet
 
 
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
-  private val logTag = "Openid4vpBleModule"
   private val verifier = Verifier(reactContext, this::emitNearbyEvent)
-  //  private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+    private val wallet = Wallet(reactContext, this::emitNearbyEvent)
 
   private var activeMode: ModeOfOperation = ModeOfOperation.UnInitialised
   enum class ModeOfOperation {
@@ -25,7 +25,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
-    return verifier.generateKeyPair()
+    return "{\"cid\":\"ilB8l\",\"pk\":\"${verifier.generateKeyPair()}\"}"
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -35,12 +35,15 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
-    // TODO: Set this on wallet
+    Log.d(LOG_TAG, "setConnectionParameters called with $params")
+
+    //TODO: Confirm the params structure(Assuming it to be Verifier PK)
+    return wallet.setVerifierKey(params)
   }
 
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
-    Log.d(logTag, "createConnection: received request with mode $mode")
+    Log.d(LOG_TAG, "createConnection: received request with mode $mode")
     when (mode) {
       "advertiser" -> {
         updateModeOfOperation(ModeOfOperation.Verifier)
@@ -48,7 +51,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       }
       "discoverer" -> {
         updateModeOfOperation(ModeOfOperation.Wallet)
-//        wallet.startScanning("OVPMOSIP", callback)
+        wallet.startScanning("OVPMOSIP", callback)
       }
     }
   }
@@ -61,7 +64,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod
   fun send(message: String, callback: Callback) {
     // TODO: Find the mode and call send
-    Log.d(logTag, "send: message $message")
+    Log.d(LOG_TAG, "send: message $message")
     val messageSplits = message.split("\n", limit = 2)
     when(messageSplits[0]) {
       "exchange-receiver-info" -> {
@@ -136,5 +139,6 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   companion object {
     const val NAME = "Openid4vpBle"
+    const val LOG_TAG = "Openid4vpBleModule"
   }
 }

@@ -1,10 +1,12 @@
 package com.ble.central.impl
 
+import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.content.Context
+import android.util.Log
 import com.ble.central.state.IMessageSender
-import com.ble.central.state.message.ScanStartFailureMessage
-import com.ble.central.state.message.ScanStartMessage
-import com.ble.central.state.message.ScanStartSuccessMessage
+import com.ble.central.state.message.*
+import com.openid4vpble.Openid4vpBleModule
 
 class Controller(context: Context) {
   private var scanner: Scanner
@@ -14,7 +16,6 @@ class Controller(context: Context) {
   init {
     gattClient = GattClient(context)
     scanner = Scanner(context)
-    gattClient.init()
   }
 
   fun setHandlerThread(messageSender: IMessageSender) {
@@ -22,18 +23,39 @@ class Controller(context: Context) {
   }
 
   fun scan(scanStartMessage: ScanStartMessage) {
+    Log.d(Openid4vpBleModule.LOG_TAG, "BLE: starting scan")
+
     scanner.start(
       scanStartMessage.serviceUUID,
-      scanStartMessage.scanRespUUID,
       scanStartMessage.advPayload,
-      this::onScanStartSuccess,
+      this::onDeviceFound,
       this::onScanStartFailure
     )
   }
 
-  private fun onScanStartSuccess() {
-    val scanStartSuccessMessage = ScanStartSuccessMessage()
-    messageSender.sendMessage(scanStartSuccessMessage)
+  @SuppressLint("MissingPermission")
+  fun connect(device: BluetoothDevice) {
+    Log.d(Openid4vpBleModule.LOG_TAG, "BLE: Connecting to device: ${device.name}", )
+
+    gattClient.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
+  }
+
+  private fun onDeviceFound(device: BluetoothDevice) {
+    val deviceFoundMessage = DeviceFoundMessage(device)
+    Log.d(Openid4vpBleModule.LOG_TAG, "Sent message to on device found" )
+
+    messageSender.sendMessage(deviceFoundMessage)
+  }
+
+  private fun onDeviceConnected(device: BluetoothDevice) {
+    val deviceConnectedMessage = DeviceConnectedMessage(device)
+
+    messageSender.sendMessage(deviceConnectedMessage)
+  }
+
+  private fun onDeviceDisconnected(device: BluetoothDevice) {
+    val deviceDisconnectedMessage = DeviceDisconnectedMessage(device)
+    messageSender.sendMessage(deviceDisconnectedMessage)
   }
 
   private fun onScanStartFailure(errorCode: Int) {
