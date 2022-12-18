@@ -4,7 +4,9 @@ import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
 import android.util.Log
+import java.util.UUID
 
+@OptIn(ExperimentalUnsignedTypes::class)
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private val logTag = "GattServer"
@@ -42,6 +44,13 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     gattServer.addService(service)
   }
 
+  fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: UByteArray): Boolean {
+    val service = gattServer.getService(serviceUUID)
+    val characteristic = service.getCharacteristic(charUUID)
+    characteristic.value = data.toByteArray()
+    return gattServer.notifyCharacteristicChanged(bluetoothDevice, characteristic, false)
+  }
+
   override fun onServiceAdded(status: Int, service: BluetoothGattService?) {
     onServiceAddedCallback(status)
   }
@@ -73,6 +82,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     }
   }
 
+  // TODO: Confirm if this is needed, if peripheral always sends data through notification
   override fun onCharacteristicReadRequest(
     device: BluetoothDevice?,
     requestId: Int,

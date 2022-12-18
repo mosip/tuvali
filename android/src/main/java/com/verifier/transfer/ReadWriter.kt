@@ -7,6 +7,7 @@ import com.verifier.exception.WriteToRemoteException
 import java.util.UUID
 
 // Non Thread safe instance
+// This is not used, this is to demonstrate complexity of code without state machine
 @OptIn(ExperimentalUnsignedTypes::class)
 class ReadWriter(private val peripheral: Peripheral) {
   private val logTag = "ReadWriter"
@@ -47,8 +48,9 @@ class ReadWriter(private val peripheral: Peripheral) {
   }
 
   fun onReceivedWriteFromRemote(uuid: UUID, data: UByteArray) {
-    if (uuid == GattService.RESPONSE_SIZE_CHAR_UUID && currentState == TransferStates.ResponseSizeReadPending) {
-      assembler = Assembler(data)
+    if (uuid == GattService.RESPONSE_SIZE_CHAR_UUID && currentState == TransferStates.ResponseSizeReadPending && data.size == 2) {
+      val responseSize = data.toString().toInt()
+      assembler = Assembler(responseSize)
       isChunkInProcess = true
       currentState = TransferStates.ResponseReadPending
     } else if (uuid == GattService.RESPONSE_CHAR_UUID && currentState == TransferStates.ResponseReadPending && isChunkInProcess) {

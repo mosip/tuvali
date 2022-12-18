@@ -1,3 +1,5 @@
 package com.verifier.exception
 
-class CorruptedChunkReceivedException(val size: Int, receivedSeqNumber: Int, receivedMtuSize: Int) : Throwable() {}
+class CorruptedChunkReceivedException(size: Int, receivedSeqNumber: Int, receivedMtuSize: Int) : Throwable(
+  "size: $size, receivedSeqNumber: $receivedSeqNumber, receivedMtuSize: $receivedMtuSize"
+) {}

@@ -2,6 +2,7 @@ package com.verifier.transfer
 
 import kotlin.math.ceil
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class Chunker(private val data: UByteArray) {
   private val mtuSize= 200
   private val seqNumberReservedByteSize = 2

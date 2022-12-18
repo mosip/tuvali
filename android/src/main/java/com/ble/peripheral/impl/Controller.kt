@@ -5,6 +5,7 @@ import android.content.Context
 import com.ble.peripheral.state.IMessageSender
 import com.ble.peripheral.state.message.*
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class Controller(context: Context) {
   private var advertiser: Advertiser
   private var gattServer: GattServer
@@ -33,6 +34,17 @@ class Controller(context: Context) {
       this::onAdvertisementStartSuccess,
       this::onAdvertisementStartFailure
     )
+  }
+
+  fun sendData(sendDataMessage: SendDataMessage) {
+    val isNotificationTriggered = gattServer.writeToChar(
+      sendDataMessage.serviceUUID,
+      sendDataMessage.charUUID,
+      sendDataMessage.data
+    )
+    val sendDataTriggeredMessage =
+      SendDataTriggeredMessage(sendDataMessage.charUUID, isNotificationTriggered)
+    messageSender.sendMessage(sendDataTriggeredMessage)
   }
 
   private fun onServiceAdded(status: Int) {

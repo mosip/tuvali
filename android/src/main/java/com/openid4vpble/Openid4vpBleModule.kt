@@ -86,11 +86,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     emitEvent("EVENT_NEARBY", writableMap)
   }
 
-  private fun emitLogEvent(eventType: String, data: Map<String, String>) {
-    val writableMap = Arguments.createMap()
-    data.forEach { writableMap.putString(it.key, it.value) }
-    emitEvent("EVENT_LOG", writableMap)
-  }
+  private fun emitLogEvent(eventType: String, data: Map<String, String>) {}
 
   private fun updateModeOfOperation(newMode: ModeOfOperation) {
     if (activeMode != newMode) {

@@ -3,8 +3,7 @@ package com.verifier.transfer
 import com.verifier.exception.CorruptedChunkReceivedException
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Assembler(val sizeBytes: UByteArray) {
-  private val totalSize: Int
+class Assembler(private val totalSize: Int) {
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2
   private val chunkMetaSize = seqNumberReservedByteSize + mtuReservedByteSize
@@ -13,7 +12,6 @@ class Assembler(val sizeBytes: UByteArray) {
   private var lastReadSeqNumber: Int? = null
 
   init {
-    totalSize = twoBytesToInt(sizeBytes)
     if (totalSize == 0) {
       throw CorruptedChunkReceivedException(0, 0, 0)
     }

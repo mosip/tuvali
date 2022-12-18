@@ -8,4 +8,5 @@ interface IPeripheralListener {
   fun onReceivedWrite(uuid: UUID, value: ByteArray?)
   fun onDeviceConnected()
   fun onRead(uuid: UUID?, read: Boolean)
+  fun onSendDataNotified(uuid: UUID, notificationTriggered: Boolean)
 }

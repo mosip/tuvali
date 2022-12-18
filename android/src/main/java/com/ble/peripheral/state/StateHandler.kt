@@ -9,6 +9,7 @@ import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.impl.Controller
 import com.ble.peripheral.state.message.*
 
+@OptIn(ExperimentalUnsignedTypes::class)
 class StateHandler(
   looper: Looper,
   private val controller: Controller,
@@ -50,7 +51,7 @@ class StateHandler(
         currentState = States.Advertising
       }
       IMessage.PeripheralMessageTypes.ADV_START_FAILURE.ordinal -> {
-        Log.d(logTag, "advertisement start failed")
+        Log.e(logTag, "advertisement start failed")
         val failureMsg = msg.obj as AdvertisementStartFailureMessage
         peripheralListener.onAdvertisementStartFailed(failureMsg.errorCode)
       }
@@ -74,6 +75,7 @@ class StateHandler(
         }
       }
 
+      // TODO: Can be removed not hit
       IMessage.PeripheralMessageTypes.ON_READ.ordinal -> {
         val onReadMessage = msg.obj as OnReadMessage
         Log.d(logTag, "on Read: characteristicUUID: ${onReadMessage.characteristic?.uuid}, isReadSuccessful: ${onReadMessage.isRead}")
@@ -86,7 +88,23 @@ class StateHandler(
         currentState = States.CommunicationReady
         Log.d(logTag, "enabled communication")
       }
+
+      IMessage.PeripheralMessageTypes.SEND_DATA.ordinal -> {
+        val sendDataMessage = msg.obj as SendDataMessage
+        Log.d(logTag, "sendData: uuid: ${sendDataMessage.charUUID}, dataSize: ${sendDataMessage.data.size}")
+        controller.sendData(sendDataMessage)
+      }
+
+      IMessage.PeripheralMessageTypes.SEND_DATA_NOTIFIED.ordinal -> {
+        val sendDataNotifiedMessage = msg.obj as SendDataTriggeredMessage
+        Log.d(logTag, "sendData: uuid: ${sendDataNotifiedMessage.charUUID}, isNotified: ${sendDataNotifiedMessage.isNotificationTriggered}")
+        peripheralListener.onSendDataNotified(sendDataNotifiedMessage.charUUID, sendDataNotifiedMessage.isNotificationTriggered)
+      }
     }
+  }
+
+  override fun getCurrentState() : States {
+    return currentState
   }
 
   override fun sendMessage(msg: IMessage) {
