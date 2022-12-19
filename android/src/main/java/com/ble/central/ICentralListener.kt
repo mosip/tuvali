@@ -1,11 +1,12 @@
 package com.ble.central
 
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.le.ScanRecord
 import java.util.*
 
 interface ICentralListener {
   fun onScanStartedFailed(errorCode: Int)
-  fun onDeviceFound(device: BluetoothDevice)
+  fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?)
   fun onDeviceConnected(device: BluetoothDevice)
   fun onDeviceDisconnected()
   fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int)

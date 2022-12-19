@@ -47,4 +47,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(RequestMTUMessage(mtu))
   }
 
+  fun stopScan() {
+    messageSender.sendMessage(ScanStopMessage())
+  }
+
 }

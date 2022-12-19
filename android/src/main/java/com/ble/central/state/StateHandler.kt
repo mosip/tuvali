@@ -36,6 +36,11 @@ class StateHandler(
         controller.scan(msg.obj as ScanStartMessage)
         currentState = States.Scanning
       }
+      IMessage.CentralStates.SCAN_STOP.ordinal -> {
+        Log.d(logTag, "stopping scan.")
+        controller.stopScan()
+        currentState = States.Init
+      }
       IMessage.CentralStates.SCAN_START_FAILURE.ordinal -> {
         Log.d(logTag, "scan failed to start.")
         val failureMsg = msg.obj as ScanStartFailureMessage
@@ -47,7 +52,7 @@ class StateHandler(
         Log.d(logTag, "peripheral device found successfully with ${msg.obj}")
         val deviceFoundMessage = msg.obj as DeviceFoundMessage
 
-        listener.onDeviceFound(deviceFoundMessage.device)
+        listener.onDeviceFound(deviceFoundMessage.device, deviceFoundMessage.scanRecord)
         currentState = States.WaitingToConnect
       }
       IMessage.CentralStates.CONNECT_DEVICE.ordinal -> {

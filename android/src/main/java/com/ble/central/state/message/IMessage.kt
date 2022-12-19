@@ -3,6 +3,7 @@ package com.ble.central.state.message
 abstract class IMessage(val commandType: CentralStates) {
   enum class CentralStates {
     SCAN_START,
+    SCAN_STOP,
     SCAN_START_FAILURE,
 
     DEVICE_FOUND,

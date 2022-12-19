@@ -13,9 +13,8 @@ import java.util.*
 class Scanner(context: Context) {
   private lateinit var advPayload: String
   private lateinit var onScanStartFailure: (Int) -> Unit
-  private lateinit var onDeviceFound: (BluetoothDevice) -> Unit
+  private lateinit var onDeviceFound: (ScanResult) -> Unit
   private var bluetoothLeScanner: BluetoothLeScanner
-  private lateinit var peripheralDevice: BluetoothDevice
 
   init {
     val bluetoothManager: BluetoothManager =
@@ -27,11 +26,8 @@ class Scanner(context: Context) {
   private val leScanCallback: ScanCallback = object : ScanCallback() {
     override fun onScanResult(callbackType: Int, result: ScanResult) {
       Log.i("BLE Central", "Found the device: $result. The bytes are: ${result.scanRecord?.bytes?.toUByteArray()}")
-      stopScan()
 
-      //TODO: Compare advPayload before confirming peripheral
-      peripheralDevice = result.device
-      onDeviceFound(peripheralDevice)
+      onDeviceFound(result)
     }
 
     override fun onScanFailed(errorCode: Int) {
@@ -43,7 +39,7 @@ class Scanner(context: Context) {
   fun start(
     serviceUUID: UUID,
     advPayload: String,
-    onDeviceFound: (BluetoothDevice) -> Unit,
+    onDeviceFound: (ScanResult) -> Unit,
     onScanStartFailure: (Int) -> Unit
   ) {
     this.onDeviceFound = onDeviceFound;

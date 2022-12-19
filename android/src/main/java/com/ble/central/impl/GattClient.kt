@@ -80,7 +80,7 @@ class GattClient(var context: Context) {
 
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         Log.i(logTag, "Disconnected from the peripheral")
-        closeConnection()
+        closeGatt()
 
         peripheral = null;
       }
@@ -88,8 +88,7 @@ class GattClient(var context: Context) {
   }
 
   @SuppressLint("MissingPermission")
-  private fun closeConnection() {
-    bluetoothGatt?.disconnect()
+  private fun closeGatt() {
     bluetoothGatt?.close()
     peripheral?.let { onDeviceDisconnected() };
 

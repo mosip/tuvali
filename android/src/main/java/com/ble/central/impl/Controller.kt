@@ -2,6 +2,7 @@ package com.ble.central.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.le.ScanResult
 import android.content.Context
 import com.ble.central.state.IMessageSender
 import com.ble.central.state.message.*
@@ -29,6 +30,10 @@ class Controller(context: Context) {
       this::onDeviceFound,
       this::onScanStartFailure
     )
+  }
+
+  fun stopScan() {
+    scanner.stopScan()
   }
 
   @SuppressLint("MissingPermission")
@@ -71,8 +76,8 @@ class Controller(context: Context) {
     messageSender.sendMessage(writeFailedMessage)
   }
 
-  private fun onDeviceFound(device: BluetoothDevice) {
-    val deviceFoundMessage = DeviceFoundMessage(device)
+  private fun onDeviceFound(scanResult: ScanResult) {
+    val deviceFoundMessage = DeviceFoundMessage(scanResult.device, scanResult.scanRecord)
     messageSender.sendMessage(deviceFoundMessage)
   }
 

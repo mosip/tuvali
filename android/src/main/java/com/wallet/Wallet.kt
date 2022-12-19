@@ -1,7 +1,9 @@
 package com.wallet
 
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.le.ScanRecord
 import android.content.Context
+import android.os.ParcelUuid
 import android.util.Log
 import com.ble.central.Central
 import com.ble.central.ICentralListener
@@ -50,9 +52,15 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     Log.d(logTag, "onScanStartedFailed: $errorCode")
   }
 
-  override fun onDeviceFound(device: BluetoothDevice) {
-    Log.d(logTag, "onDeviceFound")
+  override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
+    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))?.decodeToString()
+    val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))?.decodeToString()
 
+    Log.d(logTag, "onDeviceFound with advPayload: ${advertisementPayload}, scanPayload: ${scanResponsePayload},")
+    val firstPartOfPK = advertisementPayload?.split("_", limit = 2)?.get(1)
+    val verifierPK = firstPartOfPK + scanResponsePayload
+
+    central.stopScan()
     central.connect(device)
   }
 
