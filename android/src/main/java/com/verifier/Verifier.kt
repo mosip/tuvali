@@ -144,7 +144,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   // TODO: Can remove this
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
-    responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
   }
 
   override fun onResponseReceived(data: UByteArray) {
