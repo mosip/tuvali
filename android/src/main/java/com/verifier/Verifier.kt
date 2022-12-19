@@ -23,8 +23,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   private var secretsTranslator: SecretsTranslator? = null;
   private val logTag = "Verifier"
   private var publicKey: ByteArray = byteArrayOf()
-  private lateinit var walletPubKey: String
-  private lateinit var iv: String
+  private lateinit var walletPubKey: ByteArray
+  private lateinit var iv: ByteArray
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
@@ -57,6 +57,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     val sr = SecureRandom()
     val vcb: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(sr)
     publicKey = vcb.publicKey()
+    Log.i(logTag, "Verifier public key: ${Hex.encodeHex(publicKey, false)}")
   }
 
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
@@ -87,17 +88,15 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
         GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-          val identityValue = value!!.decodeToString()
-          var identitySubstrings = listOf<String>()
-          if (identityValue !== "") {
-            identitySubstrings = identityValue.split("_", limit = 2)
-          }
-          if (identitySubstrings.size > 1) {
-            iv = identitySubstrings[0]
-            walletPubKey = identitySubstrings[1]
-          }
-          // TODO: Validate pub key, how to handle if not valid?
-          if (walletPubKey != "") {
+          value?.let {
+            // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
+            if (value.size < 12 + 32) {
+              return
+            }
+            iv = value.copyOfRange(0, 12)
+            walletPubKey = value.copyOfRange(12, 12 + 32)
+            Log.i(logTag, "received wallet iv: ${Hex.encodeHex(iv, false)}, wallet pub key: ${Hex.encodeHex(walletPubKey, false)}")
+            // TODO: Validate pub key, how to handle if not valid?
             responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
             peripheral.enableCommunication()
           }
@@ -175,7 +174,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {
-    // 5 bytes, since it's in hex it'd be twice
+    // Readable Identifier from higher layer + _ + first 5 bytes of public key
     return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0,5)
   }
 

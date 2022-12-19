@@ -16,7 +16,7 @@ import java.util.*
 class Wallet(context: Context, private val responseListener: (String, String) -> Unit) : ICentralListener {
   private val logTag = "Wallet"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97984"
-  private var IV: String = "DUMMY"
+  private var iv: String = "012345678901"
   private lateinit var advIdentifier: String;
   private var central: Central
   private val maxMTU = 517
@@ -45,7 +45,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   fun writeIdentity() {
-    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${IV}_$publicKey")
+    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${iv}$publicKey")
   }
 
   override fun onScanStartedFailed(errorCode: Int) {
