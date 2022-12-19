@@ -35,8 +35,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(connectDeviceMessage)
   }
 
-  fun write(device: BluetoothDevice, serviceUuid: UUID, charUUID: UUID, data: String) {
-    val writeMessage = WriteMessage(device, serviceUuid, charUUID, data)
+  fun write(serviceUuid: UUID, charUUID: UUID, data: String) {
+    val writeMessage = WriteMessage(serviceUuid, charUUID, data)
 
     messageSender.sendMessage(writeMessage)
   }

@@ -70,6 +70,10 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       "exchange-receiver-info" -> {
         callback()
       }
+      "exchange-sender-info" -> {
+        callback()
+        wallet.writeIdentity()
+      }
     }
   }
 

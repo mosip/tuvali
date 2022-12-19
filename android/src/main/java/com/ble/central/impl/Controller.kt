@@ -11,6 +11,7 @@ class Controller(context: Context) {
   private var scanner: Scanner
   private var gattClient: GattClient
   private lateinit var messageSender: IMessageSender
+  private var peripheralDevice: BluetoothDevice? = null;
 
   init {
     gattClient = GattClient(context)
@@ -36,7 +37,10 @@ class Controller(context: Context) {
   }
 
   fun write(writeMessage: WriteMessage) {
-    gattClient.write(writeMessage.device, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
+    //TODO: handle no device case
+    peripheralDevice?.let {
+      gattClient.write(it, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
+    }
   }
 
   private fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
@@ -57,12 +61,14 @@ class Controller(context: Context) {
   }
 
   private fun onDeviceConnected(device: BluetoothDevice) {
+    peripheralDevice = device
     val deviceConnectedMessage = DeviceConnectedMessage(device)
 
     messageSender.sendMessage(deviceConnectedMessage)
   }
 
   private fun onDeviceDisconnected(device: BluetoothDevice) {
+    peripheralDevice = null
     val deviceDisconnectedMessage = DeviceDisconnectedMessage(device)
     messageSender.sendMessage(deviceDisconnectedMessage)
   }

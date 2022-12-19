@@ -40,6 +40,10 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     )
   }
 
+  fun writeIdentity() {
+    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${IV}_$publicKey")
+  }
+
   override fun onScanStartedFailed(errorCode: Int) {
     Log.d(logTag, "onScanStartedFailed: $errorCode")
   }
@@ -55,8 +59,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
     connectionEstablishedCallBack?.let {
       it()
-      central.write(device, Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${IV}_$publicKey")
-
       //TODO: Why this is getting called multiple times?. (Calling callback multiple times raises a exception)
       callbacks.remove(CentralCallbacks.CONNECTION_ESTABLISHED)
     }

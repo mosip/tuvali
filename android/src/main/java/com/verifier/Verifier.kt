@@ -32,12 +32,14 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   private enum class PeripheralCallbacks {
     ADV_SUCCESS_CALLBACK,
     ADV_FAILURE_CALLBACK,
+    DEVICE_CONNECTED_CALLBACK,
     RESPONSE_RECEIVED_CALLBACK
   }
 
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
 
   init {
+    handlerThread.start()
     peripheral = Peripheral(context, this@Verifier)
     val gattService = GattService()
     peripheral.setupService(gattService.create())
@@ -49,7 +51,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
-    callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK] = successCallback
+    callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK] = successCallback
     peripheral.start(
       SERVICE_UUID,
       SCAN_RESPONSE_SERVICE_UUID,
@@ -144,6 +146,12 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   // TODO: Can remove this
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
+    val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
+
+    deviceConnectedCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK)
+    }
   }
 
   override fun onResponseReceived(data: UByteArray) {
