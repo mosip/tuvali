@@ -8,7 +8,6 @@ import android.util.Log
 import com.ble.central.impl.Controller
 import com.ble.central.ICentralListener
 import com.ble.central.state.message.*
-import com.ble.peripheral.state.StateHandler
 
 class StateHandler(
   looper: Looper,
@@ -23,7 +22,9 @@ class StateHandler(
     Scanning,
     WaitingToConnect,
     Connecting,
-    Ready,
+    Connected,
+    DiscoveringServices,
+    RequestingMTU,
     Writing,
   }
 
@@ -61,12 +62,47 @@ class StateHandler(
         Log.d(logTag, "device-${deviceConnectedMessage.device.name} connected successfully")
 
         listener.onDeviceConnected(deviceConnectedMessage.device)
-        currentState = States.Ready
+        currentState = States.Connected
       }
       IMessage.CentralStates.DEVICE_DISCONNECTED.ordinal -> {
         Log.d(logTag, "device got disconnected.")
         listener.onDeviceDisconnected()
         currentState = States.Init
+      }
+      IMessage.CentralStates.DISCOVER_SERVICES.ordinal -> {
+        Log.d(logTag, "discovering services.")
+        controller.discoverServices()
+        currentState = States.DiscoveringServices
+      }
+      IMessage.CentralStates.DISCOVER_SERVICES_SUCCESS.ordinal -> {
+        Log.d(logTag, "discovered services.")
+        listener.onServicesDiscovered()
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.DISCOVER_SERVICES_FAILURE.ordinal -> {
+        Log.d(logTag, "failed to discover services.")
+        val discoverServicesFailureMessage = msg.obj as DiscoverServicesFailureMessage
+        listener.onServicesDiscoveryFailed(discoverServicesFailureMessage.errorCode)
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.REQUEST_MTU.ordinal -> {
+        val requestMTUMessage = msg.obj as RequestMTUMessage
+        Log.d(logTag, "request mtu change to ${requestMTUMessage.mtu}")
+        controller.requestMTU(requestMTUMessage.mtu)
+        currentState = States.RequestingMTU
+      }
+      IMessage.CentralStates.REQUEST_MTU_SUCCESS.ordinal -> {
+        val requestMTUSuccessMessage = msg.obj as RequestMTUSuccessMessage
+
+        Log.d(logTag, "MTU changed to ${requestMTUSuccessMessage.mtu}.")
+        listener.onRequestMTUSuccess(requestMTUSuccessMessage.mtu)
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.REQUEST_MTU_FAILURE.ordinal -> {
+        Log.d(logTag, "failed to request MTU Change.")
+        val requestMTUFailureMessage = msg.obj as RequestMTUFailureMessage
+        listener.onRequestMTUFailure(requestMTUFailureMessage.errorCode)
+        currentState = States.Connected
       }
       IMessage.CentralStates.WRITE.ordinal -> {
         val writeMessage = msg.obj as WriteMessage
@@ -80,14 +116,14 @@ class StateHandler(
         Log.d(logTag, "Completed writing to ${writeSuccessMessage.charUUID} successfully")
 
         listener.onWriteSuccess(writeSuccessMessage.device, writeSuccessMessage.charUUID)
-        currentState = States.Ready
+        currentState = States.Connected
       }
       IMessage.CentralStates.WRITE_FAILED.ordinal -> {
         val writeFailedMessage = msg.obj as WriteFailedMessage;
 
         Log.d(logTag, "write failed for ${writeFailedMessage.charUUID} due to ${writeFailedMessage.err}")
         listener.onWriteFailed(writeFailedMessage.device, writeFailedMessage.charUUID, writeFailedMessage.err)
-        currentState = States.Ready
+        currentState = States.Connected
       }
     }
   }

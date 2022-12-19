@@ -10,12 +10,14 @@ import com.verifier.GattService
 import com.verifier.Verifier
 import java.util.*
 
+
 class Wallet(context: Context, private val responseListener: (String, String) -> Unit) : ICentralListener {
   private val logTag = "Wallet"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97984"
   private var IV: String = "DUMMY"
   private lateinit var walletPk: String;
   private var central: Central
+  private val maxMTU = 517
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
@@ -55,6 +57,24 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
+    Log.d(logTag, "onDeviceConnected")
+
+    central.discoverServices()
+  }
+
+  override fun onServicesDiscovered() {
+    Log.d(logTag, "onServicesDiscovered")
+
+    central.requestMTU(maxMTU)
+  }
+
+  override fun onServicesDiscoveryFailed(errorCode: Int) {
+    Log.d(logTag, "onServicesDiscoveryFailed")
+    //TODO: Handle services discovery failure
+  }
+
+  override fun onRequestMTUSuccess(mtu: Int) {
+    Log.d(logTag, "onRequestMTUSuccess")
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
 
     connectionEstablishedCallBack?.let {
@@ -64,15 +84,12 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     }
   }
 
-  override fun onDeviceDisconnected() {
-      //TODO "Not yet implemented"
+  override fun onRequestMTUFailure(errorCode: Int) {
+    //TODO: Handle onRequest MTU failure
   }
 
-  override fun onKeyExchanged() {
-    Log.d(logTag, "onKeyExchanged")
-
-    val connectionEstablishedCallback = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
-    connectionEstablishedCallback?.let { it() }
+  override fun onDeviceDisconnected() {
+    //TODO Handle Disconnect
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {

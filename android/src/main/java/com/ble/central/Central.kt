@@ -6,10 +6,8 @@ import android.os.HandlerThread
 import android.os.Process
 import com.ble.central.impl.Controller
 import com.ble.central.state.IMessageSender
-import com.ble.central.state.message.ScanStartMessage
 import com.ble.central.state.StateHandler
-import com.ble.central.state.message.ConnectDeviceMessage
-import com.ble.central.state.message.WriteMessage
+import com.ble.central.state.message.*
 import java.util.*
 
 class Central(context: Context, centralLister: ICentralListener) {
@@ -39,6 +37,14 @@ class Central(context: Context, centralLister: ICentralListener) {
     val writeMessage = WriteMessage(serviceUuid, charUUID, data)
 
     messageSender.sendMessage(writeMessage)
+  }
+
+  fun discoverServices() {
+    messageSender.sendMessage(DiscoverServicesMessage())
+  }
+
+  fun requestMTU(mtu: Int) {
+    messageSender.sendMessage(RequestMTUMessage(mtu))
   }
 
 }

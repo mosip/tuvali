@@ -43,6 +43,22 @@ class Controller(context: Context) {
     }
   }
 
+  fun discoverServices() {
+    gattClient.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
+  }
+
+  fun requestMTU(mtu: Int) {
+    gattClient.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+  }
+
+  private fun onRequestMTUSuccess(mtu: Int) {
+    messageSender.sendMessage(RequestMTUSuccessMessage(mtu))
+  }
+
+  private fun onRequestMTUFailure(errorCode: Int) {
+    messageSender.sendMessage(RequestMTUFailureMessage(errorCode))
+  }
+
   private fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     val writeSuccessMessage = WriteSuccessMessage(device, charUUID)
 
@@ -67,15 +83,23 @@ class Controller(context: Context) {
     messageSender.sendMessage(deviceConnectedMessage)
   }
 
-  private fun onDeviceDisconnected(device: BluetoothDevice) {
+  private fun onDeviceDisconnected() {
     peripheralDevice = null
-    val deviceDisconnectedMessage = DeviceDisconnectedMessage(device)
+    val deviceDisconnectedMessage = DeviceDisconnectedMessage()
     messageSender.sendMessage(deviceDisconnectedMessage)
   }
 
   private fun onScanStartFailure(errorCode: Int) {
     val scanStartFailureMessage = ScanStartFailureMessage(errorCode)
+
     messageSender.sendMessage(scanStartFailureMessage)
   }
 
+  private fun onServicesDiscovered(){
+    messageSender.sendMessage(DiscoverServicesSuccessMessage())
+  }
+
+  private fun onServiceDiscoveryFailure(errorCode: Int){
+    messageSender.sendMessage(DiscoverServicesFailureMessage(errorCode))
+  }
 }

@@ -3,14 +3,19 @@ package com.ble.central.impl
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.bluetooth.BluetoothGatt.GATT_FAILURE
+import android.bluetooth.BluetoothGatt.GATT_SUCCESS
 import android.content.Context
 import android.util.Log
 import java.util.*
 
 class GattClient(var context: Context) {
+  private lateinit var onRequestMTUSuccess: (mtu: Int) -> Unit
+  private lateinit var onRequestMTUFailure: (err: Int) -> Unit
+  private lateinit var onServicesDiscoveryFailure: (err: Int) -> Unit
+  private lateinit var onServicesDiscovered: () -> Unit
   private lateinit var onWriteFailed: (BluetoothDevice, UUID, Int) -> Unit
   private lateinit var onWriteSuccess: (BluetoothDevice, UUID) -> Unit
-  private lateinit var onDeviceDisconnected: (BluetoothDevice) -> Unit
+  private lateinit var onDeviceDisconnected: () -> Unit
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit;
   private var peripheral: BluetoothDevice? = null;
   private var bluetoothGatt: BluetoothGatt? = null;
@@ -24,7 +29,7 @@ class GattClient(var context: Context) {
     ) {
       Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}")
 
-      if(status != BluetoothGatt.GATT_SUCCESS) {
+      if(status != GATT_SUCCESS) {
         Log.i(logTag, "\"Failed to send message to peripheral")
 
         peripheral?.let {
@@ -43,33 +48,36 @@ class GattClient(var context: Context) {
 
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
-      peripheral?.let { onDeviceConnected(it) }
 
-      Log.i(logTag, "Successfully changed mtu size: $mtu")
+      if(status == GATT_SUCCESS) {
+         onRequestMTUSuccess(mtu)
+        Log.i(logTag, "Successfully changed mtu size: $mtu")
+      } else {
+        onRequestMTUFailure(status)
+        Log.i(logTag, "Failed to change mtu due to ErrorCode: $status")
+      }
+
     }
 
     @SuppressLint("MissingPermission")
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
       super.onServicesDiscovered(gatt, status)
-      if (status != BluetoothGatt.GATT_SUCCESS) {
+      if (status != GATT_SUCCESS) {
         Log.e(logTag, "Failed to discover services")
+        onServicesDiscoveryFailure(status)
         return
       }
 
-      val success = gatt?.requestMtu(517)
-
-      if (success == false) {
-        Log.i(logTag, "Failed to request MTU change")
-      }
-
       Log.i(logTag, "discovered services: ${gatt?.services?.map { it.uuid }}")
+      onServicesDiscovered()
     }
 
     @SuppressLint("MissingPermission")
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
       if (newState == BluetoothProfile.STATE_CONNECTED) {
         Log.i(logTag, "Connected to the peripheral")
-        gatt?.discoverServices()
+        peripheral?.let { onDeviceConnected(it) }
+
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         Log.i(logTag, "Disconnected from the peripheral")
         closeConnection()
@@ -83,7 +91,7 @@ class GattClient(var context: Context) {
   private fun closeConnection() {
     bluetoothGatt?.disconnect()
     bluetoothGatt?.close()
-    peripheral?.let { onDeviceDisconnected(it) };
+    peripheral?.let { onDeviceDisconnected() };
 
     bluetoothGatt = null
 
@@ -93,7 +101,7 @@ class GattClient(var context: Context) {
   fun connect(
     device: BluetoothDevice,
     onDeviceConnected: (BluetoothDevice) -> Unit,
-    onDeviceDisconnected: (BluetoothDevice) -> Unit
+    onDeviceDisconnected: () -> Unit
   ) {
     Log.i(logTag, "Initiating connect to ble peripheral")
 
@@ -138,5 +146,25 @@ class GattClient(var context: Context) {
 
     this.onWriteSuccess = onSuccess
     this.onWriteFailed = onFailed
+  }
+
+  @SuppressLint("MissingPermission")
+  fun discoverServices(onSuccess: () -> Unit, onFailure: (err: Int) -> Unit) {
+    this.onServicesDiscovered = onSuccess
+    this.onServicesDiscoveryFailure = onFailure
+    bluetoothGatt?.discoverServices()
+  }
+
+  @SuppressLint("MissingPermission")
+  fun requestMtu(mtu: Int, onSuccess: (mtu: Int) -> Unit, onFailure: (err: Int) -> Unit) {
+    val success = bluetoothGatt?.requestMtu(mtu)
+    this.onRequestMTUSuccess = onSuccess
+    this.onRequestMTUFailure = onFailure
+
+    if (success == false) {
+      Log.i(logTag, "Failed to request MTU change")
+      onFailure(GATT_FAILURE)
+    }
+
   }
 }
