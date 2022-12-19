@@ -9,7 +9,7 @@ import java.util.UUID
 // Non Thread safe instance
 // This is not used, this is to demonstrate complexity of code without state machine
 @OptIn(ExperimentalUnsignedTypes::class)
-class ReadWriter(private val peripheral: Peripheral) {
+class ReadWriter(private val serviceUUID: UUID, private val peripheral: Peripheral) {
   private val logTag = "ReadWriter"
   private lateinit var onTransferCompleteCallback: (UByteArray) -> Unit
   private lateinit var onTransferFailedCallback: (TransferStates, String) -> Unit
@@ -96,7 +96,7 @@ class ReadWriter(private val peripheral: Peripheral) {
       isChunkInProcess = false
     }
     if (chunkBytes != null) {
-      peripheral.sendData(GattService.REQUEST_CHAR_UUID, chunkBytes)
+      peripheral.sendData(serviceUUID, GattService.REQUEST_CHAR_UUID, chunkBytes)
     }
   }
 
@@ -118,6 +118,7 @@ class ReadWriter(private val peripheral: Peripheral) {
   private fun process(data: UByteArray) {
     currentState = TransferStates.RequestSizeWritePending
     peripheral.sendData(
+      serviceUUID,
       GattService.REQUEST_SIZE_CHAR_UUID,
       arrayOf(data.size.toUByte()).toUByteArray()
     )
