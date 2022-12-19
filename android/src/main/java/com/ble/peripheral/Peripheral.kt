@@ -35,7 +35,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     messageSender.sendMessage(setupServiceMsg)
   }
 
-  fun start(serviceUUID: UUID, scanRespUUID: UUID, advPayload: String, scanRespPayload: String) {
+  fun start(serviceUUID: UUID, scanRespUUID: UUID, advPayload: ByteArray, scanRespPayload: ByteArray) {
     val advStartMsg = AdvertisementStartMessage(
       serviceUUID,
       scanRespUUID,

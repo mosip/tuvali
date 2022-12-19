@@ -45,8 +45,8 @@ class Advertiser(
   fun start(
     serviceUUID: UUID,
     scanRespUUID: UUID,
-    advPayload: String,
-    scanRespPayload: String,
+    advPayload: ByteArray,
+    scanRespPayload: ByteArray,
     onStartSuccess: () -> Unit,
     onStartFailure: (Int) -> Unit
   ) {
@@ -54,8 +54,8 @@ class Advertiser(
     onAdvStartFailureCallback = onStartFailure
     advertiser.startAdvertising(
       getSettings(),
-      advertiseData(serviceUUID, advPayload.toByteArray(), true),
-      advertiseData(scanRespUUID, scanRespPayload.toByteArray(), false),
+      advertiseData(serviceUUID, advPayload, true),
+      advertiseData(scanRespUUID, scanRespPayload, false),
       advertiseCallbackImpl
     )
   }

@@ -25,12 +25,14 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
-    return "{\"cid\":\"ilB8l\",\"pk\":\"${verifier.generateKeyPair()}\"}"
+    verifier.generateKeyPair()
+    val payload = verifier.getAdvIdentifier("OVPMOSIP");
+    return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParametersDebug(): String {
-    return verifier.generateKeyPair()
+    return getConnectionParameters()
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -38,7 +40,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     Log.d(LOG_TAG, "setConnectionParameters called with $params")
 
     //TODO: Confirm the params structure(Assuming it to be Verifier PK)
-    return wallet.setVerifierKey(params)
+    return wallet.setAdvIdentifier(params)
   }
 
   @ReactMethod

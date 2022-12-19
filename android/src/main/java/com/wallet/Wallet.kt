@@ -17,7 +17,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   private val logTag = "Wallet"
   private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97984"
   private var IV: String = "DUMMY"
-  private lateinit var walletPk: String;
+  private lateinit var advIdentifier: String;
   private var central: Central
   private val maxMTU = 517
 
@@ -110,8 +110,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier dummy\"}")
   }
 
-  fun setVerifierKey(walletPk: String) {
-    this.walletPk = walletPk
+  fun setAdvIdentifier(advIdentifier: String) {
+    this.advIdentifier = advIdentifier
   }
 
 }

@@ -6,17 +6,24 @@ import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
 import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.Peripheral
+import com.cryptography.SecretsTranslator
+import com.cryptography.VerifierCryptoBox
+import com.cryptography.VerifierCryptoBoxBuilder
+import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
 import com.verifier.transfer.ITransferListener
 import com.verifier.transfer.TransferHandler
 import com.verifier.transfer.message.*
+import java.security.SecureRandom
 import java.util.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class Verifier(context: Context, private val responseListener: (String, String) -> Unit) :
   IPeripheralListener, ITransferListener {
+  private var secretsTranslator: SecretsTranslator? = null;
   private val logTag = "Verifier"
-  private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
+//  private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
+  private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: String
   private lateinit var iv: String
   private var peripheral: Peripheral
@@ -46,8 +53,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     transferHandler = TransferHandler(handlerThread.looper, peripheral, SERVICE_UUID)
   }
 
-  fun generateKeyPair(): String {
-    return publicKey
+  fun generateKeyPair() {
+    // DOUBT: Should it be generated each time?
+    val sr = SecureRandom()
+    val vcb: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(sr)
+    publicKey = vcb.publicKey()
   }
 
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
@@ -160,11 +170,17 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     responseReceivedCallback?.let { it() }
   }
 
-  private fun getAdvPayload(advIdentifier: String): String {
-    return advIdentifier + "_" + publicKey.substring(0, 5)
+  public fun getAdvIdentifier(identifier: String): String {
+    // 5 bytes, since it's in hex it'd be twice
+    return "${identifier}_${Hex.encodeHex(publicKey.copyOfRange(0,5), false)}"
   }
 
-  private fun getScanRespPayload(): String {
-    return publicKey.substring(5, 32)
+  private fun getAdvPayload(advIdentifier: String): ByteArray {
+    // 5 bytes, since it's in hex it'd be twice
+    return advIdentifier.toByteArray() + "_".toByte() + publicKey.copyOfRange(0,5)
+  }
+
+  private fun getScanRespPayload(): ByteArray {
+    return publicKey.copyOfRange(5, 32) // should contain 27 bytes
   }
 }
