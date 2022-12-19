@@ -124,7 +124,7 @@ class GattClient(var context: Context) {
     device: BluetoothDevice,
     serviceUuid: UUID,
     charUUID: UUID,
-    data: String,
+    data: ByteArray,
     onSuccess: (BluetoothDevice, UUID) -> Unit,
     onFailed: (BluetoothDevice, UUID, Int) -> Unit
   ) {
@@ -135,7 +135,7 @@ class GattClient(var context: Context) {
 
     val service = bluetoothGatt?.getService(serviceUuid)
     val writeChar = service?.getCharacteristic(charUUID)
-    writeChar?.value = data.toByteArray()
+    writeChar?.value = data
     writeChar?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
     val status = bluetoothGatt?.writeCharacteristic(writeChar)
 

@@ -7,16 +7,22 @@ import android.os.ParcelUuid
 import android.util.Log
 import com.ble.central.Central
 import com.ble.central.ICentralListener
+import com.cryptography.SecretsTranslator
+import com.cryptography.WalletCryptoBoxBuilder
+import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
 import com.verifier.GattService
 import com.verifier.Verifier
+import java.security.SecureRandom
 import java.util.*
 
-
 class Wallet(context: Context, private val responseListener: (String, String) -> Unit) : ICentralListener {
+  private lateinit var verifierPK: ByteArray
+  private lateinit var buildSecretsTranslator: SecretsTranslator
   private val logTag = "Wallet"
-  private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97984"
-  private var iv: String = "012345678901"
+  private lateinit var iv: ByteArray;
+  private val walletCipherBox = WalletCryptoBoxBuilder.build(SecureRandom())
+  private val publicKey = walletCipherBox.publicKey()
   private lateinit var advIdentifier: String;
   private var central: Central
   private val maxMTU = 517
@@ -32,7 +38,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   fun generateKeyPair(): String {
-    return publicKey
+    return publicKey.toString()
   }
 
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
@@ -45,7 +51,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   fun writeIdentity() {
-    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,"${iv}$publicKey")
+    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,iv+publicKey)
+    Log.d(logTag, "Public Key of wallet: ${Hex.encodeHex(publicKey, false)}")
   }
 
   override fun onScanStartedFailed(errorCode: Int) {
@@ -53,19 +60,44 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))?.decodeToString()
-    val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))?.decodeToString()
+    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+    val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
-    Log.d(logTag, "onDeviceFound with advPayload: ${advertisementPayload}, scanPayload: ${scanResponsePayload},")
-    val firstPartOfPK = advertisementPayload?.split("_", limit = 2)?.get(1)
-    val verifierPK = firstPartOfPK + scanResponsePayload
+    //TODO: Handle multiple calls while connecting
+    if(advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+      Log.d(logTag, "Stopping the scan.")
+      central.stopScan()
 
-    central.stopScan()
-    central.connect(device)
+      setVerifierPK(advertisementPayload, scanResponsePayload)
+      central.connect(device)
+    } else {
+      Log.d(
+        logTag,
+        "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
+      )
+    }
+  }
+
+  private fun setVerifierPK(advertisementPayload: ByteArray, scanResponsePayload: ByteArray) {
+    val first5BytesOfPkFromBLE = advertisementPayload.takeLast(5).toByteArray()
+    this.verifierPK = first5BytesOfPkFromBLE + scanResponsePayload
+
+    Log.d(logTag, "Public Key of Verifier: ${Hex.encodeHex(verifierPK, false)}")
+  }
+
+  private fun isSameAdvIdentifier(advertisementPayload: ByteArray): Boolean {
+    val first5BytesOfPk = advIdentifier.split("_", limit = 2)[1]
+    val first5BytesOfPkFromBLE = advertisementPayload.takeLast(5).toByteArray()
+
+    //Not matching due to size. advIdentifier has 5 size and advPayload has size of 9
+    return Hex.decodeHex(first5BytesOfPk) contentEquals first5BytesOfPkFromBLE
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
     Log.d(logTag, "onDeviceConnected")
+
+    buildSecretsTranslator = walletCipherBox.buildSecretsTranslator(verifierPK)
+    iv = buildSecretsTranslator.initializationVector()
 
     central.discoverServices()
   }
@@ -115,3 +147,14 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
 }
+
+//
+//V ->
+//Verifier: A695D3 055C4D5C5C3C396635AB18A3543AE893C86E6636B69B7E0D2726E36224
+//wallet pub key: 11D61C37EC58B3ED2C0C0711A39A208FB9B09940574CA944FAD445A6F2D78710
+//
+//  W ->
+//
+//Verifier -> EFBFBDEFBFBDEFBFBD 055C4D5C5C3C396635AB18A3543AE893C86E6636B69B7E0D2726E36224
+//W -> 11D61C37EC58B3ED2C0C0711A39A208FB9B09940574CA944FAD445A6F2D78710
+//

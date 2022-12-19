@@ -33,7 +33,7 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(connectDeviceMessage)
   }
 
-  fun write(serviceUuid: UUID, charUUID: UUID, data: String) {
+  fun write(serviceUuid: UUID, charUUID: UUID, data: ByteArray) {
     val writeMessage = WriteMessage(serviceUuid, charUUID, data)
 
     messageSender.sendMessage(writeMessage)

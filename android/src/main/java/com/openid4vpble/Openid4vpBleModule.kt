@@ -5,7 +5,7 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import com.verifier.Verifier
 import com.wallet.Wallet
-
+import org.json.JSONObject
 
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -37,10 +37,11 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
-    Log.d(LOG_TAG, "setConnectionParameters called with $params")
+    val paramsObj = JSONObject(params)
+    val firstPartOfPk = paramsObj.getString("pk")
+    Log.d(LOG_TAG, "setConnectionParameters called with $params and $firstPartOfPk")
 
-    //TODO: Confirm the params structure(Assuming it to be Verifier PK)
-    return wallet.setAdvIdentifier(params)
+    return wallet.setAdvIdentifier(firstPartOfPk)
   }
 
   @ReactMethod

@@ -25,7 +25,7 @@ class Scanner(context: Context) {
 
   private val leScanCallback: ScanCallback = object : ScanCallback() {
     override fun onScanResult(callbackType: Int, result: ScanResult) {
-      Log.i("BLE Central", "Found the device: $result. The bytes are: ${result.scanRecord?.bytes?.toUByteArray()}")
+      Log.i("BLE Central", "Found the device: $result. The bytes are: ${result.scanRecord?.bytes}")
 
       onDeviceFound(result)
     }

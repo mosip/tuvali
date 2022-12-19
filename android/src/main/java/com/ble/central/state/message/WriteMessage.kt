@@ -5,5 +5,5 @@ import java.util.*
 class WriteMessage(
   val serviceUUID: UUID,
   val charUUID: UUID,
-  val data: String
+  val data: ByteArray
 ) : IMessage(CentralStates.WRITE)
