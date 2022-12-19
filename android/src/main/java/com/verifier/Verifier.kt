@@ -22,7 +22,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
   private val logTag = "Verifier"
-//  private var publicKey: String = "b0f8980279d4df9f383bfd6e990b45c5fcba1c4fbef76c27b9141dff50b97983"
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: String
   private lateinit var iv: String
@@ -170,14 +169,14 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     responseReceivedCallback?.let { it() }
   }
 
-  public fun getAdvIdentifier(identifier: String): String {
+  fun getAdvIdentifier(identifier: String): String {
     // 5 bytes, since it's in hex it'd be twice
     return "${identifier}_${Hex.encodeHex(publicKey.copyOfRange(0,5), false)}"
   }
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {
     // 5 bytes, since it's in hex it'd be twice
-    return advIdentifier.toByteArray() + "_".toByte() + publicKey.copyOfRange(0,5)
+    return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0,5)
   }
 
   private fun getScanRespPayload(): ByteArray {
