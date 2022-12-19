@@ -2,6 +2,7 @@ package com.ble.central.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
+import android.bluetooth.BluetoothGatt.GATT_FAILURE
 import android.content.Context
 import android.util.Log
 import java.util.*
@@ -13,6 +14,7 @@ class GattClient(var context: Context) {
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit;
   private var peripheral: BluetoothDevice? = null;
   private var bluetoothGatt: BluetoothGatt? = null;
+  private val logTag = "BLECentral"
 
   private val bluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onCharacteristicWrite(
@@ -20,15 +22,17 @@ class GattClient(var context: Context) {
       characteristic: BluetoothGattCharacteristic?,
       status: Int
     ) {
-      Log.i("BLE Central", "Status of write is $status for ${characteristic?.uuid}")
+      Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}")
 
       if(status != BluetoothGatt.GATT_SUCCESS) {
-        Log.i("BLE Central", "\"Failed to send message to peripheral")
+        Log.i(logTag, "\"Failed to send message to peripheral")
 
         peripheral?.let {
           characteristic?.uuid?.let {
               uuid -> onWriteFailed(it, uuid, status)
           } }
+
+        return
       }
 
       peripheral?.let {
@@ -41,33 +45,33 @@ class GattClient(var context: Context) {
       super.onMtuChanged(gatt, mtu, status)
       peripheral?.let { onDeviceConnected(it) }
 
-      Log.i("BLE Central", "BLE: Successfully changed mtu size: $mtu")
+      Log.i(logTag, "Successfully changed mtu size: $mtu")
     }
 
     @SuppressLint("MissingPermission")
     override fun onServicesDiscovered(gatt: BluetoothGatt?, status: Int) {
       super.onServicesDiscovered(gatt, status)
       if (status != BluetoothGatt.GATT_SUCCESS) {
-        Log.e("BLE Central", "BLE: Failed to discover services")
+        Log.e(logTag, "Failed to discover services")
         return
       }
 
       val success = gatt?.requestMtu(517)
 
       if (success == false) {
-        Log.i("BLE Central", "BLE: Failed to request MTU change")
+        Log.i(logTag, "Failed to request MTU change")
       }
 
-      Log.i("BLE Central", "BLE: discovered services: ${gatt?.services?.map { it.uuid }}")
+      Log.i(logTag, "discovered services: ${gatt?.services?.map { it.uuid }}")
     }
 
     @SuppressLint("MissingPermission")
     override fun onConnectionStateChange(gatt: BluetoothGatt?, status: Int, newState: Int) {
       if (newState == BluetoothProfile.STATE_CONNECTED) {
-        Log.i("BLE Central", "BLE: Connected to the peripheral")
+        Log.i(logTag, "Connected to the peripheral")
         gatt?.discoverServices()
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-        Log.i("BLE Central", "BLE: Disconnected from the peripheral")
+        Log.i(logTag, "Disconnected from the peripheral")
         closeConnection()
 
         peripheral = null;
@@ -91,7 +95,7 @@ class GattClient(var context: Context) {
     onDeviceConnected: (BluetoothDevice) -> Unit,
     onDeviceDisconnected: (BluetoothDevice) -> Unit
   ) {
-    Log.i("BLE Central", "calling connect to ble peripheral")
+    Log.i(logTag, "Initiating connect to ble peripheral")
 
     this.onDeviceConnected = onDeviceConnected;
     this.onDeviceDisconnected = onDeviceDisconnected;
@@ -118,8 +122,9 @@ class GattClient(var context: Context) {
     onFailed: (BluetoothDevice, UUID, Int) -> Unit
   ) {
     if(bluetoothGatt == null){
-        return onFailed(device, charUUID, 1)
+        return onFailed(device, charUUID, GATT_FAILURE)
     }
+    Log.i(logTag, "Initiating write to peripheral char: $charUUID")
 
     val service = bluetoothGatt?.getService(serviceUuid)
     val writeChar = service?.getCharacteristic(charUUID)
@@ -128,7 +133,7 @@ class GattClient(var context: Context) {
     val status = bluetoothGatt?.writeCharacteristic(writeChar)
 
     if (status == false) {
-      return onFailed(device, charUUID, 1)
+      return onFailed(device, charUUID, GATT_FAILURE)
     }
 
     this.onWriteSuccess = onSuccess

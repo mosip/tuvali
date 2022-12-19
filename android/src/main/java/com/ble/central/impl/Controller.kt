@@ -3,10 +3,8 @@ package com.ble.central.impl
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
 import android.content.Context
-import android.util.Log
 import com.ble.central.state.IMessageSender
 import com.ble.central.state.message.*
-import com.openid4vpble.Openid4vpBleModule
 import java.util.UUID
 
 class Controller(context: Context) {
@@ -24,8 +22,6 @@ class Controller(context: Context) {
   }
 
   fun scan(scanStartMessage: ScanStartMessage) {
-    Log.d(Openid4vpBleModule.LOG_TAG, "BLE: starting scan")
-
     scanner.start(
       scanStartMessage.serviceUUID,
       scanStartMessage.advPayload,
@@ -36,8 +32,6 @@ class Controller(context: Context) {
 
   @SuppressLint("MissingPermission")
   fun connect(device: BluetoothDevice) {
-    Log.d(Openid4vpBleModule.LOG_TAG, "BLE: Connecting to device: ${device.name}", )
-
     gattClient.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
   }
 
@@ -59,8 +53,6 @@ class Controller(context: Context) {
 
   private fun onDeviceFound(device: BluetoothDevice) {
     val deviceFoundMessage = DeviceFoundMessage(device)
-    Log.d(Openid4vpBleModule.LOG_TAG, "Sent message to on device found" )
-
     messageSender.sendMessage(deviceFoundMessage)
   }
 
