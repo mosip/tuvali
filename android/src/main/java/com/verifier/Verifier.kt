@@ -49,7 +49,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     peripheral = Peripheral(context, this@Verifier)
     val gattService = GattService()
     peripheral.setupService(gattService.create())
-    transferHandler = TransferHandler(handlerThread.looper, peripheral, SERVICE_UUID)
+    transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
   fun generateKeyPair() {
@@ -113,18 +113,25 @@ class Verifier(context: Context, private val responseListener: (String, String) 
         }
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
-        val semaphoreValue = value.toString().toInt()
-        val chunkReadByRemoteStatusUpdatedMessage =
-          ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
-        transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+        value?.let {
+          val semaphoreValue = String(value).toInt()
+          val chunkReadByRemoteStatusUpdatedMessage =
+            ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
+          transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+        }
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
-        val responseSize = value.toString().toInt()
-        val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
-        transferHandler.sendMessage(responseSizeReadSuccessMessage)
+        value?.let {
+          Log.d(logTag, "received response size on characteristic value: ${String(value)}")
+          val responseSize: Int = String(value).toInt()
+          Log.d(logTag, "received response size on characteristic: $responseSize")
+          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
+          transferHandler.sendMessage(responseSizeReadSuccessMessage)
+        }
       }
       GattService.RESPONSE_CHAR_UUID -> {
         if (value != null) {
+          Log.d(logTag, "received response chunk on characteristic: $value")
           transferHandler.sendMessage(ResponseChunkReadMessage(value.toUByteArray()))
         }
       }

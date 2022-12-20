@@ -13,7 +13,7 @@ import com.verifier.transfer.message.*
 import java.util.*
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class TransferHandler(looper: Looper, private val peripheral: Peripheral, val serviceUUID: UUID) : Handler(looper) {
+class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = "TransferHandler"
   enum class States {
     UnInitialised,
@@ -122,10 +122,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, val se
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         // TODO: Let higher layer know
+        Log.d(logTag, "handleMessage: response transfer complete")
         currentState = States.TransferComplete
+
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
         // TODO: Let higher layer know
+        Log.d(logTag, "handleMessage: response transfer failed")
         currentState = States.ResponseReadFailed
       }
     }

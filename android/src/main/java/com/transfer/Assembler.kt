@@ -1,9 +1,11 @@
 package com.transfer
 
+import android.util.Log
 import com.verifier.exception.CorruptedChunkReceivedException
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class Assembler(private val totalSize: Int) {
+  private val logTag = "Assembler"
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2
   private val chunkMetaSize = seqNumberReservedByteSize + mtuReservedByteSize
@@ -18,6 +20,7 @@ class Assembler(private val totalSize: Int) {
   }
 
   fun addChunk(chunkData: UByteArray) {
+    Log.d(logTag, "received add chunk: $chunkData")
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
@@ -33,7 +36,7 @@ class Assembler(private val totalSize: Int) {
       lastReadSeqNumber = seqNumber
     }
     chunkCount++
-    data.plus(
+    data = data.plus(
       chunkData.copyOfRange(
         chunkMetaSize,
         chunkData.size
@@ -42,6 +45,7 @@ class Assembler(private val totalSize: Int) {
   }
 
   fun isComplete(): Boolean {
+    Log.d(logTag, "assembler isComplete: ${data.size == totalSize}")
     return data.size == totalSize
   }
 
