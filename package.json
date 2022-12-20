@@ -150,6 +150,13 @@
         {
           "project": "tsconfig.build.json"
         }
+      ],
+      [
+        "aar",
+        {
+          "reverseJetify": true,
+          "androidBundleName": "android-debug.aar"
+        }
       ]
     ]
   }
