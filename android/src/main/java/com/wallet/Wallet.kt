@@ -81,7 +81,10 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   private fun isSameAdvIdentifier(advertisementPayload: ByteArray): Boolean {
-    return Hex.decodeHex(this.advIdentifier) contentEquals advertisementPayload
+    this.advIdentifier?.let {
+      return Hex.decodeHex(it) contentEquals advertisementPayload
+    }
+    return false
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
