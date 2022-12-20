@@ -78,7 +78,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onAdvertisementStartSuccessful() {
     Log.d(logTag, "onAdvertisementStartSuccess")
     val successCallback = callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK]
-    successCallback?.let { it() }
+    successCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.ADV_SUCCESS_CALLBACK)
+    }
   }
 
   override fun onAdvertisementStartFailed(errorCode: Int) {
@@ -87,36 +90,44 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
-        GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-          value?.let {
-            // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
-            if (value.size < 12 + 32) {
-              return
-            }
-            iv = value.copyOfRange(0, 12)
-            walletPubKey = value.copyOfRange(12, 12 + 32)
-            Log.i(logTag, "received wallet iv: ${Hex.encodeHex(iv, false)}, wallet pub key: ${Hex.encodeHex(walletPubKey, false)}")
-            // TODO: Validate pub key, how to handle if not valid?
-            responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
-            peripheral.enableCommunication()
+      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+        value?.let {
+          // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
+          if (value.size < 12 + 32) {
+            return
           }
+          iv = value.copyOfRange(0, 12)
+          walletPubKey = value.copyOfRange(12, 12 + 32)
+          Log.i(
+            logTag,
+            "received wallet iv: ${Hex.encodeHex(iv, false)}, wallet pub key: ${
+              Hex.encodeHex(
+                walletPubKey,
+                false
+              )
+            }"
+          )
+          // TODO: Validate pub key, how to handle if not valid?
+          responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
+          peripheral.enableCommunication()
         }
-        GattService.SEMAPHORE_CHAR_UUID -> {
-          val semaphoreValue = value.toString().toInt()
-          val chunkReadByRemoteStatusUpdatedMessage =
-            ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
-          transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+      }
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        val semaphoreValue = value.toString().toInt()
+        val chunkReadByRemoteStatusUpdatedMessage =
+          ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
+        transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+      }
+      GattService.RESPONSE_SIZE_CHAR_UUID -> {
+        val responseSize = value.toString().toInt()
+        val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
+        transferHandler.sendMessage(responseSizeReadSuccessMessage)
+      }
+      GattService.RESPONSE_CHAR_UUID -> {
+        if (value != null) {
+          transferHandler.sendMessage(ResponseChunkReadMessage(value.toUByteArray()))
         }
-        GattService.RESPONSE_SIZE_CHAR_UUID -> {
-          val responseSize = value.toString().toInt()
-          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
-          transferHandler.sendMessage(responseSizeReadSuccessMessage)
-        }
-        GattService.RESPONSE_CHAR_UUID -> {
-          if (value != null) {
-            transferHandler.sendMessage(ResponseChunkReadMessage(value.toUByteArray()))
-          }
-        }
+      }
     }
   }
 
@@ -140,7 +151,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
             transferHandler.sendMessage(RequestSizeWriteFailedMessage("notifying request size write to remote failed"))
           }
         } else {
-          Log.e(logTag, "onSendDataSuccessful: on unknown state of transfer handler: ${transferHandler.getCurrentState()}")
+          Log.e(
+            logTag,
+            "onSendDataSuccessful: on unknown state of transfer handler: ${transferHandler.getCurrentState()}"
+          )
         }
       }
       GattService.REQUEST_CHAR_UUID -> {
@@ -165,17 +179,20 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onResponseReceived(data: UByteArray) {
     Log.d(logTag, "onResponseReceived data: $data")
     val responseReceivedCallback = callbacks[PeripheralCallbacks.RESPONSE_RECEIVED_CALLBACK]
-    responseReceivedCallback?.let { it() }
+    responseReceivedCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.RESPONSE_RECEIVED_CALLBACK)
+    }
   }
 
   fun getAdvIdentifier(identifier: String): String {
     // 5 bytes, since it's in hex it'd be twice
-    return Hex.encodeHex("${identifier}_".toByteArray() + publicKey.copyOfRange(0,5), false)
+    return Hex.encodeHex("${identifier}_".toByteArray() + publicKey.copyOfRange(0, 5), false)
   }
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {
     // Readable Identifier from higher layer + _ + first 5 bytes of public key
-    return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0,5)
+    return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0, 5)
   }
 
   private fun getScanRespPayload(): ByteArray {

@@ -42,9 +42,9 @@ class Controller(context: Context) {
       sendDataMessage.charUUID,
       sendDataMessage.data
     )
-    val sendDataTriggeredMessage =
+    val sendDataNotifiedMessage =
       SendDataTriggeredMessage(sendDataMessage.charUUID, isNotificationTriggered)
-    messageSender.sendMessage(sendDataTriggeredMessage)
+    messageSender.sendMessage(sendDataNotifiedMessage)
   }
 
   private fun onServiceAdded(status: Int) {
