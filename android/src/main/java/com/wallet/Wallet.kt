@@ -23,7 +23,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   private lateinit var iv: ByteArray;
   private val walletCipherBox = WalletCryptoBoxBuilder.build(SecureRandom())
   private val publicKey = walletCipherBox.publicKey()
-  private lateinit var advIdentifier: String;
+  private var advIdentifier: String? = null;
   private var central: Central
   private val maxMTU = 517
 
@@ -43,7 +43,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
     callbacks[CentralCallbacks.CONNECTION_ESTABLISHED] = connectionEstablishedCallback
-
     central.scan(
       Verifier.SERVICE_UUID,
       advIdentifier
