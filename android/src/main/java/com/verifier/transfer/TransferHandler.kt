@@ -103,6 +103,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, val se
           assembler = Assembler(responseSizeReadSuccessMessage.responseSize)
         } catch (c: CorruptedChunkReceivedException) {
           this.sendMessage(ResponseTransferFailedMessage("Corrupted Data from Remote " + c.message.toString()))
+          return
         }
         currentState = States.ResponseReadPending
       }

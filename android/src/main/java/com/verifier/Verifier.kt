@@ -136,16 +136,20 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     Log.d(logTag, "onRead: called, does nothing")
   }
 
-  override fun onSendDataNotified(uuid: UUID, notificationTriggered: Boolean) {
+  override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.RequestWritePending) {
-          //TODO: Handle this?
+        if (transferHandler.getCurrentState() == TransferHandler.States.ResponseReadPending) {
+          if (isSent) {
+            Log.d(logTag, "Value was written to semaphore")
+          } else {
+            Log.d(logTag, "Failed to write value to semaphore")
+          }
         }
       }
       GattService.REQUEST_SIZE_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.RequestSizeWritePending) {
-          if (notificationTriggered) {
+          if (isSent) {
             transferHandler.sendMessage(RequestSizeWriteSuccessMessage())
           } else {
             transferHandler.sendMessage(RequestSizeWriteFailedMessage("notifying request size write to remote failed"))
@@ -159,7 +163,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       }
       GattService.REQUEST_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.RequestWritePending) {
-          transferHandler.sendMessage(RequestChunkWriteFailedMessage("notifying chunk write to remote failed"))
+          if (isSent) {
+            transferHandler.sendMessage(RequestChunkWriteSuccessMessage())
+          } else {
+            transferHandler.sendMessage(RequestChunkWriteFailedMessage("notifying chunk write to remote failed"))
+          }
         }
       }
     }
