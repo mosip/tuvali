@@ -170,7 +170,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   fun getAdvIdentifier(identifier: String): String {
     // 5 bytes, since it's in hex it'd be twice
-    return "${identifier}_${Hex.encodeHex(publicKey.copyOfRange(0,5), false)}"
+    return Hex.encodeHex("${identifier}_".toByteArray() + publicKey.copyOfRange(0,5), false)
   }
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {

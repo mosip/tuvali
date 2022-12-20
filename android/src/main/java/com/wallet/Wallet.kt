@@ -86,11 +86,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   private fun isSameAdvIdentifier(advertisementPayload: ByteArray): Boolean {
-    val first5BytesOfPk = advIdentifier.split("_", limit = 2)[1]
-    val first5BytesOfPkFromBLE = advertisementPayload.takeLast(5).toByteArray()
-
-    //Not matching due to size. advIdentifier has 5 size and advPayload has size of 9
-    return Hex.decodeHex(first5BytesOfPk) contentEquals first5BytesOfPkFromBLE
+    return Hex.decodeHex(this.advIdentifier) contentEquals advertisementPayload
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
