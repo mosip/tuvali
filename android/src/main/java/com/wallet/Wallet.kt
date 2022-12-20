@@ -37,10 +37,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     central = Central(context, this@Wallet)
   }
 
-  fun generateKeyPair(): String {
-    return publicKey.toString()
-  }
-
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
     callbacks[CentralCallbacks.CONNECTION_ESTABLISHED] = connectionEstablishedCallback
     central.scan(

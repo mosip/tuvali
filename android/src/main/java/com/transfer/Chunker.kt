@@ -1,4 +1,4 @@
-package com.verifier.transfer
+package com.transfer
 
 import kotlin.math.ceil
 

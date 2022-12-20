@@ -1,4 +1,4 @@
-package com.verifier.transfer
+package com.transfer
 
 import com.verifier.exception.CorruptedChunkReceivedException
 

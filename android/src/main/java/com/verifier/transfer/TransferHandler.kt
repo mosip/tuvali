@@ -5,6 +5,8 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import com.ble.peripheral.Peripheral
+import com.transfer.Assembler
+import com.transfer.Chunker
 import com.verifier.GattService
 import com.verifier.exception.CorruptedChunkReceivedException
 import com.verifier.transfer.message.*

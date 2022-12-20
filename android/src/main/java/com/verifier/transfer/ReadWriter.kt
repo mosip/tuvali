@@ -2,6 +2,8 @@ package com.verifier.transfer
 
 import android.util.Log
 import com.ble.peripheral.Peripheral
+import com.transfer.Assembler
+import com.transfer.Chunker
 import com.verifier.GattService
 import com.verifier.exception.WriteToRemoteException
 import java.util.UUID
