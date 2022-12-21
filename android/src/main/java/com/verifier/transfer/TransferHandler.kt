@@ -121,14 +121,15 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
-        // TODO: Let higher layer know
+        val responseTransferCompleteMessage = msg.obj as ResponseTransferCompleteMessage
         Log.d(logTag, "handleMessage: response transfer complete")
+        transferListener.onResponseReceived(responseTransferCompleteMessage.data)
         currentState = States.TransferComplete
-
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
-        // TODO: Let higher layer know
+        val responseTransferFailedMessage = msg.obj as ResponseTransferFailedMessage
         Log.d(logTag, "handleMessage: response transfer failed")
+        transferListener.onResponseReceivedFailed(responseTransferFailedMessage.errorMsg)
         currentState = States.ResponseReadFailed
       }
     }
@@ -180,8 +181,12 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
     assembler?.addChunk(chunkData)
     this.sendMessage(UpdateChunkReceivedStatusToRemoteMessage(SemaphoreMarker.ProcessChunkComplete.ordinal))
+
     if (assembler?.isComplete() == true) {
-      this.sendMessage(ResponseTransferCompleteMessage())
+      if (assembler?.data() == null){
+        return this.sendMessage(ResponseTransferFailedMessage("assembler is complete data is null"))
+      }
+      this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
     }
   }
 

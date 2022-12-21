@@ -39,7 +39,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     ADV_SUCCESS_CALLBACK,
     ADV_FAILURE_CALLBACK,
     DEVICE_CONNECTED_CALLBACK,
-    RESPONSE_RECEIVED_CALLBACK
+    RESPONSE_RECEIVE_SUCCESS_CALLBACK,
+    RESPONSE_RECEIVED_FAILED_CALLBACK
   }
 
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
@@ -71,7 +72,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   fun sendRequest(request: String, responseReceivedCallback: Callback) {
-    callbacks[PeripheralCallbacks.RESPONSE_RECEIVED_CALLBACK] = responseReceivedCallback
+    callbacks[PeripheralCallbacks.RESPONSE_RECEIVE_SUCCESS_CALLBACK] = responseReceivedCallback
     transferHandler.sendMessage(InitTransferMessage(request.toByteArray().toUByteArray()))
   }
 
@@ -193,11 +194,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onResponseReceived(data: UByteArray) {
     Log.d(logTag, "onResponseReceived data: $data")
-    val responseReceivedCallback = callbacks[PeripheralCallbacks.RESPONSE_RECEIVED_CALLBACK]
-    responseReceivedCallback?.let {
-      it()
-      callbacks.remove(PeripheralCallbacks.RESPONSE_RECEIVED_CALLBACK)
-    }
+    responseListener("send-vc", "{\"vc\": \"${String(data.toByteArray())}\"}")
+  }
+
+  override fun onResponseReceivedFailed(errorMsg: String) {
+    Log.d(logTag, "onResponseReceiveFailed errorMsg: $errorMsg")
   }
 
   fun getAdvIdentifier(identifier: String): String {

@@ -158,13 +158,12 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
     when (charUUID) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-        responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier dummy\"}")
+        responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
       }
     }
-
   }
 
   fun setAdvIdentifier(advIdentifier: String) {

@@ -1,3 +1,4 @@
 package com.verifier.transfer.message
 
-class ResponseTransferCompleteMessage(): IMessage(TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE) {}
+@OptIn(ExperimentalUnsignedTypes::class)
+class ResponseTransferCompleteMessage(val data: UByteArray) : IMessage(TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE) {}
