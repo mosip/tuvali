@@ -48,6 +48,10 @@ class Controller(context: Context) {
     }
   }
 
+  fun read(readMessage: ReadMessage) {
+    gattClient.read(readMessage.serviceUUID, readMessage.charUUID, this::onReadSuccess, this::onReadFailed)
+  }
+
   fun discoverServices() {
     gattClient.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
   }
@@ -62,6 +66,18 @@ class Controller(context: Context) {
 
   private fun onRequestMTUFailure(errorCode: Int) {
     messageSender.sendMessage(RequestMTUFailureMessage(errorCode))
+  }
+
+  private fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
+    val readSuccessMessage = ReadSuccessMessage(charUUID, value)
+
+    messageSender.sendMessage(readSuccessMessage)
+  }
+
+  private fun onReadFailed(charUUID: UUID?, errorCode: Int) {
+    val failedMessage = ReadFailedMessage(charUUID, errorCode)
+
+    messageSender.sendMessage(failedMessage)
   }
 
   private fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {

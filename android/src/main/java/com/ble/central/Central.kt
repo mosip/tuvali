@@ -39,6 +39,12 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(writeMessage)
   }
 
+  fun read(serviceUuid: UUID, charUUID: UUID, data: ByteArray) {
+    val readMessage = ReadMessage(serviceUuid, charUUID)
+
+    messageSender.sendMessage(readMessage)
+  }
+
   fun discoverServices() {
     messageSender.sendMessage(DiscoverServicesMessage())
   }

@@ -9,6 +9,8 @@ import android.util.Log
 import java.util.*
 
 class GattClient(var context: Context) {
+  private lateinit var onReadSuccess: (UUID, ByteArray?) -> Unit
+  private lateinit var onReadFailure: (UUID?, Int) -> Unit
   private lateinit var onRequestMTUSuccess: (mtu: Int) -> Unit
   private lateinit var onRequestMTUFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscoveryFailure: (err: Int) -> Unit
@@ -46,11 +48,26 @@ class GattClient(var context: Context) {
       }
     }
 
+    override fun onCharacteristicRead(
+      gatt: BluetoothGatt?,
+      characteristic: BluetoothGattCharacteristic?,
+      status: Int
+    ) {
+      super.onCharacteristicRead(gatt, characteristic, status)
+
+      if(status == GATT_SUCCESS && characteristic != null) {
+        onReadSuccess(characteristic.uuid, characteristic.value)
+        Log.i(logTag, "Successfully read char: : ${characteristic.uuid}")
+      } else {
+        onReadFailure(characteristic?.uuid, status)
+        Log.i(logTag, "Failed to read char: : ${characteristic?.uuid}")
+      }
+    }
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
 
       if(status == GATT_SUCCESS) {
-         onRequestMTUSuccess(mtu)
+        onRequestMTUSuccess(mtu)
         Log.i(logTag, "Successfully changed mtu size: $mtu")
       } else {
         onRequestMTUFailure(status)
@@ -165,5 +182,26 @@ class GattClient(var context: Context) {
       onFailure(GATT_FAILURE)
     }
 
+  }
+
+  @SuppressLint("MissingPermission")
+  fun read(
+    serviceUUID: UUID,
+    charUUID: UUID,
+    onSuccess: (UUID, ByteArray?) -> Unit,
+    onFailure: (UUID?, Int) -> Unit
+  ): Boolean {
+    this.onReadSuccess = onSuccess
+    this.onReadFailure = onFailure
+
+    try {
+      val service = bluetoothGatt!!.getService(serviceUUID)
+      val characteristic = service.getCharacteristic(charUUID)
+      bluetoothGatt!!.readCharacteristic(characteristic)
+    } catch(e: Error) {
+      return false
+    }
+
+    return true
   }
 }

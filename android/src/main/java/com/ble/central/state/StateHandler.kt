@@ -26,6 +26,7 @@ class StateHandler(
     DiscoveringServices,
     RequestingMTU,
     Writing,
+    Reading
   }
 
   @SuppressLint("MissingPermission")
@@ -129,6 +130,27 @@ class StateHandler(
         Log.d(logTag, "write failed for ${writeFailedMessage.charUUID} due to ${writeFailedMessage.err}")
         listener.onWriteFailed(writeFailedMessage.device, writeFailedMessage.charUUID, writeFailedMessage.err)
         currentState = States.Connected
+      }
+      IMessage.CentralStates.READ.ordinal -> {
+        val readMessage = msg.obj as ReadMessage
+        Log.d(logTag, "starting read from ${readMessage.charUUID}")
+
+        controller.read(readMessage)
+        currentState = States.Reading
+      }
+      IMessage.CentralStates.READ_SUCCESS.ordinal -> {
+        val readSuccessMessage = msg.obj as ReadSuccessMessage
+        Log.d(logTag, "Read successfully from ${readSuccessMessage.charUUID} and value${readSuccessMessage.value}")
+
+        listener.onReadSuccess(readSuccessMessage.charUUID, readSuccessMessage.value)
+        currentState = States.Reading
+      }
+      IMessage.CentralStates.READ_FAILED.ordinal -> {
+        val readFailedMessage = msg.obj as ReadFailedMessage
+        Log.d(logTag, "Read failed for ${readFailedMessage.charUUID} with err: ${readFailedMessage.err}")
+
+        listener.onReadFailure(readFailedMessage.charUUID, readFailedMessage.err)
+        currentState = States.Reading
       }
     }
   }

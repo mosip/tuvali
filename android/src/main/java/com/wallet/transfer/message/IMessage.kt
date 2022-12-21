@@ -1,0 +1,15 @@
+package com.wallet.transfer.message
+
+abstract class IMessage(val msgType: TransferMessageTypes) {
+  enum class TransferMessageTypes {
+    INIT_RESPONSE_TRANSFER,
+    RESPONSE_SIZE_WRITE_PENDING,
+    RESPONSE_SIZE_WRITE_SUCCESS,
+    RESPONSE_SIZE_WRITE_FAILED,
+    INIT_RESPONSE_CHUNK_TRANSFER,
+    CHUNK_WRITE_TO_REMOTE_STATUS_UPDATED,
+    UPDATE_CHUNK_WRITE_STATUS_TO_REMOTE,
+    RESPONSE_CHUNK_WRITE_SUCCESS,
+    RESPONSE_TRANSFER_COMPLETE
+  }
+}

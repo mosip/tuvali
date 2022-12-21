@@ -15,4 +15,6 @@ interface ICentralListener {
   fun onServicesDiscoveryFailed(errorCode: Int)
   fun onRequestMTUSuccess(mtu: Int)
   fun onRequestMTUFailure(errorCode: Int)
+  fun onReadSuccess(charUUID: UUID, value: ByteArray?)
+  fun onReadFailure(charUUID: UUID?, err: Int)
 }

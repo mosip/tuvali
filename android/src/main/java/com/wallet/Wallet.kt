@@ -3,7 +3,9 @@ package com.wallet
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanRecord
 import android.content.Context
+import android.os.HandlerThread
 import android.os.ParcelUuid
+import android.os.Process
 import android.util.Log
 import com.ble.central.Central
 import com.ble.central.ICentralListener
@@ -13,6 +15,9 @@ import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
 import com.verifier.GattService
 import com.verifier.Verifier
+import com.wallet.transfer.TransferHandler
+import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
+import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
 import java.security.SecureRandom
 import java.util.*
 
@@ -24,6 +29,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   private val walletCipherBox = WalletCryptoBoxBuilder.build(SecureRandom())
   private val publicKey = walletCipherBox.publicKey()
   private var advIdentifier: String? = null;
+  private var transferHandler: TransferHandler
+  private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
   private var central: Central
   private val maxMTU = 517
 
@@ -35,6 +42,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   init {
     central = Central(context, this@Wallet)
+    handlerThread.start()
+    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID)
   }
 
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
@@ -122,6 +131,20 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     //TODO: Handle onRequest MTU failure
   }
 
+  override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
+    Log.d(logTag, "Read to $charUUID successfully")
+
+    when(charUUID) {
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(value.toString().toInt()))
+      }
+    }
+  }
+
+  override fun onReadFailure(charUUID: UUID?, err: Int) {
+    // TODO("Not yet implemented")
+  }
+
   override fun onDeviceDisconnected() {
     //TODO Handle Disconnect
   }
@@ -133,7 +156,15 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
 
-    responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier dummy\"}")
+    when (charUUID) {
+      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+        responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier dummy\"}")
+      }
+      GattService.RESPONSE_SIZE_CHAR_UUID -> {
+        transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
+      }
+    }
+
   }
 
   fun setAdvIdentifier(advIdentifier: String) {
