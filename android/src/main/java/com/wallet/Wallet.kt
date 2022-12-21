@@ -17,6 +17,7 @@ import com.verifier.GattService
 import com.verifier.Verifier
 import com.wallet.transfer.TransferHandler
 import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
+import com.wallet.transfer.message.InitResponseTransferMessage
 import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
 import java.security.SecureRandom
 import java.util.*
@@ -136,7 +137,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
     when(charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(value.toString().toInt()))
+        if (value != null && value.isNotEmpty()) {
+          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(value[0].toInt()))
+        }
       }
     }
   }
@@ -155,7 +158,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
-
     when (charUUID) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
         responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
@@ -170,6 +172,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     this.advIdentifier = advIdentifier
   }
 
+  fun sendData(vcData: String) {
+    transferHandler.sendMessage(InitResponseTransferMessage(vcData.toByteArray()))
+  }
 }
 
 //

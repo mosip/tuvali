@@ -24,8 +24,8 @@ class Assembler(private val totalSize: Int) {
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
-    val seqNumber = bytesToInt(chunkData.copyOfRange(0, 2))
-    val mtuSize = bytesToInt(chunkData.copyOfRange(2, 4))
+    val seqNumber = twoBytesToInt(chunkData.copyOfRange(0, 2))
+    val mtuSize = twoBytesToInt(chunkData.copyOfRange(2, 4))
     if (chunkData.size > mtuSize) {
       throw CorruptedChunkReceivedException(chunkData.size, seqNumber, mtuSize)
     }
@@ -53,7 +53,10 @@ class Assembler(private val totalSize: Int) {
     return data
   }
 
-  private fun bytesToInt(num: UByteArray): Int {
-    return String(num.toByteArray()).toInt()
+  private fun twoBytesToInt(num: UByteArray): Int {
+    //TODO: Document endianness here
+    val firstByte = num[0]
+    val secondByte = num[1]
+    return secondByte.toInt() + (256 * firstByte.toInt())
   }
 }

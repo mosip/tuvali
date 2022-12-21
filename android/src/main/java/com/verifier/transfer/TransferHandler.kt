@@ -7,6 +7,7 @@ import android.util.Log
 import com.ble.peripheral.Peripheral
 import com.transfer.Assembler
 import com.transfer.Chunker
+import com.transfer.Semaphore
 import com.verifier.GattService
 import com.verifier.exception.CorruptedChunkReceivedException
 import com.verifier.transfer.message.*
@@ -26,14 +27,6 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     ResponseReadPending,
     ResponseReadFailed,
     TransferComplete
-  }
-
-  enum class SemaphoreMarker {
-    UnInitialised,
-    ProcessChunkPending,
-    ProcessChunkComplete,
-    ResendChunk,
-    Error
   }
 
   private var currentState: States = States.UnInitialised
@@ -71,16 +64,16 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       IMessage.TransferMessageTypes.CHUNK_READ_BY_REMOTE_STATUS_UPDATED.ordinal -> {
         val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
         when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
-          SemaphoreMarker.ProcessChunkPending.ordinal -> {
+          Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
             markChunkSend()
           }
-          SemaphoreMarker.ProcessChunkComplete.ordinal -> {
+          Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> {
             this.sendMessage(RequestChunkWriteSuccessMessage())
           }
-          SemaphoreMarker.ResendChunk.ordinal -> {
+          Semaphore.SemaphoreMarker.ResendChunk.ordinal -> {
             Log.d(logTag, "handleMessage: resend chunk requested")
           }
-          SemaphoreMarker.Error.ordinal -> {
+          Semaphore.SemaphoreMarker.Error.ordinal -> {
             Log.d(logTag, "handleMessage: chunk marked as error while reading by remote")
           }
         }
@@ -116,8 +109,8 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         val updateChunkReceivedStatusToRemoteMessage =
           msg.obj as UpdateChunkReceivedStatusToRemoteMessage
         when(updateChunkReceivedStatusToRemoteMessage.semaphoreCharValue) {
-          SemaphoreMarker.ProcessChunkComplete.ordinal -> markChunkReceive()
-          SemaphoreMarker.ResendChunk.ordinal -> Log.e(logTag, "receive semaphore value to re-read")
+          Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> markChunkReceive()
+          Semaphore.SemaphoreMarker.ResendChunk.ordinal -> Log.e(logTag, "receive semaphore value to re-read")
         }
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
@@ -139,7 +132,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(SemaphoreMarker.ProcessChunkPending.ordinal.toUByte())
+      ubyteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal.toUByte())
     )
   }
 
@@ -147,7 +140,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(SemaphoreMarker.ProcessChunkComplete.ordinal.toUByte())
+      ubyteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal.toUByte())
     )
   }
 
@@ -155,7 +148,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(SemaphoreMarker.UnInitialised.ordinal.toUByte())
+      ubyteArrayOf(Semaphore.SemaphoreMarker.UnInitialised.ordinal.toUByte())
     )
   }
 
@@ -171,7 +164,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         GattService.REQUEST_CHAR_UUID,
         chunkArray
       )
-      this.sendMessage(ChunkReadByRemoteStatusUpdatedMessage(SemaphoreMarker.ProcessChunkPending.ordinal))
+      this.sendMessage(ChunkReadByRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
     }
   }
 
@@ -180,7 +173,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       return
     }
     assembler?.addChunk(chunkData)
-    this.sendMessage(UpdateChunkReceivedStatusToRemoteMessage(SemaphoreMarker.ProcessChunkComplete.ordinal))
+    this.sendMessage(UpdateChunkReceivedStatusToRemoteMessage(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal))
 
     if (assembler?.isComplete() == true) {
       if (assembler?.data() == null){

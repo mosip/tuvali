@@ -66,7 +66,6 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod
   fun send(message: String, callback: Callback) {
-    // TODO: Find the mode and call send
     Log.d(LOG_TAG, "send: message $message")
     val messageSplits = message.split("\n", limit = 2)
     when(messageSplits[0]) {
@@ -76,6 +75,12 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       "exchange-sender-info" -> {
         callback()
         wallet.writeIdentity()
+      }
+      "send-vc" -> {
+        val data = JSONObject(messageSplits[1])
+        val vcData = data.getString("vc")
+        Log.d(LOG_TAG, "vc received: $vcData")
+        wallet.sendData(vcData)
       }
     }
   }
