@@ -47,7 +47,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   fun writeIdentity() {
     central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,iv+publicKey)
-    Log.d(logTag, "Public Key of wallet: ${Hex.encodeHex(publicKey, false)}")
+    Log.d(logTag, "Started to write - generated IV ${Hex.encodeHex(iv, false)}, Public Key of wallet: ${Hex.encodeHex(publicKey, false)}")
   }
 
   override fun onScanStartedFailed(errorCode: Int) {
