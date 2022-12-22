@@ -13,12 +13,14 @@ import com.cryptography.SecretsTranslator
 import com.cryptography.WalletCryptoBoxBuilder
 import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
+import com.transfer.Semaphore
 import com.verifier.GattService
 import com.verifier.Verifier
 import com.wallet.transfer.TransferHandler
 import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
 import com.wallet.transfer.message.InitResponseTransferMessage
 import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
+import java.lang.Integer.parseInt
 import java.security.SecureRandom
 import java.util.*
 
@@ -133,12 +135,14 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
-    Log.d(logTag, "Read to $charUUID successfully")
+    Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when(charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         if (value != null && value.isNotEmpty()) {
-          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(value[0].toInt()))
+          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(parseInt(Hex.encodeHex(value, false))))
+        } else {
+          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
         }
       }
     }

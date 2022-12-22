@@ -2,10 +2,10 @@ package com.ble.central.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.*
-import android.bluetooth.BluetoothGatt.GATT_FAILURE
-import android.bluetooth.BluetoothGatt.GATT_SUCCESS
+import android.bluetooth.BluetoothGatt.*
 import android.content.Context
 import android.util.Log
+import com.facebook.common.util.Hex
 import java.util.*
 
 class GattClient(var context: Context) {
@@ -53,8 +53,6 @@ class GattClient(var context: Context) {
       characteristic: BluetoothGattCharacteristic?,
       status: Int
     ) {
-      super.onCharacteristicRead(gatt, characteristic, status)
-
       if(status == GATT_SUCCESS && characteristic != null) {
         onReadSuccess(characteristic.uuid, characteristic.value)
         Log.i(logTag, "Successfully read char: : ${characteristic.uuid}")
@@ -190,18 +188,21 @@ class GattClient(var context: Context) {
     charUUID: UUID,
     onSuccess: (UUID, ByteArray?) -> Unit,
     onFailure: (UUID?, Int) -> Unit
-  ): Boolean {
+  ) {
     this.onReadSuccess = onSuccess
     this.onReadFailure = onFailure
 
     try {
       val service = bluetoothGatt!!.getService(serviceUUID)
       val characteristic = service.getCharacteristic(charUUID)
-      bluetoothGatt!!.readCharacteristic(characteristic)
-    } catch(e: Error) {
-      return false
-    }
+      val read = bluetoothGatt!!.readCharacteristic(characteristic)
 
-    return true
+      if(!read) {
+        Log.d(logTag, "Failed to start ")
+        onFailure(charUUID, GATT_FAILURE)
+      }
+    } catch(e: Error) {
+      onFailure(charUUID, GATT_FAILURE)
+    }
   }
 }
