@@ -19,6 +19,7 @@ import com.verifier.Verifier
 import com.wallet.transfer.TransferHandler
 import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
 import com.wallet.transfer.message.InitResponseTransferMessage
+import com.wallet.transfer.message.ResponseChunkWriteSuccessMessage
 import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
 import java.lang.Integer.parseInt
 import java.security.SecureRandom
@@ -142,14 +143,18 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         if (value != null && value.isNotEmpty()) {
           transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(parseInt(Hex.encodeHex(value, false))))
         } else {
-          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
+          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
         }
       }
     }
   }
 
   override fun onReadFailure(charUUID: UUID?, err: Int) {
-    // TODO("Not yet implemented")
+    when(charUUID) {
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
+      }
+      }
   }
 
   override fun onDeviceDisconnected() {
@@ -168,6 +173,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
+      }
+      GattService.RESPONSE_CHAR_UUID -> {
+        transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
     }
   }

@@ -198,9 +198,10 @@ class GattClient(var context: Context) {
       val read = bluetoothGatt!!.readCharacteristic(characteristic)
 
       if(!read) {
-        Log.d(logTag, "Failed to start ")
+        Log.d(logTag, "Failed to start reading")
         onFailure(charUUID, GATT_FAILURE)
       }
+
     } catch(e: Error) {
       onFailure(charUUID, GATT_FAILURE)
     }

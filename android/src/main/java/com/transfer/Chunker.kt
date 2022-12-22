@@ -1,6 +1,8 @@
 package com.transfer
 
+import android.util.Log
 import kotlin.math.ceil
+import kotlin.math.log
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class Chunker(private val data: UByteArray) {
@@ -12,6 +14,9 @@ class Chunker(private val data: UByteArray) {
   private val totalChunks: Double = ceil((data.size/effectiveChunkSize).toDouble())
   private val lastChunkByteCount = data.size % effectiveChunkSize
 
+  init {
+      Log.d("Chunker", "Total number of chunks: $totalChunks")
+  }
   fun next() : UByteArray {
     val fromIndex = chunksReadCounter * effectiveChunkSize
     if (lastChunkByteCount > 0 && chunksReadCounter == (totalChunks - 2).toInt()) {

@@ -140,7 +140,7 @@ class StateHandler(
       }
       IMessage.CentralStates.READ_SUCCESS.ordinal -> {
         val readSuccessMessage = msg.obj as ReadSuccessMessage
-        Log.d(logTag, "Read successfully from ${readSuccessMessage.charUUID} and value${readSuccessMessage.value}")
+        Log.d(logTag, "Read successfully from ${readSuccessMessage.charUUID} and value${readSuccessMessage.value?.decodeToString()}")
 
         listener.onReadSuccess(readSuccessMessage.charUUID, readSuccessMessage.value)
         currentState = States.Reading

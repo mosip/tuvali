@@ -5,6 +5,7 @@ class Semaphore {
     UnInitialised,
     ProcessChunkPending,
     ProcessChunkComplete,
+    FailedToRead,
     ResendChunk,
     Error
   }

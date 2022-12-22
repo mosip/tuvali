@@ -8,6 +8,7 @@ import android.util.Log
 import com.ble.peripheral.IPeripheralListener
 import com.ble.peripheral.impl.Controller
 import com.ble.peripheral.state.message.*
+import com.facebook.common.util.Hex
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class StateHandler(
@@ -91,7 +92,8 @@ class StateHandler(
 
       IMessage.PeripheralMessageTypes.SEND_DATA.ordinal -> {
         val sendDataMessage = msg.obj as SendDataMessage
-        Log.d(logTag, "sendData: uuid: ${sendDataMessage.charUUID}, dataSize: ${sendDataMessage.data.size}")
+        Log.d(logTag, "sendData: uuid: ${sendDataMessage.charUUID}, " +
+          "dataSize: ${sendDataMessage.data.size}, data: ${Hex.encodeHex(sendDataMessage.data.toByteArray(), false)}")
         controller.sendData(sendDataMessage)
       }
 
