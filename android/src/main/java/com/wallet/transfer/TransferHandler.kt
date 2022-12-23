@@ -52,6 +52,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       IMessage.TransferMessageTypes.INIT_RESPONSE_TRANSFER.ordinal -> {
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
         val responseData = initResponseTransferMessage.data.toUByteArray()
+        Log.d(logTag, "Total response size of data ${responseData.size}")
         chunker = Chunker(responseData)
         currentState = States.ResponseSizeWritePending
         this.sendMessage(ResponseSizeWritePendingMessage(responseData.size))

@@ -86,8 +86,8 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
       }
       IMessage.TransferMessageTypes.CHUNK_WROTE_BY_REMOTE_STATUS_UPDATED.ordinal -> {
-        val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
-        when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
+        val chunkWroteByRemoteStatusUpdatedMessage = msg.obj as ChunkWroteByRemoteStatusUpdatedMessage
+        when(chunkWroteByRemoteStatusUpdatedMessage.semaphoreCharValue) {
           Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
             val oldState = semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal)
             Log.d(logTag, "chunk wrote by remote status updated from old value: $oldState to ${Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal}")

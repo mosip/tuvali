@@ -12,16 +12,16 @@ class Assembler(private val totalSize: Int) {
   private var data: UByteArray = ubyteArrayOf()
   private var chunkCount: Int = 0
   private var lastReadSeqNumber: Int? = null
-  private var chunkCounterLog = 0
 
   init {
+    Log.d(logTag, "expected total chunk size: $totalSize")
     if (totalSize == 0) {
       throw CorruptedChunkReceivedException(0, 0, 0)
     }
   }
 
   fun addChunk(chunkData: UByteArray) {
-    Log.d(logTag, "received add chunk: $chunkData : ${chunkCounterLog++}")
+    Log.d(logTag, "received add chunk: $chunkData , chunk size: ${chunkData.size}")
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
@@ -43,10 +43,11 @@ class Assembler(private val totalSize: Int) {
         chunkData.size
       )
     )
+    Log.d(logTag, "add chunk complete: $chunkData : chunk size: ${chunkData.size}, chunkCount: $chunkCount")
   }
 
   fun isComplete(): Boolean {
-    Log.d(logTag, "assembler isComplete: ${data.size == totalSize} and ${totalSize - data.size} left")
+    Log.d(logTag, "assembler assembled data size : ${data.size}, expected total size: $totalSize , isComplete: ${data.size == totalSize} and remaining byte count: ${totalSize - data.size} left")
     return data.size == totalSize
   }
 

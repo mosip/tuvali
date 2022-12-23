@@ -22,6 +22,7 @@ class GattClient(var context: Context) {
   private var peripheral: BluetoothDevice? = null;
   private var bluetoothGatt: BluetoothGatt? = null;
   private val logTag = "BLECentral"
+  private var tempCounterMap = mutableMapOf<UUID, Int>()
 
   private val bluetoothGattCallback = object : BluetoothGattCallback() {
     override fun onCharacteristicWrite(
@@ -29,7 +30,14 @@ class GattClient(var context: Context) {
       characteristic: BluetoothGattCharacteristic?,
       status: Int
     ) {
-      Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}")
+      if (characteristic?.uuid != null) {
+        if (tempCounterMap[characteristic.uuid!!] == null) {
+          tempCounterMap[characteristic.uuid!!] = 0
+        } else {
+          tempCounterMap[characteristic.uuid!!] = (tempCounterMap[characteristic.uuid] as Int) + 1
+        }
+      }
+      Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
 
       if(status != GATT_SUCCESS) {
         Log.i(logTag, "\"Failed to send message to peripheral")

@@ -202,7 +202,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onResponseReceived(data: UByteArray) {
     Log.d(logTag, "onResponseReceived data: $data")
-    responseListener("send-vc", "{\"vc\": \"${String(data.toByteArray())}\"}")
+    responseListener("send-vc", String(data.toByteArray()))
   }
 
   override fun onResponseReceivedFailed(errorMsg: String) {

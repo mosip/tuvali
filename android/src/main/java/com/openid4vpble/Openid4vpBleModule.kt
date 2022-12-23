@@ -77,10 +77,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
         wallet.writeIdentity()
       }
       "send-vc" -> {
-        val data = JSONObject(messageSplits[1])
-        val vcData = data.getString("vc")
-        Log.d(LOG_TAG, "vc received: $vcData")
-        wallet.sendData(vcData)
+        wallet.sendData(messageSplits[1])
       }
     }
   }
