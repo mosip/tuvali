@@ -12,6 +12,7 @@ import com.verifier.GattService
 import com.verifier.exception.CorruptedChunkReceivedException
 import com.verifier.transfer.message.*
 import java.util.*
+import java.util.concurrent.atomic.AtomicInteger
 
 @OptIn(ExperimentalUnsignedTypes::class)
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
@@ -33,6 +34,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   private var requestData: UByteArray = ubyteArrayOf()
   private var chunker: Chunker? = null
   private var assembler: Assembler? = null
+  private var semaphoreWriteAtomic: AtomicInteger = AtomicInteger(Semaphore.SemaphoreMarker.UnInitialised.ordinal)
 
   override fun handleMessage(msg: Message) {
     when(msg.what) {
@@ -61,12 +63,17 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         sendRequestChunk()
         currentState = States.RequestWritePending
       }
-      IMessage.TransferMessageTypes.CHUNK_READ_BY_REMOTE_STATUS_UPDATED.ordinal -> {
-        val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
-        when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
+      IMessage.TransferMessageTypes.UPDATE_CHUNK_WROTE_STATUS_TO_REMOTE.ordinal -> {
+        val updateChunkWroteStatusToRemoteMessage = msg.obj as UpdateChunkWroteStatusToRemoteMessage
+        when(updateChunkWroteStatusToRemoteMessage.semaphoreCharValue) {
           Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
             markChunkSend()
           }
+        }
+      }
+      IMessage.TransferMessageTypes.CHUNK_READ_BY_REMOTE_STATUS_UPDATED.ordinal -> {
+        val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
+        when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
           Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> {
             this.sendMessage(RequestChunkWriteSuccessMessage())
           }
@@ -75,6 +82,15 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
           }
           Semaphore.SemaphoreMarker.Error.ordinal -> {
             Log.d(logTag, "handleMessage: chunk marked as error while reading by remote")
+          }
+        }
+      }
+      IMessage.TransferMessageTypes.CHUNK_WROTE_BY_REMOTE_STATUS_UPDATED.ordinal -> {
+        val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
+        when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
+          Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
+            val oldState = semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal)
+            Log.d(logTag, "chunk wrote by remote status updated from old value: $oldState to ${Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal}")
           }
         }
       }
@@ -101,16 +117,21 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         currentState = States.ResponseReadPending
       }
       // On verifier side, we can wait on response char, instead of semaphore to know when chunk arrived
-      IMessage.TransferMessageTypes.RESPONSE_CHUNK_READ.ordinal -> {
-        val responseChunkReadMessage = msg.obj as ResponseChunkReadMessage
-        assembleChunk(responseChunkReadMessage.chunkData)
+      IMessage.TransferMessageTypes.RESPONSE_CHUNK_RECEIVED.ordinal -> {
+        val responseChunkReceivedMessage = msg.obj as ResponseChunkReceivedMessage
+        assembleChunk(responseChunkReceivedMessage.chunkData)
       }
-      IMessage.TransferMessageTypes.UPDATE_CHUNK_READ_STATUS_TO_REMOTE.ordinal -> {
+      IMessage.TransferMessageTypes.UPDATE_CHUNK_RECEIVED_STATUS_TO_REMOTE.ordinal -> {
         val updateChunkReceivedStatusToRemoteMessage =
           msg.obj as UpdateChunkReceivedStatusToRemoteMessage
-        when(updateChunkReceivedStatusToRemoteMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> markChunkReceive()
-          Semaphore.SemaphoreMarker.ResendChunk.ordinal -> Log.e(logTag, "receive semaphore value to re-read")
+        // Mark it as completed only if the previous state was pending
+        if (semaphoreWriteAtomic.get() == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
+          when(updateChunkReceivedStatusToRemoteMessage.semaphoreCharValue) {
+            Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> markChunkReceive()
+            Semaphore.SemaphoreMarker.ResendChunk.ordinal -> Log.e(logTag, "receive semaphore value to re-read")
+          }
+        } else {
+          this.sendMessageDelayed(updateChunkReceivedStatusToRemoteMessage, 2)
         }
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
@@ -142,6 +163,8 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       GattService.SEMAPHORE_CHAR_UUID,
       ubyteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal.toUByte())
     )
+    // TODO: Can update this value once above write call is success - UpdateChunkWroteStatusToRemoteMessage
+    semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal)
   }
 
   private fun markChunkTransferComplete() {
@@ -164,7 +187,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         GattService.REQUEST_CHAR_UUID,
         chunkArray
       )
-      this.sendMessage(ChunkReadByRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
+      this.sendMessage(UpdateChunkWroteStatusToRemoteMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
     }
   }
 
@@ -202,6 +225,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     message.what = msg.msgType.ordinal
     message.obj = msg
     this.sendMessage(message)
+  }
+
+  fun sendMessageDelayed(msg: IMessage, delayInMillis: Long) {
+    val message = this.obtainMessage()
+    message.what = msg.msgType.ordinal
+    message.obj = msg
+    this.sendMessageDelayed(message,delayInMillis)
   }
 
   fun getCurrentState(): States {

@@ -140,7 +140,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
     when(charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
+        value?.let {
+          Log.d(logTag, "onReadSuccess: size of semaphore value: ${value.size}")
+        }
         if (value != null && value.isNotEmpty()) {
+          Log.d(logTag, "on semaphore read success value: ${value[0].toInt()}")
           transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(parseInt(Hex.encodeHex(value, false))))
         } else {
           transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))

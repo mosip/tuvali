@@ -11,6 +11,7 @@ import com.cryptography.VerifierCryptoBox
 import com.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
+import com.transfer.Semaphore
 import com.verifier.transfer.ITransferListener
 import com.verifier.transfer.TransferHandler
 import com.verifier.transfer.message.*
@@ -115,10 +116,17 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
         value?.let {
-          val semaphoreValue = String(value).toInt()
-          val chunkReadByRemoteStatusUpdatedMessage =
-            ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
-          transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+          if (value.isEmpty()) {
+            return
+          }
+          val semaphoreValue = value[0].toInt()
+          if(semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
+            val chunkWroteByRemoteStatusUpdatedMessage = ChunkWroteByRemoteStatusUpdatedMessage(semaphoreValue)
+            transferHandler.sendMessage(chunkWroteByRemoteStatusUpdatedMessage)
+          } else if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal){
+            val chunkReadByRemoteStatusUpdatedMessage = ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
+            transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+          }
         }
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
@@ -133,7 +141,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       GattService.RESPONSE_CHAR_UUID -> {
         if (value != null) {
           Log.d(logTag, "received response chunk on characteristic: $value")
-          transferHandler.sendMessage(ResponseChunkReadMessage(value.toUByteArray()))
+          transferHandler.sendMessage(ResponseChunkReceivedMessage(value.toUByteArray()))
         }
       }
     }

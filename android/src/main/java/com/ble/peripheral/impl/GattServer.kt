@@ -89,6 +89,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     offset: Int,
     characteristic: BluetoothGattCharacteristic?
   ) {
+    Log.d(logTag, "onCharacteristicReadRequest: uuid: ${characteristic?.uuid} and value: ${characteristic?.value} and value size: ${characteristic?.value?.size}")
     val isSuccessful = gattServer.sendResponse(
       device,
       requestId,
