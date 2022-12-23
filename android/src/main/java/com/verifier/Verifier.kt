@@ -9,12 +9,13 @@ import com.ble.peripheral.Peripheral
 import com.cryptography.SecretsTranslator
 import com.cryptography.VerifierCryptoBox
 import com.cryptography.VerifierCryptoBoxBuilder
-import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
 import com.transfer.Semaphore
+import com.transfer.Util
 import com.verifier.transfer.ITransferListener
 import com.verifier.transfer.TransferHandler
 import com.verifier.transfer.message.*
+import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 
@@ -26,6 +27,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var iv: ByteArray
+  private var secureRandom: SecureRandom = SecureRandom()
+  private var verifierCryptoBox: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
@@ -55,11 +58,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   fun generateKeyPair() {
-    // DOUBT: Should it be generated each time?
-    val sr = SecureRandom()
-    val vcb: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(sr)
-    publicKey = vcb.publicKey()
-    Log.i(logTag, "Verifier public key: ${Hex.encodeHex(publicKey, false)}")
+    // TODO: Should it be generated each time?
+    verifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
+    publicKey = verifierCryptoBox.publicKey()
+    Log.i(logTag, "Verifier public key: ${Hex.toHexString(publicKey)}")
   }
 
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
@@ -102,13 +104,13 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           walletPubKey = value.copyOfRange(12, 12 + 32)
           Log.i(
             logTag,
-            "received wallet iv: ${Hex.encodeHex(iv, false)}, wallet pub key: ${
-              Hex.encodeHex(
-                walletPubKey,
-                false
+            "received wallet iv: ${Hex.toHexString(iv)}, wallet pub key: ${
+              Hex.toHexString(
+                walletPubKey
               )
             }"
           )
+          secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPubKey)
           // TODO: Validate pub key, how to handle if not valid?
           responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
@@ -120,11 +122,13 @@ class Verifier(context: Context, private val responseListener: (String, String) 
             return
           }
           val semaphoreValue = value[0].toInt()
-          if(semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
-            val chunkWroteByRemoteStatusUpdatedMessage = ChunkWroteByRemoteStatusUpdatedMessage(semaphoreValue)
+          if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
+            val chunkWroteByRemoteStatusUpdatedMessage =
+              ChunkWroteByRemoteStatusUpdatedMessage(semaphoreValue)
             transferHandler.sendMessage(chunkWroteByRemoteStatusUpdatedMessage)
-          } else if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal){
-            val chunkReadByRemoteStatusUpdatedMessage = ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
+          } else if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal) {
+            val chunkReadByRemoteStatusUpdatedMessage =
+              ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
             transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
           }
         }
@@ -201,8 +205,15 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   override fun onResponseReceived(data: UByteArray) {
-    Log.d(logTag, "onResponseReceived data: $data")
-    responseListener("send-vc", String(data.toByteArray()))
+    val dataInBytes = data.toByteArray()
+    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(dataInBytes)}")
+    val decryptedData = secretsTranslator?.decryptUponReceive(dataInBytes)
+    if (decryptedData != null) {
+      Log.d(logTag, "decryptedData size: ${decryptedData.size}")
+      responseListener("send-vc", String(decryptedData))
+    } else {
+      Log.e(logTag, "failed to decrypt data with size: ${data.size}")
+    }
   }
 
   override fun onResponseReceivedFailed(errorMsg: String) {
@@ -211,7 +222,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   fun getAdvIdentifier(identifier: String): String {
     // 5 bytes, since it's in hex it'd be twice
-    return Hex.encodeHex("${identifier}_".toByteArray() + publicKey.copyOfRange(0, 5), false)
+    return Hex.toHexString("${identifier}_".toByteArray() + publicKey.copyOfRange(0, 5))
   }
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {

@@ -21,7 +21,7 @@ class Assembler(private val totalSize: Int) {
   }
 
   fun addChunk(chunkData: UByteArray) {
-    Log.d(logTag, "received add chunk: $chunkData , chunk size: ${chunkData.size}")
+    Log.d(logTag, "received add chunk: chunk size: ${chunkData.size}")
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
@@ -43,7 +43,7 @@ class Assembler(private val totalSize: Int) {
         chunkData.size
       )
     )
-    Log.d(logTag, "add chunk complete: $chunkData : chunk size: ${chunkData.size}, chunkCount: $chunkCount")
+    Log.d(logTag, "received add chunk complete: chunk size: ${chunkData.size}, chunkCount: $chunkCount")
   }
 
   fun isComplete(): Boolean {

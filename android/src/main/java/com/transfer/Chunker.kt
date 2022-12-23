@@ -2,12 +2,10 @@ package com.transfer
 
 import android.util.Log
 import kotlin.math.ceil
-import kotlin.math.log
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Chunker(private val data: UByteArray) {
+class Chunker(private val data: UByteArray, mtuSize: Int = 200) {
   private val logTag = "Chunker"
-  private val mtuSize= 200
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2
   private val effectiveChunkSize = mtuSize - seqNumberReservedByteSize - mtuReservedByteSize

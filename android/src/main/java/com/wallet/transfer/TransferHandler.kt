@@ -4,10 +4,7 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
-import android.util.TimeUtils
 import com.ble.central.Central
-import com.ble.central.state.StateHandler
-import com.facebook.common.util.Hex
 import com.transfer.Chunker
 import com.transfer.Semaphore
 import com.verifier.GattService
@@ -15,8 +12,6 @@ import com.verifier.transfer.message.*
 import com.wallet.transfer.message.*
 import com.wallet.transfer.message.IMessage
 import com.wallet.transfer.message.ResponseTransferCompleteMessage
-import org.bouncycastle.asn1.cms.Time
-import org.bouncycastle.asn1.cms.TimeStampAndCRL
 import java.util.*
 import kotlin.time.*
 

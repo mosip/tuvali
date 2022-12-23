@@ -10,10 +10,11 @@ import android.util.Log
 import com.ble.central.Central
 import com.ble.central.ICentralListener
 import com.cryptography.SecretsTranslator
+import com.cryptography.WalletCryptoBox
 import com.cryptography.WalletCryptoBoxBuilder
-import com.facebook.common.util.Hex
 import com.facebook.react.bridge.Callback
 import com.transfer.Semaphore
+import com.transfer.Util
 import com.verifier.GattService
 import com.verifier.Verifier
 import com.wallet.transfer.TransferHandler
@@ -21,20 +22,25 @@ import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
 import com.wallet.transfer.message.InitResponseTransferMessage
 import com.wallet.transfer.message.ResponseChunkWriteSuccessMessage
 import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
+import org.bouncycastle.util.encoders.Hex
 import java.lang.Integer.parseInt
 import java.security.SecureRandom
 import java.util.*
 
-class Wallet(context: Context, private val responseListener: (String, String) -> Unit) : ICentralListener {
-  private lateinit var verifierPK: ByteArray
-  private lateinit var buildSecretsTranslator: SecretsTranslator
+class Wallet(context: Context, private val responseListener: (String, String) -> Unit) :
+  ICentralListener {
   private val logTag = "Wallet"
-  private lateinit var iv: ByteArray;
-  private val walletCipherBox = WalletCryptoBoxBuilder.build(SecureRandom())
-  private val publicKey = walletCipherBox.publicKey()
+
+  private val secureRandom: SecureRandom = SecureRandom()
+  private lateinit var verifierPK: ByteArray
+  private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
+  private var secretsTranslator: SecretsTranslator? = null
+
   private var advIdentifier: String? = null;
   private var transferHandler: TransferHandler
-  private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
+  private val handlerThread =
+    HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
+
   private var central: Central
   private val maxMTU = 517
 
@@ -59,8 +65,20 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   fun writeIdentity() {
-    central.write(Verifier.SERVICE_UUID, GattService.IDENTITY_CHARACTERISTIC_UUID,iv+publicKey)
-    Log.d(logTag, "Started to write - generated IV ${Hex.encodeHex(iv, false)}, Public Key of wallet: ${Hex.encodeHex(publicKey, false)}")
+    val publicKey = walletCryptoBox.publicKey()
+    secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
+    val iv = secretsTranslator?.initializationVector()
+    central.write(
+      Verifier.SERVICE_UUID,
+      GattService.IDENTITY_CHARACTERISTIC_UUID,
+      iv!! + publicKey!!
+    )
+    Log.d(
+      logTag,
+      "Started to write - generated IV ${
+        Hex.toHexString(iv)
+      }, Public Key of wallet: ${Hex.toHexString(publicKey)}"
+    )
   }
 
   override fun onScanStartedFailed(errorCode: Int) {
@@ -68,11 +86,12 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+    val scanResponsePayload =
+      scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
     val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
     //TODO: Handle multiple calls while connecting
-    if(advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+    if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
       Log.d(logTag, "Stopping the scan.")
       central.stopScan()
 
@@ -90,28 +109,24 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     val first5BytesOfPkFromBLE = advertisementPayload.takeLast(5).toByteArray()
     this.verifierPK = first5BytesOfPkFromBLE + scanResponsePayload
 
-    Log.d(logTag, "Public Key of Verifier: ${Hex.encodeHex(verifierPK, false)}")
+    Log.d(logTag, "Public Key of Verifier: ${Hex.toHexString(verifierPK)}")
   }
 
   private fun isSameAdvIdentifier(advertisementPayload: ByteArray): Boolean {
     this.advIdentifier?.let {
-      return Hex.decodeHex(it) contentEquals advertisementPayload
+      return Hex.decode(it) contentEquals advertisementPayload
     }
     return false
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
     Log.d(logTag, "onDeviceConnected")
-
-    buildSecretsTranslator = walletCipherBox.buildSecretsTranslator(verifierPK)
-    iv = buildSecretsTranslator.initializationVector()
-
+    walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
     central.discoverServices()
   }
 
   override fun onServicesDiscovered() {
     Log.d(logTag, "onServicesDiscovered")
-
     central.requestMTU(maxMTU)
   }
 
@@ -138,14 +153,20 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
     Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
-    when(charUUID) {
+    when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         value?.let {
           Log.d(logTag, "onReadSuccess: size of semaphore value: ${value.size}")
         }
         if (value != null && value.isNotEmpty()) {
           Log.d(logTag, "on semaphore read success value: ${value[0].toInt()}")
-          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(parseInt(Hex.encodeHex(value, false))))
+          transferHandler.sendMessage(
+            ChunkWriteToRemoteStatusUpdatedMessage(
+              parseInt(
+                Hex.toHexString(value)
+              )
+            )
+          )
         } else {
           transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
         }
@@ -154,11 +175,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onReadFailure(charUUID: UUID?, err: Int) {
-    when(charUUID) {
+    when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
       }
-      }
+    }
   }
 
   override fun onDeviceDisconnected() {
@@ -188,18 +209,15 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     this.advIdentifier = advIdentifier
   }
 
-  fun sendData(vcData: String) {
-    transferHandler.sendMessage(InitResponseTransferMessage(vcData.toByteArray()))
+  fun sendData(data: String) {
+    val dataInBytes = data.toByteArray()
+    Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
+    val encryptedData = secretsTranslator?.encryptToSend(dataInBytes)
+    if (encryptedData != null) {
+      Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
+      transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
+    } else {
+      Log.e(logTag, "failed to encrypt data with size: ${dataInBytes.size}")
+    }
   }
 }
-
-//
-//V ->
-//Verifier: A695D3 055C4D5C5C3C396635AB18A3543AE893C86E6636B69B7E0D2726E36224
-//wallet pub key: 11D61C37EC58B3ED2C0C0711A39A208FB9B09940574CA944FAD445A6F2D78710
-//
-//  W ->
-//
-//Verifier -> EFBFBDEFBFBDEFBFBD 055C4D5C5C3C396635AB18A3543AE893C86E6636B69B7E0D2726E36224
-//W -> 11D61C37EC58B3ED2C0C0711A39A208FB9B09940574CA944FAD445A6F2D78710
-//
