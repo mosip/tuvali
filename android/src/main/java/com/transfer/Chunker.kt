@@ -4,7 +4,7 @@ import android.util.Log
 import kotlin.math.ceil
 
 @OptIn(ExperimentalUnsignedTypes::class)
-class Chunker(private val data: UByteArray, mtuSize: Int = 200) {
+class Chunker(private val data: UByteArray, mtuSize: Int = 500) {
   private val logTag = "Chunker"
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2

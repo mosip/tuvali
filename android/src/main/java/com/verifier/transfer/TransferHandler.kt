@@ -11,6 +11,8 @@ import com.transfer.Semaphore
 import com.verifier.GattService
 import com.verifier.exception.CorruptedChunkReceivedException
 import com.verifier.transfer.message.*
+import java.time.Duration
+import java.time.temporal.Temporal
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -35,6 +37,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   private var chunker: Chunker? = null
   private var assembler: Assembler? = null
   private var semaphoreWriteAtomic: AtomicInteger = AtomicInteger(Semaphore.SemaphoreMarker.UnInitialised.ordinal)
+  private var responseStartTimeInMillis: Long = 0
 
   override fun handleMessage(msg: Message) {
     when(msg.what) {
@@ -107,6 +110,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         currentState = States.ResponseSizeReadPending
       }
       IMessage.TransferMessageTypes.RESPONSE_SIZE_READ.ordinal -> {
+        responseStartTimeInMillis = System.currentTimeMillis()
         val responseSizeReadSuccessMessage = msg.obj as ResponseSizeReadSuccessMessage
         try {
           assembler = Assembler(responseSizeReadSuccessMessage.responseSize)
@@ -135,8 +139,8 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
+        Log.d(logTag, "response transfer complete in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         val responseTransferCompleteMessage = msg.obj as ResponseTransferCompleteMessage
-        Log.d(logTag, "handleMessage: response transfer complete")
         transferListener.onResponseReceived(responseTransferCompleteMessage.data)
         currentState = States.TransferComplete
       }

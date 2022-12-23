@@ -35,14 +35,11 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
   private var currentState: States = States.UnInitialised
   private var chunker: Chunker? = null
+  private var responseStartTimeInMillis: Long = 0
 
   @OptIn(ExperimentalTime::class)
   override fun handleMessage(msg: Message) {
     Log.d(logTag, "Received message to transfer thread handler: ${msg.what} and ${msg.data}")
-
-    val transferStartMark = TimeSource.Monotonic.markNow()
-    var startDuration:Duration = transferStartMark.elapsedNow();
-
     when (msg.what) {
       IMessage.TransferMessageTypes.INIT_RESPONSE_TRANSFER.ordinal -> {
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
@@ -57,6 +54,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         sendResponseSize(responseSizeWritePendingMessage.size)
       }
       IMessage.TransferMessageTypes.RESPONSE_SIZE_WRITE_SUCCESS.ordinal -> {
+        responseStartTimeInMillis = System.currentTimeMillis()
         currentState = States.ResponseSizeWriteSuccess
         initResponseChunkSend()
       }
@@ -64,8 +62,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         currentState = States.ResponseSizeWriteFailed
       }
       IMessage.TransferMessageTypes.INIT_RESPONSE_CHUNK_TRANSFER.ordinal -> {
-        startDuration = transferStartMark.elapsedNow()
-        Log.d("time check", "$startDuration start")
         currentState = States.ResponseWritePending
         sendResponseChunk()
       }
@@ -109,10 +105,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         // TODO: Let higher level know
-        Log.d(logTag, "handleMessage: Successfully transferred vc")
-        Log.d("time check", "end ${transferStartMark.elapsedNow()}")
-        Log.d("time check", "diff ${transferStartMark.minus(startDuration)}")
-
+        Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         currentState = States.TransferComplete
       }
     }
@@ -154,6 +147,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   }
 
   private fun initResponseChunkSend() {
+    Log.d(logTag, "initResponseChunkSend")
     val initResponseChunkTransferMessage = InitResponseChunkTransferMessage()
     this.sendMessage(initResponseChunkTransferMessage)
   }
