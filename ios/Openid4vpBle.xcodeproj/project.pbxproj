@@ -9,6 +9,18 @@
 /* Begin PBXBuildFile section */
 		0A62BB712938C1EC0092E47D /* Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62BB702938C1EC0092E47D /* Wallet.swift */; };
 		0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62BB722938C1FA0092E47D /* Verifier.swift */; };
+		8D179C892954871400017EE5 /* CipherBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C882954871400017EE5 /* CipherBox.swift */; };
+		8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */; };
+		8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8C29548AB400017EE5 /* CryptoBox.swift */; };
+		8D179C8F29548B3A00017EE5 /* CryptoBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8E29548B3A00017EE5 /* CryptoBoxImpl.swift */; };
+		8D179C9129548B9A00017EE5 /* CipherPackage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C9029548B9A00017EE5 /* CipherPackage.swift */; };
+		8D31C3F42956AD8B0073B710 /* KeyGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3F32956AD8B0073B710 /* KeyGenerator.swift */; };
+		8D31C3F62956AF460073B710 /* CryptoConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3F52956AF460073B710 /* CryptoConstants.swift */; };
+		8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3F72956B0B30073B710 /* SecretTranslator.swift */; };
+		8D31C3FA2956B10E0073B710 /* SenderTransferOwnershipOfData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3F92956B10E0073B710 /* SenderTransferOwnershipOfData.swift */; };
+		8D31C3FC2956B20F0073B710 /* WalletCryptoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3FB2956B20F0073B710 /* WalletCryptoBox.swift */; };
+		8D31C3FE2956B2650073B710 /* WalletCryptoBoxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */; };
+		8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */; };
 		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
 /* End PBXBuildFile section */
 
@@ -28,6 +40,18 @@
 		0A62BB702938C1EC0092E47D /* Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
 		0A62BB722938C1FA0092E47D /* Verifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Verifier.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D179C882954871400017EE5 /* CipherBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CipherBox.swift; sourceTree = "<group>"; };
+		8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiperBoxImpl.swift; sourceTree = "<group>"; };
+		8D179C8C29548AB400017EE5 /* CryptoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBox.swift; sourceTree = "<group>"; };
+		8D179C8E29548B3A00017EE5 /* CryptoBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBoxImpl.swift; sourceTree = "<group>"; };
+		8D179C9029548B9A00017EE5 /* CipherPackage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CipherPackage.swift; sourceTree = "<group>"; };
+		8D31C3F32956AD8B0073B710 /* KeyGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KeyGenerator.swift; sourceTree = "<group>"; };
+		8D31C3F52956AF460073B710 /* CryptoConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoConstants.swift; sourceTree = "<group>"; };
+		8D31C3F72956B0B30073B710 /* SecretTranslator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecretTranslator.swift; sourceTree = "<group>"; };
+		8D31C3F92956B10E0073B710 /* SenderTransferOwnershipOfData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SenderTransferOwnershipOfData.swift; sourceTree = "<group>"; };
+		8D31C3FB2956B20F0073B710 /* WalletCryptoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBox.swift; sourceTree = "<group>"; };
+		8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxBuilder.swift; sourceTree = "<group>"; };
+		8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxImpl.swift; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBle.swift; sourceTree = "<group>"; };
@@ -55,6 +79,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				8D179C82295486B500017EE5 /* crypto */,
 				F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */,
 				0A62BB702938C1EC0092E47D /* Wallet.swift */,
 				0A62BB722938C1FA0092E47D /* Verifier.swift */,
@@ -62,6 +87,65 @@
 				F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
+			sourceTree = "<group>";
+		};
+		8D179C82295486B500017EE5 /* crypto */ = {
+			isa = PBXGroup;
+			children = (
+				8D179C87295486F600017EE5 /* Wallet */,
+				8D179C86295486EB00017EE5 /* Utils */,
+				8D179C85295486E200017EE5 /* SecretTranslator */,
+				8D179C84295486D600017EE5 /* CryptoBox */,
+				8D179C83295486C700017EE5 /* CipherBox */,
+			);
+			path = crypto;
+			sourceTree = "<group>";
+		};
+		8D179C83295486C700017EE5 /* CipherBox */ = {
+			isa = PBXGroup;
+			children = (
+				8D179C882954871400017EE5 /* CipherBox.swift */,
+				8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */,
+			);
+			path = CipherBox;
+			sourceTree = "<group>";
+		};
+		8D179C84295486D600017EE5 /* CryptoBox */ = {
+			isa = PBXGroup;
+			children = (
+				8D179C8C29548AB400017EE5 /* CryptoBox.swift */,
+				8D179C8E29548B3A00017EE5 /* CryptoBoxImpl.swift */,
+			);
+			path = CryptoBox;
+			sourceTree = "<group>";
+		};
+		8D179C85295486E200017EE5 /* SecretTranslator */ = {
+			isa = PBXGroup;
+			children = (
+				8D31C3F72956B0B30073B710 /* SecretTranslator.swift */,
+				8D31C3F92956B10E0073B710 /* SenderTransferOwnershipOfData.swift */,
+			);
+			path = SecretTranslator;
+			sourceTree = "<group>";
+		};
+		8D179C86295486EB00017EE5 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				8D179C9029548B9A00017EE5 /* CipherPackage.swift */,
+				8D31C3F32956AD8B0073B710 /* KeyGenerator.swift */,
+				8D31C3F52956AF460073B710 /* CryptoConstants.swift */,
+			);
+			path = Utils;
+			sourceTree = "<group>";
+		};
+		8D179C87295486F600017EE5 /* Wallet */ = {
+			isa = PBXGroup;
+			children = (
+				8D31C3FB2956B20F0073B710 /* WalletCryptoBox.swift */,
+				8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */,
+				8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */,
+			);
+			path = Wallet;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -121,9 +205,21 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
+				8D31C3F42956AD8B0073B710 /* KeyGenerator.swift in Sources */,
 				0A62BB712938C1EC0092E47D /* Wallet.swift in Sources */,
 				0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */,
+				8D179C8F29548B3A00017EE5 /* CryptoBoxImpl.swift in Sources */,
+				8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */,
+				8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */,
+				8D31C3FA2956B10E0073B710 /* SenderTransferOwnershipOfData.swift in Sources */,
+				8D31C3FE2956B2650073B710 /* WalletCryptoBoxBuilder.swift in Sources */,
+				8D179C892954871400017EE5 /* CipherBox.swift in Sources */,
+				8D31C3F62956AF460073B710 /* CryptoConstants.swift in Sources */,
+				8D179C9129548B9A00017EE5 /* CipherPackage.swift in Sources */,
 				F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */,
+				8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */,
+				8D31C3FC2956B20F0073B710 /* WalletCryptoBox.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -174,7 +270,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -218,7 +314,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 8.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				VALIDATE_PRODUCT = YES;
