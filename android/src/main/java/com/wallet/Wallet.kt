@@ -151,7 +151,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
-    Log.d(logTag, "Read from $charUUID successfully and value is $value")
+//    Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
@@ -161,11 +161,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         if (value != null && value.isNotEmpty()) {
           Log.d(logTag, "on semaphore read success value: ${value[0].toInt()}")
           transferHandler.sendMessage(
-            ChunkWriteToRemoteStatusUpdatedMessage(
-              parseInt(
-                Hex.toHexString(value)
-              )
-            )
+            ChunkWriteToRemoteStatusUpdatedMessage(value[0].toInt())
           )
         } else {
           transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
@@ -201,6 +197,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       }
       GattService.RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
+      }
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        transferHandler.readSemaphoreAckDelayed()
       }
     }
   }

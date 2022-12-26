@@ -37,7 +37,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   private var chunker: Chunker? = null
   private var responseStartTimeInMillis: Long = 0
 
-  @OptIn(ExperimentalTime::class)
   override fun handleMessage(msg: Message) {
     Log.d(logTag, "Received message to transfer thread handler: ${msg.what} and ${msg.data}")
     when (msg.what) {
@@ -100,7 +99,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_WRITE_SUCCESS.ordinal -> {
         updateSemaphore(Semaphore.SemaphoreMarker.ProcessChunkPending)
-        readSemaphoreAckDelayed()
         chunkCounter++
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
@@ -142,8 +140,8 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     }
   }
 
-  private fun readSemaphoreAckDelayed() {
-    this.sendMessageDelayed(ReadSemaphoreStatusMessage(), 20)
+  fun readSemaphoreAckDelayed() {
+    this.sendMessageDelayed(ReadSemaphoreStatusMessage(), 5)
   }
 
   private fun initResponseChunkSend() {
