@@ -19,7 +19,6 @@ import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class Verifier(context: Context, private val responseListener: (String, String) -> Unit) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -76,7 +75,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   fun sendRequest(request: String, responseReceivedCallback: Callback) {
     callbacks[PeripheralCallbacks.RESPONSE_RECEIVE_SUCCESS_CALLBACK] = responseReceivedCallback
-    transferHandler.sendMessage(InitTransferMessage(request.toByteArray().toUByteArray()))
+    transferHandler.sendMessage(InitTransferMessage(request.toByteArray()))
   }
 
   override fun onAdvertisementStartSuccessful() {
@@ -145,7 +144,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       GattService.RESPONSE_CHAR_UUID -> {
         if (value != null) {
           Log.d(logTag, "received response chunk on characteristic: $value")
-          transferHandler.sendMessage(ResponseChunkReceivedMessage(value.toUByteArray()))
+          transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
         }
       }
     }
@@ -204,10 +203,9 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     }
   }
 
-  override fun onResponseReceived(data: UByteArray) {
-    val dataInBytes = data.toByteArray()
-    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(dataInBytes)}")
-    val decryptedData = secretsTranslator?.decryptUponReceive(dataInBytes)
+  override fun onResponseReceived(data: ByteArray) {
+    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
+    val decryptedData = secretsTranslator?.decryptUponReceive(data)
     if (decryptedData != null) {
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
       responseListener("send-vc", String(decryptedData))

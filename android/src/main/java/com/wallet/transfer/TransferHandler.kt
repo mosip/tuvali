@@ -15,7 +15,6 @@ import com.wallet.transfer.message.ResponseTransferCompleteMessage
 import java.util.*
 import kotlin.time.*
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID) :
   Handler(looper) {
   private val logTag = "TransferHandler"
@@ -42,7 +41,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     when (msg.what) {
       IMessage.TransferMessageTypes.INIT_RESPONSE_TRANSFER.ordinal -> {
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
-        val responseData = initResponseTransferMessage.data.toUByteArray()
+        val responseData = initResponseTransferMessage.data
         Log.d(logTag, "Total response size of data ${responseData.size}")
         chunker = Chunker(responseData)
         currentState = States.ResponseSizeWritePending
@@ -133,7 +132,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       central.write(
         serviceUUID,
         GattService.RESPONSE_CHAR_UUID,
-        byteArrayOf(0, 1, 73, Byte.MAX_VALUE) + chunkArray.toByteArray()
+        byteArrayOf(0, 1, 73, Byte.MAX_VALUE) + chunkArray
       )
 
       readCounter = 0

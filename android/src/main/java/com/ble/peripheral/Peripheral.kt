@@ -14,7 +14,6 @@ import com.ble.peripheral.state.message.SendDataMessage
 import com.ble.peripheral.state.message.SetupGattServiceMessage
 import java.util.*
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   private val logTag = "Peripheral"
   private val controller: Controller =
@@ -50,7 +49,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     messageSender.sendMessage(enabledCommMsg)
   }
 
-  fun sendData(serviceUUID: UUID, charUUID: UUID, data: UByteArray) {
+  fun sendData(serviceUUID: UUID, charUUID: UUID, data: ByteArray) {
     val currentState = messageSender.getCurrentState()
     if (currentState == StateHandler.States.CommunicationReady) {
       val sendDataMessage = SendDataMessage(serviceUUID, charUUID, data)

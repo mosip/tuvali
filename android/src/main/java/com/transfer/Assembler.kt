@@ -3,13 +3,12 @@ package com.transfer
 import android.util.Log
 import com.verifier.exception.CorruptedChunkReceivedException
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class Assembler(private val totalSize: Int) {
   private val logTag = "Assembler"
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2
   private val chunkMetaSize = seqNumberReservedByteSize + mtuReservedByteSize
-  private var data: UByteArray = ubyteArrayOf()
+  private var data: ByteArray = byteArrayOf()
   private var chunkCount: Int = 0
   private var lastReadSeqNumber: Int? = null
 
@@ -20,7 +19,7 @@ class Assembler(private val totalSize: Int) {
     }
   }
 
-  fun addChunk(chunkData: UByteArray) {
+  fun addChunk(chunkData: ByteArray) {
     Log.d(logTag, "received add chunk: chunk size: ${chunkData.size}")
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
@@ -51,11 +50,11 @@ class Assembler(private val totalSize: Int) {
     return data.size == totalSize
   }
 
-  fun data(): UByteArray {
+  fun data(): ByteArray {
     return data
   }
 
-  private fun twoBytesToInt(num: UByteArray): Int {
+  private fun twoBytesToInt(num: ByteArray): Int {
     //TODO: Document endianness here
     val firstByte = num[0]
     val secondByte = num[1]

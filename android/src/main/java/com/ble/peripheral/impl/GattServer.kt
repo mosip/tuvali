@@ -6,7 +6,6 @@ import android.content.Context
 import android.util.Log
 import java.util.UUID
 
-@OptIn(ExperimentalUnsignedTypes::class)
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private val logTag = "GattServer"
@@ -44,10 +43,10 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     gattServer.addService(service)
   }
 
-  fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: UByteArray): Boolean {
+  fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: ByteArray): Boolean {
     val service = gattServer.getService(serviceUUID)
     val characteristic = service.getCharacteristic(charUUID)
-    characteristic.value = data.toByteArray()
+    characteristic.value = data
     return gattServer.notifyCharacteristicChanged(bluetoothDevice, characteristic, false)
   }
 

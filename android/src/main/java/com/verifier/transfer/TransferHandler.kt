@@ -11,12 +11,9 @@ import com.transfer.Semaphore
 import com.verifier.GattService
 import com.verifier.exception.CorruptedChunkReceivedException
 import com.verifier.transfer.message.*
-import java.time.Duration
-import java.time.temporal.Temporal
 import java.util.*
 import java.util.concurrent.atomic.AtomicInteger
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = "TransferHandler"
   enum class States {
@@ -33,7 +30,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   }
 
   private var currentState: States = States.UnInitialised
-  private var requestData: UByteArray = ubyteArrayOf()
+  private var requestData: ByteArray = byteArrayOf()
   private var chunker: Chunker? = null
   private var assembler: Assembler? = null
   private var semaphoreWriteAtomic: AtomicInteger = AtomicInteger(Semaphore.SemaphoreMarker.UnInitialised.ordinal)
@@ -157,7 +154,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal.toUByte())
+      byteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal.toByte())
     )
   }
 
@@ -165,7 +162,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal.toUByte())
+      byteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal.toByte())
     )
     // TODO: Can update this value once above write call is success - UpdateChunkWroteStatusToRemoteMessage
     semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal)
@@ -175,7 +172,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.SEMAPHORE_CHAR_UUID,
-      ubyteArrayOf(Semaphore.SemaphoreMarker.UnInitialised.ordinal.toUByte())
+      byteArrayOf(Semaphore.SemaphoreMarker.UnInitialised.ordinal.toByte())
     )
   }
 
@@ -195,7 +192,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
   }
 
-  private fun assembleChunk(chunkData: UByteArray) {
+  private fun assembleChunk(chunkData: ByteArray) {
     if (assembler?.isComplete() == true) {
       return
     }
@@ -220,7 +217,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     peripheral.sendData(
       serviceUUID,
       GattService.REQUEST_SIZE_CHAR_UUID,
-      arrayOf(size.toUByte()).toUByteArray()
+      arrayOf(size.toByte()).toByteArray()
     )
   }
 

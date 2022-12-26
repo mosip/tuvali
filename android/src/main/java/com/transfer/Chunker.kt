@@ -3,8 +3,7 @@ package com.transfer
 import android.util.Log
 import kotlin.math.ceil
 
-@OptIn(ExperimentalUnsignedTypes::class)
-class Chunker(private val data: UByteArray, mtuSize: Int = 500) {
+class Chunker(private val data: ByteArray, mtuSize: Int = 500) {
   private val logTag = "Chunker"
   private val seqNumberReservedByteSize = 2
   private val mtuReservedByteSize = 2
@@ -16,7 +15,7 @@ class Chunker(private val data: UByteArray, mtuSize: Int = 500) {
   init {
       Log.d(logTag, "Total number of chunks: $totalChunks")
   }
-  fun next() : UByteArray {
+  fun next() : ByteArray {
     val fromIndex = chunksReadCounter * effectiveChunkSize
     if (lastChunkByteCount > 0 && chunksReadCounter == (totalChunks - 1).toInt()) {
       chunksReadCounter++

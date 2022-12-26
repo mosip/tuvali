@@ -5,7 +5,6 @@ import android.content.Context
 import com.ble.peripheral.state.IMessageSender
 import com.ble.peripheral.state.message.*
 
-@OptIn(ExperimentalUnsignedTypes::class)
 class Controller(context: Context) {
   private var advertiser: Advertiser
   private var gattServer: GattServer
