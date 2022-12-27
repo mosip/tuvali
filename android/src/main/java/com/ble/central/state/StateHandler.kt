@@ -26,7 +26,8 @@ class StateHandler(
     DiscoveringServices,
     RequestingMTU,
     Writing,
-    Reading
+    Reading,
+    Subscribing
   }
 
   @SuppressLint("MissingPermission")
@@ -124,11 +125,11 @@ class StateHandler(
         listener.onWriteSuccess(writeSuccessMessage.device, writeSuccessMessage.charUUID)
         currentState = States.Connected
       }
-      IMessage.CentralStates.WRITE_FAILED.ordinal -> {
-        val writeFailedMessage = msg.obj as WriteFailedMessage;
+      IMessage.CentralStates.WRITE_FAILURE.ordinal -> {
+        val writeFailureMessage = msg.obj as WriteFailureMessage;
 
-        Log.d(logTag, "write failed for ${writeFailedMessage.charUUID} due to ${writeFailedMessage.err}")
-        listener.onWriteFailed(writeFailedMessage.device, writeFailedMessage.charUUID, writeFailedMessage.err)
+        Log.d(logTag, "write failed for ${writeFailureMessage.charUUID} due to ${writeFailureMessage.err}")
+        listener.onWriteFailed(writeFailureMessage.device, writeFailureMessage.charUUID, writeFailureMessage.err)
         currentState = States.Connected
       }
       IMessage.CentralStates.READ.ordinal -> {
@@ -143,14 +144,36 @@ class StateHandler(
         Log.d(logTag, "Read successfully from ${readSuccessMessage.charUUID} and value${readSuccessMessage.value?.decodeToString()}")
 
         listener.onReadSuccess(readSuccessMessage.charUUID, readSuccessMessage.value)
-        currentState = States.Reading
+        currentState = States.Connected
       }
-      IMessage.CentralStates.READ_FAILED.ordinal -> {
-        val readFailedMessage = msg.obj as ReadFailedMessage
-        Log.d(logTag, "Read failed for ${readFailedMessage.charUUID} with err: ${readFailedMessage.err}")
+      IMessage.CentralStates.READ_FAILURE.ordinal -> {
+        val readFailureMessage = msg.obj as ReadFailureMessage
+        Log.d(logTag, "Read failed for ${readFailureMessage.charUUID} with err: ${readFailureMessage.err}")
 
-        listener.onReadFailure(readFailedMessage.charUUID, readFailedMessage.err)
-        currentState = States.Reading
+        listener.onReadFailure(readFailureMessage.charUUID, readFailureMessage.err)
+        currentState = States.Connected
+      }
+
+      IMessage.CentralStates.SUBSCRIBE.ordinal -> {
+        val subscribeMessage = msg.obj as SubscribeMessage
+        Log.d(logTag, "subscribing to ${subscribeMessage.charUUID}")
+
+        controller.subscribe(subscribeMessage)
+        currentState = States.Subscribing
+      }
+      IMessage.CentralStates.SUBSCRIBE_SUCCESS.ordinal -> {
+        val subscribeSuccessMessage = msg.obj as SubscribeSuccessMessage
+        Log.d(logTag, "Subscribed successfully to ${subscribeSuccessMessage.charUUID}")
+
+        listener.onSubscriptionSuccess(subscribeSuccessMessage.charUUID)
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.SUBSCRIBE_FAILURE.ordinal -> {
+        val subscribeFailureMessage = msg.obj as SubscribeFailureMessage
+        Log.d(logTag, "Read failed for ${subscribeFailureMessage.charUUID} with err: ${subscribeFailureMessage.err}")
+
+        listener.onSubscriptionFailure(subscribeFailureMessage.charUUID, subscribeFailureMessage.err)
+        currentState = States.Connected
       }
     }
   }

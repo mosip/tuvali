@@ -21,10 +21,15 @@ abstract class IMessage(val commandType: CentralStates) {
 
     WRITE,
     WRITE_SUCCESS,
-    WRITE_FAILED,
+    WRITE_FAILURE,
 
     READ,
     READ_SUCCESS,
-    READ_FAILED
+    READ_FAILURE,
+
+    SUBSCRIBE,
+    SUBSCRIBE_SUCCESS,
+    SUBSCRIBE_FAILURE,
+    NOTIFICATION_RECEIVED
   }
 }

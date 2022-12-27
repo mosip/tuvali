@@ -52,12 +52,28 @@ class Controller(context: Context) {
     gattClient.read(readMessage.serviceUUID, readMessage.charUUID, this::onReadSuccess, this::onReadFailed)
   }
 
+  fun subscribe(subscribeMessage: SubscribeMessage) {
+    gattClient.subscribe(subscribeMessage.serviceUUID, subscribeMessage.charUUID, this::onNotificationReceived, this::onSubscribeSuccess, this::onSubscribeFailure)
+  }
+
   fun discoverServices() {
     gattClient.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
   }
 
   fun requestMTU(mtu: Int) {
     gattClient.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+  }
+
+  private fun onSubscribeSuccess(charUUID: UUID) {
+    messageSender.sendMessage(SubscribeSuccessMessage(charUUID))
+  }
+
+  private fun onSubscribeFailure(charUUID: UUID, err: Int) {
+    messageSender.sendMessage(SubscribeFailureMessage(charUUID, err))
+  }
+
+  private fun onNotificationReceived(charUUID: UUID, data: ByteArray) {
+    messageSender.sendMessage(NotificationReceivedMessage(charUUID, data))
   }
 
   private fun onRequestMTUSuccess(mtu: Int) {
@@ -75,7 +91,7 @@ class Controller(context: Context) {
   }
 
   private fun onReadFailed(charUUID: UUID?, errorCode: Int) {
-    val failedMessage = ReadFailedMessage(charUUID, errorCode)
+    val failedMessage = ReadFailureMessage(charUUID, errorCode)
 
     messageSender.sendMessage(failedMessage)
   }
@@ -87,9 +103,9 @@ class Controller(context: Context) {
   }
 
   private fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, errorCode: Int) {
-    val writeFailedMessage = WriteFailedMessage(device, charUUID, errorCode)
+    val writeFailureMessage = WriteFailureMessage(device, charUUID, errorCode)
 
-    messageSender.sendMessage(writeFailedMessage)
+    messageSender.sendMessage(writeFailureMessage)
   }
 
   private fun onDeviceFound(scanResult: ScanResult) {

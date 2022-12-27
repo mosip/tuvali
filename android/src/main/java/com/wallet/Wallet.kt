@@ -23,7 +23,6 @@ import com.wallet.transfer.message.InitResponseTransferMessage
 import com.wallet.transfer.message.ResponseChunkWriteSuccessMessage
 import com.wallet.transfer.message.ResponseSizeWriteSuccessMessage
 import org.bouncycastle.util.encoders.Hex
-import java.lang.Integer.parseInt
 import java.security.SecureRandom
 import java.util.*
 
@@ -138,6 +137,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
+    central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -176,6 +176,14 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
       }
     }
+  }
+
+  override fun onSubscriptionSuccess(charUUID: UUID) {
+    // TODO("Not yet implemented")
+  }
+
+  override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
+    // TODO("Not yet implemented")
   }
 
   override fun onDeviceDisconnected() {

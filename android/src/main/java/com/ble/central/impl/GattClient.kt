@@ -5,10 +5,11 @@ import android.bluetooth.*
 import android.bluetooth.BluetoothGatt.*
 import android.content.Context
 import android.util.Log
-import com.facebook.common.util.Hex
 import java.util.*
 
 class GattClient(var context: Context) {
+  private lateinit var onNotificationReceived: (UUID, ByteArray) -> Unit
+  private lateinit var onSubscriptionSuccess: (UUID) -> Unit
   private lateinit var onReadSuccess: (UUID, ByteArray?) -> Unit
   private lateinit var onReadFailure: (UUID?, Int) -> Unit
   private lateinit var onRequestMTUSuccess: (mtu: Int) -> Unit
@@ -69,6 +70,17 @@ class GattClient(var context: Context) {
         Log.i(logTag, "Failed to read char: : ${characteristic?.uuid}")
       }
     }
+
+    override fun onCharacteristicChanged(
+      gatt: BluetoothGatt?,
+      characteristic: BluetoothGattCharacteristic?
+    ) {
+      Log.i(logTag, "Got notification from char ${characteristic?.uuid} and value ${
+        characteristic?.value?.get(0)?.toInt()}")
+
+      characteristic?.let { onNotificationReceived(it.uuid, it.value) }
+    }
+
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
 
@@ -208,6 +220,35 @@ class GattClient(var context: Context) {
       if(!read) {
         Log.d(logTag, "Failed to start reading")
         onFailure(charUUID, GATT_FAILURE)
+      }
+
+    } catch(e: Error) {
+      onFailure(charUUID, GATT_FAILURE)
+    }
+  }
+
+  @SuppressLint("MissingPermission")
+  fun subscribe(
+    serviceUUID: UUID,
+    charUUID: UUID,
+    onNotificationReceived: (UUID, ByteArray) -> Unit,
+    onSuccess: (UUID) -> Unit,
+    onFailure: (UUID, Int) -> Unit
+  ) {
+    this.onSubscriptionSuccess = onSuccess
+    this.onNotificationReceived = onNotificationReceived
+
+    try {
+      val service = bluetoothGatt!!.getService(serviceUUID)
+      val characteristic = service.getCharacteristic(charUUID)
+      val notificationsEnabled =
+        bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
+
+      if(!notificationsEnabled) {
+        Log.d(logTag, "Failed to subscribe to $charUUID")
+        onFailure(charUUID, GATT_FAILURE)
+      } else {
+        onSubscriptionSuccess(charUUID)
       }
 
     } catch(e: Error) {

@@ -45,6 +45,12 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(readMessage)
   }
 
+  fun subscribe(serviceUuid: UUID, charUUID: UUID) {
+    val subscribeMessage = SubscribeMessage(serviceUuid, charUUID)
+
+    messageSender.sendMessage(subscribeMessage)
+  }
+
   fun discoverServices() {
     messageSender.sendMessage(DiscoverServicesMessage())
   }

@@ -17,4 +17,6 @@ interface ICentralListener {
   fun onRequestMTUFailure(errorCode: Int)
   fun onReadSuccess(charUUID: UUID, value: ByteArray?)
   fun onReadFailure(charUUID: UUID?, err: Int)
+  fun onSubscriptionSuccess(charUUID: UUID)
+  fun onSubscriptionFailure(charUUID: UUID, err: Int)
 }
