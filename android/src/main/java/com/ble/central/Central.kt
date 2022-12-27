@@ -69,4 +69,12 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(ScanStopMessage())
   }
 
+  fun disconnect() {
+    messageSender.sendMessage(DisconnectDeviceMessage())
+  }
+
+  fun close() {
+    messageSender.sendMessage(CloseMessage())
+  }
+
 }

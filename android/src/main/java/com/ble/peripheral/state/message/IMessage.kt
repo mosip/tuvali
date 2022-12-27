@@ -7,12 +7,17 @@ abstract class IMessage(val commandType: PeripheralMessageTypes) {
     ADV_START,
     ADV_START_SUCCESS,
     ADV_START_FAILURE,
+
     DEVICE_CONNECTED,
     DEVICE_NOT_CONNECTED,
+
     RECEIVED_WRITE,
     ON_READ,
     ENABLE_COMMUNICATION,
     SEND_DATA,
-    SEND_DATA_NOTIFIED
+    SEND_DATA_NOTIFIED,
+
+    DISCONNECT,
+    CLOSE_SERVER
   }
 }

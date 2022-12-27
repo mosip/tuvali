@@ -8,6 +8,7 @@ abstract class IMessage(val commandType: CentralStates) {
 
     DEVICE_FOUND,
     CONNECT_DEVICE,
+    DISCONNECT_DEVICE,
     DEVICE_CONNECTED,
     DEVICE_DISCONNECTED,
 
@@ -33,6 +34,8 @@ abstract class IMessage(val commandType: CentralStates) {
     UNSUBSCRIBE,
     UNSUBSCRIBE_SUCCESS,
     UNSUBSCRIBE_FAILURE,
-    NOTIFICATION_RECEIVED
+    NOTIFICATION_RECEIVED,
+
+    CLOSE
   }
 }

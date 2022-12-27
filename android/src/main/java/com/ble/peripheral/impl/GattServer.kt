@@ -33,8 +33,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
   }
 
-  fun stop() {
-    // TODO: Handle explicit connection close
+  fun close() {
     gattServer.close()
   }
 
@@ -110,6 +109,13 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   ) {
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+    }
+  }
+
+  fun disconnect() {
+    if(bluetoothDevice != null) {
+      gattServer.cancelConnection(bluetoothDevice)
+      bluetoothDevice = null
     }
   }
 }

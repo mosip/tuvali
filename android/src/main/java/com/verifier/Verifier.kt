@@ -199,6 +199,16 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           }
         }
       }
+      GattService.VERIFICATION_STATUS_CHAR_UUID -> {
+        if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
+          if (isSent) {
+            peripheral.disconnect()
+            peripheral.close()
+          } else {
+            Log.e(logTag, "onSendDataFail: Failed to notify verification status to wallet about")
+          }
+        }
+      }
     }
   }
 

@@ -8,10 +8,7 @@ import android.util.Log
 import com.ble.peripheral.impl.Controller
 import com.ble.peripheral.state.IMessageSender
 import com.ble.peripheral.state.StateHandler
-import com.ble.peripheral.state.message.AdvertisementStartMessage
-import com.ble.peripheral.state.message.EnableCommunicationMessage
-import com.ble.peripheral.state.message.SendDataMessage
-import com.ble.peripheral.state.message.SetupGattServiceMessage
+import com.ble.peripheral.state.message.*
 import java.util.*
 
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
@@ -57,5 +54,13 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     } else {
       Log.e(logTag, "sendData: failed as communication not ready, current state: $currentState")
     }
+  }
+
+  fun disconnect() {
+   messageSender.sendMessage(DisconnectDeviceMessage())
+  }
+
+  fun close() {
+    messageSender.sendMessage(CloseServerMessage())
   }
 }

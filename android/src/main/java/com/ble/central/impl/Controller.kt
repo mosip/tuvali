@@ -70,18 +70,15 @@ class Controller(context: Context) {
   }
 
   fun unsubscribe(unsubscribeMessage: UnsubscribeMessage) {
-    val subscribed = gattClient.subscribe(
+    val unsubscribe = gattClient.unsubscribe(
       unsubscribeMessage.serviceUUID,
       unsubscribeMessage.charUUID,
-      this::onNotificationReceived
     )
 
-    if(subscribed) {
-      messageSender.sendMessage(SubscribeSuccessMessage(unsubscribeMessage.charUUID))
+    if(unsubscribe) {
+      messageSender.sendMessage(UnsubscribeSuccessMessage(unsubscribeMessage.charUUID))
     } else {
-      messageSender.sendMessage(SubscribeFailureMessage(unsubscribeMessage.charUUID,
-        BluetoothGatt.GATT_FAILURE
-      ))
+      messageSender.sendMessage(UnsubscribeFailureMessage(unsubscribeMessage.charUUID, BluetoothGatt.GATT_FAILURE))
     }
   }
 
@@ -91,6 +88,14 @@ class Controller(context: Context) {
 
   fun requestMTU(mtu: Int) {
     gattClient.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+  }
+
+  fun disconnect() {
+    gattClient.disconnect()
+  }
+
+  fun close() {
+    gattClient.close()
   }
 
   private fun onNotificationReceived(charUUID: UUID, data: ByteArray) {

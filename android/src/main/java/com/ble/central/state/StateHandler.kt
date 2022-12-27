@@ -22,7 +22,9 @@ class StateHandler(
     Scanning,
     WaitingToConnect,
     Connecting,
+    Disconnecting,
     Connected,
+    Disconnected,
     DiscoveringServices,
     RequestingMTU,
     Writing,
@@ -64,6 +66,18 @@ class StateHandler(
 
         controller.connect(connectDeviceMessage.device)
         currentState = States.Connecting
+      }
+      IMessage.CentralStates.DISCONNECT_DEVICE.ordinal -> {
+        Log.d(logTag, "disconnecting device")
+
+        controller.disconnect()
+        currentState = States.Disconnecting
+      }
+      IMessage.CentralStates.CLOSE.ordinal -> {
+        Log.d(logTag, "closing gatt client")
+
+        controller.close()
+        currentState = States.Init
       }
       IMessage.CentralStates.DEVICE_CONNECTED.ordinal -> {
         val deviceConnectedMessage = msg.obj as DeviceConnectedMessage
@@ -191,17 +205,17 @@ class StateHandler(
         currentState = States.Unsubscribing
       }
       IMessage.CentralStates.UNSUBSCRIBE_SUCCESS.ordinal -> {
-        val subscribeSuccessMessage = msg.obj as SubscribeSuccessMessage
-        Log.d(logTag, "Unsubscribed successfully to ${subscribeSuccessMessage.charUUID}")
+        val unsubscribeSuccessMessage = msg.obj as UnsubscribeSuccessMessage
+        Log.d(logTag, "Unsubscribed successfully to ${unsubscribeSuccessMessage.charUUID}")
 
-        listener.onSubscriptionSuccess(subscribeSuccessMessage.charUUID)
+        listener.onSubscriptionSuccess(unsubscribeSuccessMessage.charUUID)
         currentState = States.Connected
       }
       IMessage.CentralStates.UNSUBSCRIBE_FAILURE.ordinal -> {
-        val subscribeFailureMessage = msg.obj as SubscribeFailureMessage
-        Log.d(logTag, "Failed to unsubscribe ${subscribeFailureMessage.charUUID} with err: ${subscribeFailureMessage.err}")
+        val unsubscribeFailureMessage = msg.obj as UnsubscribeFailureMessage
+        Log.d(logTag, "Failed to unsubscribe ${unsubscribeFailureMessage.charUUID} with err: ${unsubscribeFailureMessage.err}")
 
-        listener.onSubscriptionFailure(subscribeFailureMessage.charUUID, subscribeFailureMessage.err)
+        listener.onSubscriptionFailure(unsubscribeFailureMessage.charUUID, unsubscribeFailureMessage.err)
         currentState = States.Connected
       }
     }

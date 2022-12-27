@@ -101,6 +101,16 @@ class StateHandler(
         Log.d(logTag, "sendData: uuid: ${sendDataNotifiedMessage.charUUID}, isNotified: ${sendDataNotifiedMessage.isNotificationTriggered}")
         peripheralListener.onSendDataNotified(sendDataNotifiedMessage.charUUID, sendDataNotifiedMessage.isNotificationTriggered)
       }
+
+      IMessage.PeripheralMessageTypes.DISCONNECT.ordinal -> {
+        Log.d(logTag, "disconnecting device")
+        controller.disconnect()
+      }
+
+      IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
+        Log.d(logTag, "closing gatt server")
+        controller.closeServer()
+      }
     }
   }
 

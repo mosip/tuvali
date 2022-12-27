@@ -284,4 +284,20 @@ class GattClient(var context: Context) {
       return false
     }
   }
+
+  @SuppressLint("MissingPermission")
+  fun disconnect() {
+    if(bluetoothGatt != null) {
+      bluetoothGatt!!.disconnect()
+    }
+  }
+
+  @SuppressLint("MissingPermission")
+  fun close() {
+    if(bluetoothGatt != null) {
+      bluetoothGatt!!.close()
+      bluetoothGatt = null
+    }
+  }
+
 }

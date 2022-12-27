@@ -80,4 +80,12 @@ class Controller(context: Context) {
     val onReadMessage = OnReadMessage(characteristic, isRead)
     messageSender.sendMessage(onReadMessage)
   }
+
+  fun closeServer() {
+    gattServer.close()
+  }
+
+  fun disconnect() {
+    gattServer.disconnect()
+  }
 }
