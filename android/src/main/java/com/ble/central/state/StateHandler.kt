@@ -27,7 +27,8 @@ class StateHandler(
     RequestingMTU,
     Writing,
     Reading,
-    Subscribing
+    Subscribing,
+    Unsubscribing
   }
 
   @SuppressLint("MissingPermission")
@@ -170,7 +171,35 @@ class StateHandler(
       }
       IMessage.CentralStates.SUBSCRIBE_FAILURE.ordinal -> {
         val subscribeFailureMessage = msg.obj as SubscribeFailureMessage
-        Log.d(logTag, "Read failed for ${subscribeFailureMessage.charUUID} with err: ${subscribeFailureMessage.err}")
+        Log.d(logTag, "failed to subscribe ${subscribeFailureMessage.charUUID} with err: ${subscribeFailureMessage.err}")
+
+        listener.onSubscriptionFailure(subscribeFailureMessage.charUUID, subscribeFailureMessage.err)
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.NOTIFICATION_RECEIVED.ordinal -> {
+        val notificationReceivedMessage = msg.obj as NotificationReceivedMessage
+        Log.d(logTag, "Received notification from ${notificationReceivedMessage.charUUID} with value: ${notificationReceivedMessage.value}")
+
+        listener.onNotificationReceived(notificationReceivedMessage.charUUID, notificationReceivedMessage.value)
+      }
+
+      IMessage.CentralStates.UNSUBSCRIBE.ordinal -> {
+        val unsubscribeMessage = msg.obj as UnsubscribeMessage
+        Log.d(logTag, "Unsubscribing to ${unsubscribeMessage.charUUID}")
+
+        controller.unsubscribe(unsubscribeMessage)
+        currentState = States.Unsubscribing
+      }
+      IMessage.CentralStates.UNSUBSCRIBE_SUCCESS.ordinal -> {
+        val subscribeSuccessMessage = msg.obj as SubscribeSuccessMessage
+        Log.d(logTag, "Unsubscribed successfully to ${subscribeSuccessMessage.charUUID}")
+
+        listener.onSubscriptionSuccess(subscribeSuccessMessage.charUUID)
+        currentState = States.Connected
+      }
+      IMessage.CentralStates.UNSUBSCRIBE_FAILURE.ordinal -> {
+        val subscribeFailureMessage = msg.obj as SubscribeFailureMessage
+        Log.d(logTag, "Failed to unsubscribe ${subscribeFailureMessage.charUUID} with err: ${subscribeFailureMessage.err}")
 
         listener.onSubscriptionFailure(subscribeFailureMessage.charUUID, subscribeFailureMessage.err)
         currentState = States.Connected

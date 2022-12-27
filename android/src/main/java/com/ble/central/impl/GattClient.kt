@@ -6,10 +6,10 @@ import android.bluetooth.BluetoothGatt.*
 import android.content.Context
 import android.util.Log
 import java.util.*
+import kotlin.math.log
 
 class GattClient(var context: Context) {
-  private lateinit var onNotificationReceived: (UUID, ByteArray) -> Unit
-  private lateinit var onSubscriptionSuccess: (UUID) -> Unit
+  private var onNotificationReceived: ((UUID, ByteArray) -> Unit)? = null
   private lateinit var onReadSuccess: (UUID, ByteArray?) -> Unit
   private lateinit var onReadFailure: (UUID?, Int) -> Unit
   private lateinit var onRequestMTUSuccess: (mtu: Int) -> Unit
@@ -78,7 +78,13 @@ class GattClient(var context: Context) {
       Log.i(logTag, "Got notification from char ${characteristic?.uuid} and value ${
         characteristic?.value?.get(0)?.toInt()}")
 
-      characteristic?.let { onNotificationReceived(it.uuid, it.value) }
+      characteristic?.let {
+        if(onNotificationReceived != null) {
+          onNotificationReceived?.let { it1 -> it1(it.uuid, it.value) }
+        } else {
+          Log.d(logTag, "Notification receiver callback is not set")
+        }
+      }
     }
 
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
@@ -231,11 +237,8 @@ class GattClient(var context: Context) {
   fun subscribe(
     serviceUUID: UUID,
     charUUID: UUID,
-    onNotificationReceived: (UUID, ByteArray) -> Unit,
-    onSuccess: (UUID) -> Unit,
-    onFailure: (UUID, Int) -> Unit
-  ) {
-    this.onSubscriptionSuccess = onSuccess
+    onNotificationReceived: (UUID, ByteArray) -> Unit
+  ): Boolean {
     this.onNotificationReceived = onNotificationReceived
 
     try {
@@ -244,15 +247,41 @@ class GattClient(var context: Context) {
       val notificationsEnabled =
         bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
 
-      if(!notificationsEnabled) {
-        Log.d(logTag, "Failed to subscribe to $charUUID")
-        onFailure(charUUID, GATT_FAILURE)
+      return if(notificationsEnabled) {
+        true
       } else {
-        onSubscriptionSuccess(charUUID)
+        Log.d(logTag, "Failed to subscribe to $charUUID")
+        false
       }
 
     } catch(e: Error) {
-      onFailure(charUUID, GATT_FAILURE)
+      return false
+    }
+  }
+
+
+  @SuppressLint("MissingPermission")
+  fun unsubscribe(
+    serviceUUID: UUID,
+    charUUID: UUID,
+  ): Boolean {
+
+    try {
+      val service = bluetoothGatt!!.getService(serviceUUID)
+      val characteristic = service.getCharacteristic(charUUID)
+      val notificationsEnabled =
+        bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
+      onNotificationReceived = null
+
+      return if(notificationsEnabled) {
+        true
+      } else {
+        Log.d(logTag, "Failed to unsubscribe to $charUUID")
+        false
+      }
+
+    } catch(e: Error) {
+      return false
     }
   }
 }

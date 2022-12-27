@@ -30,6 +30,9 @@ abstract class IMessage(val commandType: CentralStates) {
     SUBSCRIBE,
     SUBSCRIBE_SUCCESS,
     SUBSCRIBE_FAILURE,
+    UNSUBSCRIBE,
+    UNSUBSCRIBE_SUCCESS,
+    UNSUBSCRIBE_FAILURE,
     NOTIFICATION_RECEIVED
   }
 }

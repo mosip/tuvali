@@ -51,6 +51,12 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(subscribeMessage)
   }
 
+  fun unsubscribe(serviceUuid: UUID, charUUID: UUID) {
+    val unsubscribeMessage = UnsubscribeMessage(serviceUuid, charUUID)
+
+    messageSender.sendMessage(unsubscribeMessage)
+  }
+
   fun discoverServices() {
     messageSender.sendMessage(DiscoverServicesMessage())
   }

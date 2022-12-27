@@ -19,4 +19,5 @@ interface ICentralListener {
   fun onReadFailure(charUUID: UUID?, err: Int)
   fun onSubscriptionSuccess(charUUID: UUID)
   fun onSubscriptionFailure(charUUID: UUID, err: Int)
+  fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
 }

@@ -13,10 +13,12 @@ import com.cryptography.SecretsTranslator
 import com.cryptography.WalletCryptoBox
 import com.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
+import com.openid4vpble.Openid4vpBleModule
 import com.transfer.Semaphore
 import com.transfer.Util
 import com.verifier.GattService
 import com.verifier.Verifier
+import com.wallet.transfer.ITransferListener
 import com.wallet.transfer.TransferHandler
 import com.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
 import com.wallet.transfer.message.InitResponseTransferMessage
@@ -27,7 +29,7 @@ import java.security.SecureRandom
 import java.util.*
 
 class Wallet(context: Context, private val responseListener: (String, String) -> Unit) :
-  ICentralListener {
+  ICentralListener, ITransferListener {
   private val logTag = "Wallet"
 
   private val secureRandom: SecureRandom = SecureRandom()
@@ -52,7 +54,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   init {
     central = Central(context, this@Wallet)
     handlerThread.start()
-    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID)
+    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
@@ -137,7 +139,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
-    central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -208,6 +209,29 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
         transferHandler.readSemaphoreAckDelayed()
+      }
+    }
+  }
+
+  override fun onResponseSent() {
+    central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
+  }
+
+  override fun onResponseSendFailure(errorMsg: String) {
+  //    TODO("Not yet implemented")
+  }
+
+  override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
+    when (charUUID) {
+      GattService.VERIFICATION_STATUS_CHAR_UUID -> {
+        val status = value?.get(0)?.toInt()
+        if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
+          responseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value)
+        } else {
+          responseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.REJECTED.value)
+        }
+
+        central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
       }
     }
   }

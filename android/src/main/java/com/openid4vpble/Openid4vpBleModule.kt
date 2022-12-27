@@ -10,7 +10,12 @@ import org.json.JSONObject
 class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val verifier = Verifier(reactContext, this::emitNearbyEvent)
-    private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+  private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+
+  enum class InjiVerificationStates(val value: String) {
+    ACCEPTED("\"ACCEPTED\""),
+    REJECTED("\"REJECTED\"")
+  }
 
   private var activeMode: ModeOfOperation = ModeOfOperation.UnInitialised
   enum class ModeOfOperation {
@@ -77,7 +82,11 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
         wallet.writeIdentity()
       }
       "send-vc" -> {
+        callback()
         wallet.sendData(messageSplits[1])
+      }
+      "send-vc:response" -> {
+        verifier.notifyVerificationStatus(messageSplits[1] == InjiVerificationStates.ACCEPTED.value)
       }
     }
   }

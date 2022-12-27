@@ -1,6 +1,6 @@
 package com.wallet.transfer
 
 interface ITransferListener {
-  fun onResponseReceived(data: ByteArray)
-  fun onResponseReceivedFailed(errorMsg: String)
+  fun onResponseSent()
+  fun onResponseSendFailure(errorMsg: String)
 }

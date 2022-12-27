@@ -78,6 +78,16 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     transferHandler.sendMessage(InitTransferMessage(request.toByteArray()))
   }
 
+  fun notifyVerificationStatus(accepted: Boolean) {
+    if(accepted) {
+      peripheral.sendData(SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID,
+        byteArrayOf(com.wallet.transfer.TransferHandler.VerificationStates.ACCEPTED.ordinal.toByte()))
+    } else {
+      peripheral.sendData(SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID,
+        byteArrayOf(com.wallet.transfer.TransferHandler.VerificationStates.REJECTED.ordinal.toByte()))
+    }
+  }
+
   override fun onAdvertisementStartSuccessful() {
     Log.d(logTag, "onAdvertisementStartSuccess")
     val successCallback = callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK]

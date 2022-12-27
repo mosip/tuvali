@@ -2,6 +2,7 @@ package com.ble.central.impl
 
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothDevice
+import android.bluetooth.BluetoothGatt
 import android.bluetooth.le.ScanResult
 import android.content.Context
 import com.ble.central.state.IMessageSender
@@ -53,7 +54,35 @@ class Controller(context: Context) {
   }
 
   fun subscribe(subscribeMessage: SubscribeMessage) {
-    gattClient.subscribe(subscribeMessage.serviceUUID, subscribeMessage.charUUID, this::onNotificationReceived, this::onSubscribeSuccess, this::onSubscribeFailure)
+    val subscribed = gattClient.subscribe(
+      subscribeMessage.serviceUUID,
+      subscribeMessage.charUUID,
+      this::onNotificationReceived
+    )
+
+    if(subscribed) {
+      messageSender.sendMessage(SubscribeSuccessMessage(subscribeMessage.charUUID))
+    } else {
+      messageSender.sendMessage(SubscribeFailureMessage(subscribeMessage.charUUID,
+        BluetoothGatt.GATT_FAILURE
+      ))
+    }
+  }
+
+  fun unsubscribe(unsubscribeMessage: UnsubscribeMessage) {
+    val subscribed = gattClient.subscribe(
+      unsubscribeMessage.serviceUUID,
+      unsubscribeMessage.charUUID,
+      this::onNotificationReceived
+    )
+
+    if(subscribed) {
+      messageSender.sendMessage(SubscribeSuccessMessage(unsubscribeMessage.charUUID))
+    } else {
+      messageSender.sendMessage(SubscribeFailureMessage(unsubscribeMessage.charUUID,
+        BluetoothGatt.GATT_FAILURE
+      ))
+    }
   }
 
   fun discoverServices() {
@@ -62,14 +91,6 @@ class Controller(context: Context) {
 
   fun requestMTU(mtu: Int) {
     gattClient.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
-  }
-
-  private fun onSubscribeSuccess(charUUID: UUID) {
-    messageSender.sendMessage(SubscribeSuccessMessage(charUUID))
-  }
-
-  private fun onSubscribeFailure(charUUID: UUID, err: Int) {
-    messageSender.sendMessage(SubscribeFailureMessage(charUUID, err))
   }
 
   private fun onNotificationReceived(charUUID: UUID, data: ByteArray) {
