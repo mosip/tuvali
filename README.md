@@ -69,6 +69,9 @@ yarn example android
 ```
 
 ## Integrate and compile with Inji (Local)
+#### Pre Requisites
+1. Install yalc with `yarn global add yalc`
+
 #### On Tuvali repo
 1. Compile Tuvali with `yarn` command
 2. Public Tuvali to local Yalc repo with `yalc publish`

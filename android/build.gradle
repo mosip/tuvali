@@ -145,7 +145,7 @@ if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
     libraryName = "Openid4vpBle"
-    codegenJavaPackageName = "com.openid4vpble"
+    codegenJavaPackageName = "io.mosip.openid4vpble"
   }
 }
 
