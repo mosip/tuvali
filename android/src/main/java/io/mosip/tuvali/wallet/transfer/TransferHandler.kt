@@ -142,7 +142,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       central.write(
         serviceUUID,
         GattService.RESPONSE_CHAR_UUID,
-        byteArrayOf(0, 1, 73, Byte.MAX_VALUE) + chunkArray
+        chunkArray
       )
 
       readCounter = 0

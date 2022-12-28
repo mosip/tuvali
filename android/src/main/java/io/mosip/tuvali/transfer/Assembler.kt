@@ -1,6 +1,7 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
+import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 
 class Assembler(private val totalSize: Int) {
@@ -24,8 +25,8 @@ class Assembler(private val totalSize: Int) {
     if (chunkData.size < chunkMetaSize) {
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
-    val seqNumber = twoBytesToInt(chunkData.copyOfRange(0, 2))
-    val mtuSize = twoBytesToInt(chunkData.copyOfRange(2, 4))
+    val seqNumber = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
+    val mtuSize = twoBytesToIntBigEndian(chunkData.copyOfRange(2, 4))
     if (chunkData.size > mtuSize) {
       throw CorruptedChunkReceivedException(chunkData.size, seqNumber, mtuSize)
     }
@@ -52,12 +53,5 @@ class Assembler(private val totalSize: Int) {
 
   fun data(): ByteArray {
     return data
-  }
-
-  private fun twoBytesToInt(num: ByteArray): Int {
-    //TODO: Document endianness here
-    val firstByte = num[0]
-    val secondByte = num[1]
-    return secondByte.toInt() + (256 * firstByte.toInt())
   }
 }
