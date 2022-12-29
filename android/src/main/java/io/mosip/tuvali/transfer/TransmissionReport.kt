@@ -1,9 +1,9 @@
 package io.mosip.tuvali.transfer
 
 class TransmissionReport  {
-  private val type: ReportType
-  private val  totalPages: Int
-  private val missingSequences: IntArray?
+  val type: ReportType
+  private val totalPages: Int
+  val missingSequences: IntArray?
 
   public enum class ReportType {
     MISSING_CHUNKS,

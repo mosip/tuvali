@@ -20,10 +20,7 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
-import io.mosip.tuvali.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
-import io.mosip.tuvali.wallet.transfer.message.InitResponseTransferMessage
-import io.mosip.tuvali.wallet.transfer.message.ResponseChunkWriteSuccessMessage
-import io.mosip.tuvali.wallet.transfer.message.ResponseSizeWriteSuccessMessage
+import io.mosip.tuvali.wallet.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
@@ -152,21 +149,10 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
-//    Log.d(logTag, "Read from $charUUID successfully and value is $value")
+    Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        value?.let {
-          Log.d(logTag, "onReadSuccess: size of semaphore value: ${value.size}")
-        }
-        if (value != null && value.isNotEmpty()) {
-          Log.d(logTag, "on semaphore read success value: ${value[0].toInt()}")
-          transferHandler.sendMessage(
-            ChunkWriteToRemoteStatusUpdatedMessage(value[0].toInt())
-          )
-        } else {
-          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
-        }
       }
     }
   }
@@ -174,7 +160,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onReadFailure(charUUID: UUID?, err: Int) {
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
       }
     }
   }
@@ -193,6 +178,12 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
+
+    when(charUUID) {
+      GattService.RESPONSE_CHAR_UUID -> {
+        transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
+      }
+    }
   }
 
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
