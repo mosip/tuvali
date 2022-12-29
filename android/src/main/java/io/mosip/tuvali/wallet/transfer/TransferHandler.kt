@@ -5,10 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.transfer.Chunker
-import io.mosip.tuvali.transfer.RetryChunker
-import io.mosip.tuvali.transfer.Semaphore
-import io.mosip.tuvali.transfer.TransferReport
+import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.transfer.message.ResponseTransferFailedMessage
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -138,7 +135,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   }
 
   private fun sendResponseChunk() {
-    Log.d(logTag, "Writing Chunk: $chunkCounter and is complete: ${chunker?.isComplete()}")
     if (chunker?.isComplete() == true) {
       this.sendMessage(ResponseTransferCompleteMessage())
       return
@@ -146,6 +142,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
     val chunkArray = chunker?.next()
     if (chunkArray != null) {
+      Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkArray)}")
       writeResponseChunk(chunkArray)
     }
   }

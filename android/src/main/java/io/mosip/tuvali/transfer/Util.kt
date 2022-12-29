@@ -1,7 +1,11 @@
 package io.mosip.tuvali.transfer
 
 import org.bouncycastle.util.encoders.Hex
+import java.io.ByteArrayInputStream
+import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 
 class Util {
@@ -31,6 +35,29 @@ class Util {
       val firstByte: UByte = convertedNum[0]
       val secondByte: UByte = convertedNum[1]
       return secondByte.toInt() + (256 * firstByte.toInt())
+    }
+
+    fun compress(bytes: ByteArray): ByteArray? {
+//      return bytes
+      val out = ByteArrayOutputStream()
+      try {
+        GZIPOutputStream(out).use { gzipOutputStream ->
+          gzipOutputStream.write(bytes, 0, bytes.size)
+          gzipOutputStream.finish()
+          return out.toByteArray()
+        }
+      } catch (e: Exception) {
+        throw RuntimeException("Error while compression!", e)
+      }
+    }
+
+    fun decompress(bytes: ByteArray): ByteArray? {
+//      return bytes
+      try {
+        GZIPInputStream(ByteArrayInputStream(bytes)).use { gzipInputStream -> return gzipInputStream.readBytes() }
+      } catch (e: Exception) {
+        throw RuntimeException("Error while decompression!", e)
+      }
     }
   }
 }

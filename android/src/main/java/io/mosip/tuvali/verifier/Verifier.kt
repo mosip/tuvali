@@ -197,7 +197,9 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     val decryptedData = secretsTranslator?.decryptUponReceive(data)
     if (decryptedData != null) {
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
-      responseListener("send-vc", String(decryptedData))
+      val decompressedData = Util.decompress(decryptedData)
+      Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
+      responseListener("send-vc", String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
     }

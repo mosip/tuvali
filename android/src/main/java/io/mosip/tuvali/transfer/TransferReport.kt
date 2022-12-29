@@ -5,6 +5,7 @@ class TransferReport  {
   private val totalPages: Int
   val missingSequences: IntArray?
 
+  //TODO: give static number to respective types below
   enum class ReportType {
     MISSING_CHUNKS,
     SUCCESS

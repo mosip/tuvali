@@ -8,6 +8,7 @@ import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.TransferReport
+import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.transfer.message.*
@@ -95,6 +96,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     if (assembler?.isComplete() == true) {
       return
     }
+    Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
 
     if (assembler?.isComplete() == true) {
