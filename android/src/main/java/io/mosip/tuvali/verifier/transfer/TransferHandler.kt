@@ -8,7 +8,6 @@ import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.Chunker
 import io.mosip.tuvali.transfer.Semaphore
-import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
@@ -29,7 +28,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     TransferComplete
   }
 
-  private var currentState: States = States.UnInitialised
+  private var currentState: States = States.ResponseSizeReadPending
   private var requestData: ByteArray = byteArrayOf()
   private var chunker: Chunker? = null
   private var assembler: Assembler? = null
@@ -38,73 +37,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
 
   override fun handleMessage(msg: Message) {
     when(msg.what) {
-      IMessage.TransferMessageTypes.INIT_REQUEST_TRANSFER.ordinal -> {
-        val initTransferMessage = msg.obj as InitTransferMessage
-        requestData = initTransferMessage.data
-        chunker = Chunker(requestData)
-        currentState = States.RequestSizeWritePending
-        this.sendMessage(RequestSizeWritePendingMessage(requestData.size))
-      }
-      IMessage.TransferMessageTypes.REQUEST_SIZE_WRITE_PENDING.ordinal -> {
-        val requestSizeWritePendingMessage = msg.obj as RequestSizeWritePendingMessage
-        sendRequestSize(requestSizeWritePendingMessage.size)
-      }
-      IMessage.TransferMessageTypes.REQUEST_SIZE_WRITE_SUCCESS.ordinal -> {
-        Log.d(logTag, "handleMessage: request size write success")
-        currentState = States.RequestSizeWriteSuccess
-        initRequestChunkSend()
-      }
-      IMessage.TransferMessageTypes.REQUEST_SIZE_WRITE_FAILED.ordinal -> {
-        val requestSizeWriteFailedMessage = msg.obj as RequestSizeWriteFailedMessage
-        Log.e(logTag, "handleMessage: request size write failed with error: ${requestSizeWriteFailedMessage.errorMsg}")
-        currentState = States.RequestSizeWriteFailed
-      }
-      IMessage.TransferMessageTypes.INIT_REQUEST_CHUNK_TRANSFER.ordinal -> {
-        sendRequestChunk()
-        currentState = States.RequestWritePending
-      }
-      IMessage.TransferMessageTypes.UPDATE_CHUNK_WROTE_STATUS_TO_REMOTE.ordinal -> {
-        val updateChunkWroteStatusToRemoteMessage = msg.obj as UpdateChunkWroteStatusToRemoteMessage
-        when(updateChunkWroteStatusToRemoteMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
-            markChunkSend()
+      IMessage.TransferMessageTypes.REMOTE_REQUESTED_TRANSFER_REPORT.ordinal -> {
+        val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
+        when(remoteRequestedTransferReportMessage.semaphoreCharValue) {
+          Semaphore.SemaphoreMarker.RequestReport.ordinal -> {
+            //TODO: Handle sending transfer report to remote
           }
         }
-      }
-      IMessage.TransferMessageTypes.CHUNK_READ_BY_REMOTE_STATUS_UPDATED.ordinal -> {
-        val chunkReadByRemoteStatusUpdatedMessage = msg.obj as ChunkReadByRemoteStatusUpdatedMessage
-        when(chunkReadByRemoteStatusUpdatedMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> {
-            this.sendMessage(RequestChunkWriteSuccessMessage())
-          }
-          Semaphore.SemaphoreMarker.ResendChunk.ordinal -> {
-            Log.d(logTag, "handleMessage: resend chunk requested")
-          }
-          Semaphore.SemaphoreMarker.Error.ordinal -> {
-            Log.d(logTag, "handleMessage: chunk marked as error while reading by remote")
-          }
-        }
-      }
-      IMessage.TransferMessageTypes.CHUNK_WROTE_BY_REMOTE_STATUS_UPDATED.ordinal -> {
-        val chunkWroteByRemoteStatusUpdatedMessage = msg.obj as ChunkWroteByRemoteStatusUpdatedMessage
-        when(chunkWroteByRemoteStatusUpdatedMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
-            val oldState = semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal)
-            Log.d(logTag, "chunk wrote by remote status updated from old value: $oldState to ${Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal}")
-          }
-        }
-      }
-      IMessage.TransferMessageTypes.REQUEST_CHUNK_WRITE_SUCCESS.ordinal -> {
-        sendRequestChunk()
-      }
-      IMessage.TransferMessageTypes.REQUEST_CHUNK_WRITE_FAILED.ordinal -> {
-        val requestChunkWriteFailedMessage = msg.obj as RequestChunkWriteFailedMessage
-        Log.e(logTag, "request chunk write to remote failed: ${requestChunkWriteFailedMessage.errorMsg}")
-        currentState = States.RequestWriteFailed
-      }
-      IMessage.TransferMessageTypes.REQUEST_TRANSFER_COMPLETE.ordinal -> {
-        markChunkTransferComplete()
-        currentState = States.ResponseSizeReadPending
       }
       IMessage.TransferMessageTypes.RESPONSE_SIZE_READ.ordinal -> {
         responseStartTimeInMillis = System.currentTimeMillis()
@@ -122,19 +61,6 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         val responseChunkReceivedMessage = msg.obj as ResponseChunkReceivedMessage
         assembleChunk(responseChunkReceivedMessage.chunkData)
       }
-      IMessage.TransferMessageTypes.UPDATE_CHUNK_RECEIVED_STATUS_TO_REMOTE.ordinal -> {
-        val updateChunkReceivedStatusToRemoteMessage =
-          msg.obj as UpdateChunkReceivedStatusToRemoteMessage
-        // Mark it as completed only if the previous state was pending
-        if (semaphoreWriteAtomic.get() == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
-          when(updateChunkReceivedStatusToRemoteMessage.semaphoreCharValue) {
-            Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> markChunkReceive()
-            Semaphore.SemaphoreMarker.ResendChunk.ordinal -> Log.e(logTag, "receive semaphore value to re-read")
-          }
-        } else {
-          this.sendMessageDelayed(updateChunkReceivedStatusToRemoteMessage, 2)
-        }
-      }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         Log.d(logTag, "response transfer complete in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         val responseTransferCompleteMessage = msg.obj as ResponseTransferCompleteMessage
@@ -150,54 +76,12 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
   }
 
-  private fun markChunkSend() {
-    peripheral.sendData(
-      serviceUUID,
-      GattService.SEMAPHORE_CHAR_UUID,
-      byteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal.toByte())
-    )
-  }
-
-  private fun markChunkReceive() {
-    peripheral.sendData(
-      serviceUUID,
-      GattService.SEMAPHORE_CHAR_UUID,
-      byteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal.toByte())
-    )
-    // TODO: Can update this value once above write call is success - UpdateChunkWroteStatusToRemoteMessage
-    semaphoreWriteAtomic.getAndSet(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal)
-  }
-
-  private fun markChunkTransferComplete() {
-    peripheral.sendData(
-      serviceUUID,
-      GattService.SEMAPHORE_CHAR_UUID,
-      byteArrayOf(Semaphore.SemaphoreMarker.UnInitialised.ordinal.toByte())
-    )
-  }
-
-  private fun sendRequestChunk() {
-    if (chunker?.isComplete() == true) {
-      this.sendMessage(RequestTransferCompleteMessage())
-      return
-    }
-    val chunkArray = chunker?.next()
-    if (chunkArray != null) {
-      peripheral.sendData(
-        serviceUUID,
-        GattService.REQUEST_CHAR_UUID,
-        chunkArray
-      )
-      this.sendMessage(UpdateChunkWroteStatusToRemoteMessage(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal))
-    }
-  }
-
   private fun assembleChunk(chunkData: ByteArray) {
     if (assembler?.isComplete() == true) {
       return
     }
     assembler?.addChunk(chunkData)
-    this.sendMessage(UpdateChunkReceivedStatusToRemoteMessage(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal))
+//    this.sendMessage(UpdateChunkReceivedStatusToRemoteMessage(Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal))
 
     if (assembler?.isComplete() == true) {
       if (assembler?.data() == null){
@@ -205,20 +89,6 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       }
       this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
     }
-  }
-
-  private fun initRequestChunkSend() {
-    val initRequestChunkTransferMessage =
-      InitRequestChunkTransferMessage()
-    this.sendMessage(initRequestChunkTransferMessage)
-  }
-
-  private fun sendRequestSize(size: Int) {
-    peripheral.sendData(
-      serviceUUID,
-      GattService.REQUEST_SIZE_CHAR_UUID,
-      arrayOf(size.toByte()).toByteArray()
-    )
   }
 
   fun sendMessage(msg: IMessage) {

@@ -132,14 +132,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
             return
           }
           val semaphoreValue = value[0].toInt()
-          if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
-            val chunkWroteByRemoteStatusUpdatedMessage =
-              ChunkWroteByRemoteStatusUpdatedMessage(semaphoreValue)
-            transferHandler.sendMessage(chunkWroteByRemoteStatusUpdatedMessage)
-          } else if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal) {
-            val chunkReadByRemoteStatusUpdatedMessage =
-              ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
-            transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+          if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
+            //TODO: Handle if wallet requested for report
+          } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
+            //TODO: Handle if wallet cannot handle report
           }
         }
       }
@@ -169,36 +165,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.ResponseReadPending) {
-          if (isSent) {
-            Log.d(logTag, "Value was written to semaphore")
-          } else {
-            Log.d(logTag, "Failed to write value to semaphore")
-          }
-        }
-      }
-      GattService.REQUEST_SIZE_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.RequestSizeWritePending) {
-          if (isSent) {
-            transferHandler.sendMessage(RequestSizeWriteSuccessMessage())
-          } else {
-            transferHandler.sendMessage(RequestSizeWriteFailedMessage("notifying request size write to remote failed"))
-          }
-        } else {
-          Log.e(
-            logTag,
-            "onSendDataSuccessful: on unknown state of transfer handler: ${transferHandler.getCurrentState()}"
-          )
-        }
-      }
-      GattService.REQUEST_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.RequestWritePending) {
-          if (isSent) {
-            transferHandler.sendMessage(RequestChunkWriteSuccessMessage())
-          } else {
-            transferHandler.sendMessage(RequestChunkWriteFailedMessage("notifying chunk write to remote failed"))
-          }
-        }
+        //TODO: Handle send notification report status here
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
