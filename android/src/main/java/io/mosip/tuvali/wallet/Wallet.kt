@@ -15,6 +15,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.TransmissionReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
@@ -183,6 +184,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       GattService.RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
+      GattService.SEMAPHORE_CHAR_UUID -> {
+      transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
+      }
     }
   }
 
@@ -199,7 +203,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.readSemaphoreAckDelayed()
       }
     }
   }
@@ -214,6 +217,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
     when (charUUID) {
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        value?.let {
+          transferHandler.sendMessage(HandleTransmissionReportMessage(TransmissionReport(it)))
+        }
+      }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {

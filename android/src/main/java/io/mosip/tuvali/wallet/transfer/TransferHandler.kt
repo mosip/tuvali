@@ -7,6 +7,7 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.transfer.Chunker
 import io.mosip.tuvali.transfer.RetryChunker
+import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.TransmissionReport
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.transfer.message.ResponseTransferFailedMessage
@@ -101,7 +102,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         val responseTransferFailedMessage = msg.obj as ResponseTransferFailedMessage
         Log.d(logTag, "handleMessage: response transfer failed")
         transferListener.onResponseSendFailure(responseTransferFailedMessage.errorMsg)
-        currentState = States.ResponseSizeWriteFailed
+        currentState = States.ResponseWriteFailed
       }
       IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
         val initRetryTransferMessage = msg.obj as InitRetryTransferMessage
@@ -133,7 +134,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   }
 
   private fun requestTransmissionReport() {
-    central.write(serviceUUID, GattService.SEMAPHORE_CHAR_UUID, ByteArray(0))
+    central.write(serviceUUID, GattService.SEMAPHORE_CHAR_UUID, byteArrayOf(Semaphore.SemaphoreMarker.RequestReport.ordinal.toByte()))
   }
 
   private fun sendResponseChunk() {
@@ -157,10 +158,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     )
   }
 
-  fun readSemaphoreAckDelayed() {
-    this.sendMessageDelayed(ReadTransmissionReportMessage(), 5)
-  }
-
   private fun initResponseChunkSend() {
     Log.d(logTag, "initResponseChunkSend")
     val initResponseChunkTransferMessage = InitResponseChunkTransferMessage()
@@ -174,13 +171,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     this.sendMessage(message)
   }
 
-
-  private fun sendMessageDelayed(msg: IMessage, delayMillis: Long) {
-    val message = this.obtainMessage()
-    message.what = msg.msgType.ordinal
-    message.obj = msg
-    this.sendMessageDelayed(message, delayMillis)
-  }
 
   private fun sendResponseSize(size: Int) {
     central.write(
