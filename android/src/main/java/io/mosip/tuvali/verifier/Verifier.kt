@@ -156,7 +156,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       }
       GattService.RESPONSE_CHAR_UUID -> {
         if (value != null) {
-          Log.d(logTag, "received response chunk on characteristic: $value")
+          Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
           transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
         }
       }

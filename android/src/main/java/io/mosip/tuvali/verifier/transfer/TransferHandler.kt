@@ -57,12 +57,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
           Semaphore.SemaphoreMarker.RequestReport.ordinal -> {
             var transferReport: TransferReport
             if (assembler?.isComplete() == true) {
+              Log.d(logTag, "success frame: transfer completed")
               transferReport = TransferReport(TransferReport.ReportType.SUCCESS, 0, null)
             } else {
               val missedSequenceNumbers = assembler?.getMissedSequenceNumbers()
               val missedCount = missedSequenceNumbers?.size
               val totalPages:Int = missedCount!!/defaultTransferReportPageSize
-              Log.d(logTag, "missedChunksCount: $missedCount, reportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages")
+              Log.d(logTag, "failure frame: missedChunksCount: $missedCount, reportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages")
               transferReport = TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages, missedSequenceNumbers.sliceArray(0..defaultTransferReportPageSize))
             }
             transferListener.sendDataOverNotification(GattService.SEMAPHORE_CHAR_UUID, transferReport.toByteArray())

@@ -20,12 +20,13 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   }
 
   fun addChunk(chunkData: ByteArray): Int {
-    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}")
     if (chunkData.size < chunkMetaSize) {
+      Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
       throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
     }
     val seqNumber = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
     val payloadSizeInChunk = twoBytesToIntBigEndian(chunkData.copyOfRange(2, 4)) - chunkMetaSize
+    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumber: $seqNumber, payloadSizeInChunk: $payloadSizeInChunk")
     if (chunkData.size > mtuSize) {
       throw CorruptedChunkReceivedException(chunkData.size, seqNumber, mtuSize)
     }

@@ -25,10 +25,11 @@ class Util {
     // Big endian conversion:
     // E.g: If there are two bytes in an array. The first byte of array will treated as MSB
     // and second byte is treated as LSB
+    @OptIn(ExperimentalUnsignedTypes::class)
     fun twoBytesToIntBigEndian(num: ByteArray): Int {
-      //TODO: Document endianness here
-      val firstByte = num[0]
-      val secondByte = num[1]
+      val convertedNum = num.toUByteArray()
+      val firstByte: UByte = convertedNum[0]
+      val secondByte: UByte = convertedNum[1]
       return secondByte.toInt() + (256 * firstByte.toInt())
     }
   }
