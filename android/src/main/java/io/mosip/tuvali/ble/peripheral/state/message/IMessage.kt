@@ -12,7 +12,6 @@ abstract class IMessage(val commandType: PeripheralMessageTypes) {
     DEVICE_NOT_CONNECTED,
 
     RECEIVED_WRITE,
-    ON_READ,
     ENABLE_COMMUNICATION,
     SEND_DATA,
     SEND_DATA_NOTIFIED,

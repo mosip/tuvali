@@ -135,7 +135,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
             //TODO: Handle if wallet requested for report
           } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
-            //TODO: Handle if wallet cannot handle report
+            onResponseReceivedFailed("received error on semaphore from remote")
           }
         }
       }
@@ -155,11 +155,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
         }
       }
     }
-  }
-
-  //TODO: Remove if not needed
-  override fun onRead(uuid: UUID?, read: Boolean) {
-    Log.d(logTag, "onRead: called, does nothing")
   }
 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {

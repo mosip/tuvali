@@ -75,15 +75,6 @@ class StateHandler(
         }
       }
 
-      // TODO: Can be removed not hit
-      IMessage.PeripheralMessageTypes.ON_READ.ordinal -> {
-        val onReadMessage = msg.obj as OnReadMessage
-        Log.d(logTag, "on Read: characteristicUUID: ${onReadMessage.characteristic?.uuid}, isReadSuccessful: ${onReadMessage.isRead}")
-        if (onReadMessage.characteristic != null) {
-          peripheralListener.onRead(onReadMessage.characteristic.uuid, onReadMessage.isRead)
-        }
-      }
-
       IMessage.PeripheralMessageTypes.ENABLE_COMMUNICATION.ordinal -> {
         currentState = States.CommunicationReady
         Log.d(logTag, "enabled communication")

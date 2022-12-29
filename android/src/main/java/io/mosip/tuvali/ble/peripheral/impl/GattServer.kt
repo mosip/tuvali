@@ -16,19 +16,16 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
-  private lateinit var onReadCallback: (BluetoothGattCharacteristic?, Boolean) -> Unit
 
 
   fun start(
     onDeviceConnected: (Int, Int) -> Unit,
     onDeviceNotConnected: (Int, Int) -> Unit,
-    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit,
-    onRead: (BluetoothGattCharacteristic?, Boolean) -> Unit
+    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
   ) {
     onDeviceConnectedCallback = onDeviceConnected
     onDeviceNotConnectedCallback = onDeviceNotConnected
     onReceivedWriteCallback = onReceivedWrite
-    onReadCallback = onRead
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
   }
@@ -80,14 +77,12 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     }
   }
 
-  // TODO: Confirm if this is needed, if peripheral always sends data through notification
   override fun onCharacteristicReadRequest(
     device: BluetoothDevice?,
     requestId: Int,
     offset: Int,
     characteristic: BluetoothGattCharacteristic?
   ) {
-    Log.d(logTag, "onCharacteristicReadRequest: uuid: ${characteristic?.uuid} and value: ${characteristic?.value} and value size: ${characteristic?.value?.size}")
     val isSuccessful = gattServer.sendResponse(
       device,
       requestId,
@@ -95,7 +90,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
       offset,
       characteristic?.value
     )
-    onReadCallback(characteristic, isSuccessful)
+    Log.d(logTag, "onCharacteristicReadRequest: isSuccessful: ${isSuccessful}, uuid: ${characteristic?.uuid} and value: ${characteristic?.value} and value size: ${characteristic?.value?.size}")
   }
 
   override fun onDescriptorWriteRequest(
