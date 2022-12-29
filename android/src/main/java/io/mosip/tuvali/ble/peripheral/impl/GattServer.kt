@@ -3,6 +3,7 @@ package io.mosip.tuvali.ble.peripheral.impl
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import java.util.UUID
 
@@ -59,6 +60,11 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
       onDeviceNotConnectedCallback(status, newState)
       null
     }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      gattServer.readPhy(bluetoothDevice)
+      gattServer.setPreferredPhy(bluetoothDevice, 2, 2, 0)
+      gattServer.readPhy(bluetoothDevice)
+    }
   }
 
   override fun onCharacteristicWriteRequest(
@@ -105,6 +111,14 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
+  }
+
+  override fun onPhyRead(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
+    Log.d(logTag, "Peripheral onPhyRead: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
+  }
+
+  override fun onPhyUpdate(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
+    Log.d(logTag, "Peripheral onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
   }
 
   fun disconnect() {
