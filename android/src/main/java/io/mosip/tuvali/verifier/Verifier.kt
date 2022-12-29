@@ -102,6 +102,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     Log.e(logTag, "onAdvertisementStartFailed: $errorCode")
   }
 
+  override fun sendDataOverNotification(charUUID: UUID, data: ByteArray) {
+    peripheral.sendData(SERVICE_UUID, charUUID, data)
+  }
+
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
@@ -133,7 +137,9 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           }
           val semaphoreValue = value[0].toInt()
           if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
-            //TODO: Handle if wallet requested for report
+            val remoteRequestedTransferReportMessage =
+              RemoteRequestedTransferReportMessage(semaphoreValue)
+            transferHandler.sendMessage(remoteRequestedTransferReportMessage)
           } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
             onResponseReceivedFailed("received error on semaphore from remote")
           }
@@ -160,7 +166,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        //TODO: Handle send notification report status here
+        //TODO: Can re-send report if failed to send notification with exponential backoff
+        Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
@@ -175,7 +182,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     }
   }
 
-  // TODO: Can remove this
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]

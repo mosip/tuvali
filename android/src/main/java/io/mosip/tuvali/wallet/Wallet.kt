@@ -14,8 +14,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.Semaphore
-import io.mosip.tuvali.transfer.TransmissionReport
+import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
@@ -219,7 +218,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         value?.let {
-          transferHandler.sendMessage(HandleTransmissionReportMessage(TransmissionReport(it)))
+          transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
         }
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {

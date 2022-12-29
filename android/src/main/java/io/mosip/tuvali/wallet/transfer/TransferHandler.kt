@@ -8,7 +8,7 @@ import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.transfer.Chunker
 import io.mosip.tuvali.transfer.RetryChunker
 import io.mosip.tuvali.transfer.Semaphore
-import io.mosip.tuvali.transfer.TransmissionReport
+import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.transfer.message.ResponseTransferFailedMessage
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -121,11 +121,11 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     }
   }
 
-  private fun handleTransmissionReport(report: TransmissionReport) {
-    if (report.type == TransmissionReport.ReportType.SUCCESS) {
+  private fun handleTransmissionReport(report: TransferReport) {
+    if (report.type == TransferReport.ReportType.SUCCESS) {
       currentState = States.TransferVerified
       transferListener.onResponseSent()
-    } else if(report.type == TransmissionReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
+    } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
       currentState = States.PartiallyTransferred
       this.sendMessage(InitRetryTransferMessage(report.missingSequences))
     } else {
