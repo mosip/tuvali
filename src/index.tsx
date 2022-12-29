@@ -1,8 +1,5 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import type { NearbyEvent, OpenIDBLEShare } from './types/bleshare';
-import * as fflate from 'fflate';
-
-type event = Array<string>;
+import type { OpenIDBLEShare } from './types/bleshare';
 
 const LINKING_ERROR =
   `The package 'react-native-openid4vp-ble' doesn't seem to be linked. Make sure: \n\n` +
@@ -21,45 +18,14 @@ const Openid4vpBle: OpenIDBLEShare = NativeModules.Openid4vpBle
       }
     );
 
-const ExportedOpenid4vpBle = {
-  ...Openid4vpBle,
-  send(message: string, callback: () => void) {
-    const [messageType, messageData]: event = message.split('\n');
-    if (messageType !== 'send-vc') {
-      Openid4vpBle.send(message, callback);
-    }
-
-    const messageBytes = fflate.compressSync(
-      fflate.strToU8(messageData as string, false),
-      { level: 6, mem: 8 }
-    );
-    const messageString = fflate.strFromU8(messageBytes);
-    Openid4vpBle.send(`${messageType}\n${messageString}`, callback);
-  },
-};
-
 if (Platform.OS === 'android') {
   const eventEmitter = new NativeEventEmitter();
-  ExportedOpenid4vpBle.handleNearbyEvents = (callback) => {
-    return eventEmitter.addListener('EVENT_NEARBY', (event: NearbyEvent) => {
-      if (event.type !== 'msg') {
-        callback(event);
-      }
-      const [messageType, messageData]: event = event.data.split('\n');
-      if (messageType !== 'send-vc') {
-        callback(event);
-      }
-      const compressedBytes = fflate.strToU8(messageData as string);
-      const uncompressedBytes = fflate.decompressSync(compressedBytes);
-      const uncompressedString = fflate.strFromU8(uncompressedBytes);
-      event.data = `${messageType}\n${uncompressedString}`;
-      callback(event);
-    });
-  };
-  ExportedOpenid4vpBle.handleLogEvents = (callback) =>
+  Openid4vpBle.handleNearbyEvents = (callback) =>
+    eventEmitter.addListener('EVENT_NEARBY', callback);
+  Openid4vpBle.handleLogEvents = (callback) =>
     eventEmitter.addListener('EVENT_LOG', callback);
 }
 
 export default {
-  ExportedOpenid4vpBle,
+  Openid4vpBle,
 };
