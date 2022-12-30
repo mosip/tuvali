@@ -202,6 +202,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
+        central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
   }

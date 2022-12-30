@@ -55,11 +55,16 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState")
     bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
       onDeviceConnectedCallback(status, newState)
+      device?.let { setPhy(it) }
+
       device
     } else {
       onDeviceNotConnectedCallback(status, newState)
       null
     }
+  }
+
+  private fun setPhy(bluetoothDevice: BluetoothDevice) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       gattServer.readPhy(bluetoothDevice)
       gattServer.setPreferredPhy(bluetoothDevice, 2, 2, 0)

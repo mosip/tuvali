@@ -91,7 +91,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         // TODO: Let higher level know
-        Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         currentState = States.TransferComplete
         this.sendMessage(ReadTransmissionReportMessage())
       }
@@ -122,6 +121,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     if (report.type == TransferReport.ReportType.SUCCESS) {
       currentState = States.TransferVerified
       transferListener.onResponseSent()
+      Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
     } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
       currentState = States.PartiallyTransferred
       this.sendMessage(InitRetryTransferMessage(report.missingSequences))

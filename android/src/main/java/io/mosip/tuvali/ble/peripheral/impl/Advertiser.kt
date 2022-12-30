@@ -83,4 +83,9 @@ class Advertiser(
       .setConnectable(true)
       .build()
   }
+
+  @SuppressLint("MissingPermission")
+  fun stop() {
+    advertiser.stopAdvertising(advertiseCallbackImpl)
+  }
 }

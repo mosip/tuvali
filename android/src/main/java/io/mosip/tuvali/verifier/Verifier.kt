@@ -185,6 +185,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
+    peripheral.stopAdvertisement()
 
     deviceConnectedCallback?.let {
       it()

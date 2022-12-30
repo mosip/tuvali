@@ -83,4 +83,8 @@ class Controller(context: Context) {
   fun disconnect() {
     gattServer.disconnect()
   }
+
+  fun stopAdvertisement() {
+    advertiser.stop()
+  }
 }

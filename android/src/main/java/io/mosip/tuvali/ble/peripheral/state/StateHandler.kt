@@ -45,6 +45,10 @@ class StateHandler(
         Log.d(logTag, "start advertisement")
         controller.startAdvertisement(msg.obj as AdvertisementStartMessage)
       }
+      IMessage.PeripheralMessageTypes.ADV_STOP.ordinal -> {
+        Log.d(logTag, "stopping advertisement")
+        controller.stopAdvertisement()
+      }
       IMessage.PeripheralMessageTypes.ADV_START_SUCCESS.ordinal -> {
         Log.d(logTag, "advertisement started successfully")
         peripheralListener.onAdvertisementStartSuccessful()

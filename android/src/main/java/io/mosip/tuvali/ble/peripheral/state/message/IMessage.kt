@@ -16,6 +16,7 @@ abstract class IMessage(val commandType: PeripheralMessageTypes) {
     SEND_DATA,
     SEND_DATA_NOTIFIED,
 
+    ADV_STOP,
     DISCONNECT,
     CLOSE_SERVER
   }

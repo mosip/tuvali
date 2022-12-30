@@ -63,4 +63,8 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   fun close() {
     messageSender.sendMessage(CloseServerMessage())
   }
+
+  fun stopAdvertisement() {
+    messageSender.sendMessage(AdvertisementStopMessage())
+  }
 }
