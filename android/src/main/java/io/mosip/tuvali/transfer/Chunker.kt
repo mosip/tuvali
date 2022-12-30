@@ -8,35 +8,48 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
   private val logTag = "Chunker"
   private var chunksReadCounter: Int = 0
   private val lastChunkByteCount = getLastChunkByteCount(data.size)
-  private val totalChunkCount = getTotalChunkCount(data.size)
+  private val totalChunkCount = getTotalChunkCount(data.size).toInt()
+  private val preSlicedChunks: Array<ByteArray?> = Array(totalChunkCount) { null }
 
   init {
-    Log.d(logTag, "Total number of chunks: $totalChunkCount")
+    Log.d(logTag, "Total number of chunks calculated: $totalChunkCount")
+    val startTime = System.currentTimeMillis()
+    for (idx in 0 until totalChunkCount) {
+      preSlicedChunks[idx] = chunk(idx)
+    }
+    Log.d(logTag, "Chunks pre-populated in ${System.currentTimeMillis() - startTime} ms time")
   }
 
   fun next(): ByteArray {
     val seqNumber = chunksReadCounter
     chunksReadCounter++
-
-    return chunk(seqNumber)
+//    return chunk(seqNumber)
+    return preSlicedChunks[seqNumber]!!
   }
 
-  fun chunk(seqNumber: Int): ByteArray {
+  fun chunkBySequenceNumber(num: Int): ByteArray {
+    return preSlicedChunks[num]!!
+  }
+
+  private fun chunk(seqNumber: Int): ByteArray {
     val fromIndex = seqNumber * effectivePayloadSize
 
     return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
       Log.d(logTag, "fetching last chunk")
 
       val chunkLength = lastChunkByteCount + chunkMetaSize
-      chunk(seqNumber, chunkLength, fromIndex, fromIndex + lastChunkByteCount)
+      frameChunk(seqNumber, chunkLength, fromIndex, fromIndex + lastChunkByteCount)
     } else {
       val toIndex = (seqNumber + 1) * effectivePayloadSize
-      chunk(seqNumber, mtuSize, fromIndex, toIndex)
+      frameChunk(seqNumber, mtuSize, fromIndex, toIndex)
     }
   }
 
-  private fun chunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int): ByteArray {
-    Log.d(logTag, "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber")
+  private fun frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int): ByteArray {
+    Log.d(
+      logTag,
+      "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber"
+    )
 
     return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(chunkLength) + data.copyOfRange(
       fromIndex,
@@ -54,5 +67,4 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
     }
     return isComplete
   }
-
 }
