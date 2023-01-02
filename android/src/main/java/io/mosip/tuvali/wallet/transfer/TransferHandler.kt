@@ -7,7 +7,6 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
-import io.mosip.tuvali.verifier.transfer.message.ResponseTransferFailedMessage
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 
@@ -95,9 +94,9 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         this.sendMessage(ReadTransmissionReportMessage())
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
-        val responseTransferFailedMessage = msg.obj as ResponseTransferFailedMessage
+        val responseTransferFailureMessage = msg.obj as ResponseTransferFailureMessage
         Log.d(logTag, "handleMessage: response transfer failed")
-        transferListener.onResponseSendFailure(responseTransferFailedMessage.errorMsg)
+        transferListener.onResponseSendFailure(responseTransferFailureMessage.errorMsg)
         currentState = States.ResponseWriteFailed
       }
       IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
