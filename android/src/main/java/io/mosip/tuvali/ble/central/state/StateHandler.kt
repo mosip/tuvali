@@ -225,6 +225,9 @@ class StateHandler(
     val message = this.obtainMessage()
     message.what = msg.commandType.ordinal
     message.obj = msg
-    this.sendMessage(message)
+    val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+    }
   }
 }

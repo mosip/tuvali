@@ -7,22 +7,15 @@ import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
 import org.json.JSONObject
 
-class Openid4vpBleModule(reactContext: ReactApplicationContext) :
+class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
-  private val verifier = Verifier(reactContext, this::emitNearbyEvent)
-  private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+  private var verifier: Verifier? = null
+  private var wallet: Wallet? = null
   private val mutex = Object()
 
   enum class InjiVerificationStates(val value: String) {
     ACCEPTED("\"ACCEPTED\""),
     REJECTED("\"REJECTED\"")
-  }
-
-  private var activeMode: ModeOfOperation = ModeOfOperation.UnInitialised
-  enum class ModeOfOperation {
-    UnInitialised,
-    Verifier,
-    Wallet
   }
 
   override fun getName(): String {
@@ -32,8 +25,11 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
     synchronized (mutex) {
-      verifier.generateKeyPair()
-      val payload = verifier.getAdvIdentifier("OVPMOSIP");
+      if (verifier == null) {
+        verifier = Verifier(reactContext, this::emitNearbyEvent)
+        verifier?.generateKeyPair()
+      }
+      val payload = verifier?.getAdvIdentifier("OVPMOSIP");
       return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
     }
   }
@@ -45,11 +41,13 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
+    if (wallet == null) {
+      wallet = Wallet(reactContext, this::emitNearbyEvent)
+    }
     val paramsObj = JSONObject(params)
     val firstPartOfPk = paramsObj.getString("pk")
     Log.d(LOG_TAG, "setConnectionParameters called with $params and $firstPartOfPk")
-
-    return wallet.setAdvIdentifier(firstPartOfPk)
+    wallet?.setAdvIdentifier(firstPartOfPk)
   }
 
   @ReactMethod
@@ -57,12 +55,10 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
     Log.d(LOG_TAG, "createConnection: received request with mode $mode")
     when (mode) {
       "advertiser" -> {
-        updateModeOfOperation(ModeOfOperation.Verifier)
-        verifier.startAdvertisement("OVPMOSIP", callback)
+        verifier?.startAdvertisement("OVPMOSIP", callback)
       }
       "discoverer" -> {
-        updateModeOfOperation(ModeOfOperation.Wallet)
-        wallet.startScanning("OVPMOSIP", callback)
+        wallet?.startScanning("OVPMOSIP", callback)
       }
     }
   }
@@ -70,7 +66,28 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun destroyConnection() {
     synchronized (mutex) {
-      //TODO: write your critical section here
+      if (wallet != null) {
+        stopWallet()
+      }
+      if (verifier != null) {
+        stopVerifier()
+      }
+    }
+  }
+
+  private fun stopVerifier() {
+    try {
+      verifier?.stop()
+    } finally {
+      verifier = null
+    }
+  }
+
+  private fun stopWallet() {
+    try {
+      wallet?.stop()
+    } finally {
+      wallet = null
     }
   }
 
@@ -84,14 +101,14 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
       }
       "exchange-sender-info" -> {
         callback()
-        wallet.writeIdentity()
+        wallet?.writeIdentity()
       }
       "send-vc" -> {
         callback()
-        wallet.sendData(messageSplits[1])
+        wallet?.sendData(messageSplits[1])
       }
       "send-vc:response" -> {
-        verifier.notifyVerificationStatus(messageSplits[1] == InjiVerificationStates.ACCEPTED.value)
+        verifier?.notifyVerificationStatus(messageSplits[1] == InjiVerificationStates.ACCEPTED.value)
       }
     }
   }
@@ -110,21 +127,6 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   }
 
   private fun emitLogEvent(eventType: String, data: Map<String, String>) {}
-
-  private fun updateModeOfOperation(newMode: ModeOfOperation) {
-    if (activeMode != newMode) {
-      destroyConnection()
-    }
-    activeMode = newMode
-  }
-
-  private fun getPeerModeOfOperation(): ModeOfOperation {
-    return when(activeMode) {
-      ModeOfOperation.Wallet -> ModeOfOperation.Verifier
-      ModeOfOperation.Verifier -> ModeOfOperation.Wallet
-      else -> ModeOfOperation.UnInitialised
-    }
-  }
 
   //  noop: () => void;
 

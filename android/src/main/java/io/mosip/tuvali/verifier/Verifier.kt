@@ -57,8 +57,12 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
+  fun stop() {
+    handlerThread.quit()
+    peripheral.stop();
+  }
+
   fun generateKeyPair() {
-    // TODO: Should it be generated each time?
     verifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
     publicKey = verifierCryptoBox.publicKey()
     Log.i(logTag, "Verifier public key: ${Hex.toHexString(publicKey)}")
@@ -100,6 +104,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onAdvertisementStartFailed(errorCode: Int) {
     Log.e(logTag, "onAdvertisementStartFailed: $errorCode")
+    // TODO: Handle error
   }
 
   override fun sendDataOverNotification(charUUID: UUID, data: ByteArray) {
@@ -171,12 +176,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
-          if (isSent) {
-            peripheral.disconnect()
-            peripheral.close()
-          } else {
+          if (!isSent){
             Log.e(logTag, "onSendDataFail: Failed to notify verification status to wallet about")
           }
+          peripheral.disconnect()
+          peripheral.close()
         }
       }
     }
@@ -203,11 +207,13 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       responseListener("send-vc", String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
+      // TODO: Handle error
     }
   }
 
   override fun onResponseReceivedFailed(errorMsg: String) {
     Log.d(logTag, "onResponseReceiveFailed errorMsg: $errorMsg")
+    // TODO: Handle error
   }
 
   fun getAdvIdentifier(identifier: String): String {

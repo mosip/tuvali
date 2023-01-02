@@ -54,6 +54,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
+  fun stop() {
+    handlerThread.quit()
+    central.stop()
+  }
+
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
     callbacks[CentralCallbacks.CONNECTION_ESTABLISHED] = connectionEstablishedCallback
     central.scan(
@@ -81,6 +86,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onScanStartedFailed(errorCode: Int) {
     Log.d(logTag, "onScanStartedFailed: $errorCode")
+    //TODO: Handle error
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
@@ -135,6 +141,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
+    //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
 
     connectionEstablishedCallBack?.let {
@@ -165,15 +172,15 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onSubscriptionSuccess(charUUID: UUID) {
-    // TODO("Not yet implemented")
+    // Do nothing
   }
 
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
-    // TODO("Not yet implemented")
+    //TODO: Close and send event to higher layer
   }
 
   override fun onDeviceDisconnected() {
-    //TODO Handle Disconnect
+    //TODO: Close and send event to higher layer
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
@@ -188,6 +195,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       }
     }
   }
+
+  // TODO: move all subscriptions and unsubscriptions to one place
 
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
@@ -212,7 +221,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
-  //    TODO("Not yet implemented")
+    // TODO: Handle error
   }
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {

@@ -9,22 +9,19 @@ import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
 import java.util.UUID
 
-class Controller(context: Context) {
-  private var scanner: Scanner
-  private var gattClient: GattClient
+class Controller(val context: Context) {
+  private lateinit var scanner: Scanner
+  private lateinit var gattClient: GattClient
   private lateinit var messageSender: IMessageSender
+  //TODO: Move it to gatt client instance
   private var peripheralDevice: BluetoothDevice? = null;
-
-  init {
-    gattClient = GattClient(context)
-    scanner = Scanner(context)
-  }
 
   fun setHandlerThread(messageSender: IMessageSender) {
     this.messageSender = messageSender
   }
 
   fun scan(scanStartMessage: ScanStartMessage) {
+    scanner = Scanner(context)
     scanner.start(
       scanStartMessage.serviceUUID,
       scanStartMessage.advPayload,
@@ -39,6 +36,7 @@ class Controller(context: Context) {
 
   @SuppressLint("MissingPermission")
   fun connect(device: BluetoothDevice) {
+    gattClient = GattClient(context)
     gattClient.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
   }
 

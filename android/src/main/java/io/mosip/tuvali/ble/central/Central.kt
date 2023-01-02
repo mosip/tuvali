@@ -21,6 +21,13 @@ class Central(context: Context, centralLister: ICentralListener) {
     controller.setHandlerThread(messageSender)
   }
 
+  fun stop() {
+    stopScan()
+    disconnect()
+    close()
+    handlerThread.quit()
+  }
+
   fun scan(serviceUuid: UUID, advIdentifier: String) {
     val scanStartMessage = ScanStartMessage(serviceUuid, advIdentifier)
 
@@ -76,5 +83,4 @@ class Central(context: Context, centralLister: ICentralListener) {
   fun close() {
     messageSender.sendMessage(CloseMessage())
   }
-
 }

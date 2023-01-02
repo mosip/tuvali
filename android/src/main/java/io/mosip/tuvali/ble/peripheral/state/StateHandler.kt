@@ -18,13 +18,14 @@ class StateHandler(
   private val logTag = "PeripheralHandlerThread"
 
   enum class States {
+    Init,
     GattServerReady,
     Advertising,
     ConnectedToDevice,
     CommunicationReady
   }
 
-  private lateinit var currentState: States
+  private var currentState: States = States.Init
 
   override fun handleMessage(msg: Message) {
     when (msg.what) {
@@ -39,6 +40,7 @@ class StateHandler(
         if (gattServiceAddedMessage.status == BluetoothGatt.GATT_SUCCESS) {
           currentState = States.GattServerReady
         }
+        //TODO: Handle this
       }
 
       IMessage.PeripheralMessageTypes.ADV_START.ordinal -> {
@@ -105,6 +107,7 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
         Log.d(logTag, "closing gatt server")
         controller.closeServer()
+        currentState = States.Init
       }
     }
   }
@@ -117,6 +120,9 @@ class StateHandler(
     val message = this.obtainMessage()
     message.what = msg.commandType.ordinal
     message.obj = msg
-    this.sendMessage(message)
+    val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+    }
   }
 }
