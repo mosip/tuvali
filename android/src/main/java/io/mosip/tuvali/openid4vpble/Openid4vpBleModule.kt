@@ -11,6 +11,7 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
   private val verifier = Verifier(reactContext, this::emitNearbyEvent)
   private val wallet = Wallet(reactContext, this::emitNearbyEvent)
+  private val mutex = Object()
 
   enum class InjiVerificationStates(val value: String) {
     ACCEPTED("\"ACCEPTED\""),
@@ -30,9 +31,11 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
-    verifier.generateKeyPair()
-    val payload = verifier.getAdvIdentifier("OVPMOSIP");
-    return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
+    synchronized (mutex) {
+      verifier.generateKeyPair()
+      val payload = verifier.getAdvIdentifier("OVPMOSIP");
+      return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
+    }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -66,7 +69,9 @@ class Openid4vpBleModule(reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun destroyConnection() {
-    // TODO: Find the mode and call close
+    synchronized (mutex) {
+      //TODO: write your critical section here
+    }
   }
 
   @ReactMethod
