@@ -1,36 +1,19 @@
+#import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
 
 @interface RCT_EXTERN_MODULE(Openid4vpBle, NSObject)
 
-RCT_EXTERN_METHOD(multiply:(float)a withB:(float)b
-                 withResolver:(RCTPromiseResolveBlock)resolve
-                 withRejecter:(RCTPromiseRejectBlock)reject)
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(getConnectionParameters)
 
-+ (BOOL)requiresMainQueueSetup
-{
-  return NO;
-}
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(getConnectionParametersDebug)
+
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(setConnectionParameters:(nonnull NSString *)params)
+
+RCT_EXTERN_METHOD(send:(NSString *)message withCallback:(RCTResponseSenderBlock)callback)
+
+RCT_EXTERN_METHOD(createConnection:(NSString *)mode withCallback:(RCTResponseSenderBlock)callback)
+
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(destroyConnection)
 
 @end
 
-@interface RCT_EXTERN_MODULE(Wallet, NSObject)
-
-RCT_EXTERN_METHOD(getModuleName:(RCTPromiseResolveBlock)resolve
-                  withRejecter:(RCTPromiseRejectBlock)reject)
-
-+ (BOOL)requiresMainQueueSetup
-{
-    return NO;
-}
-@end
-
-@interface RCT_EXTERN_MODULE(Verifier, NSObject)
-
-RCT_EXTERN_METHOD(getModuleName:(RCTPromiseResolveBlock)resolve
-                  withRejecter:(RCTPromiseRejectBlock)reject)
-
-+ (BOOL)requiresMainQueueSetup
-{
-    return NO;
-}
-@end
