@@ -1,16 +1,16 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
+import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 
-class Assembler(private val totalSize: Int) {
+class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(mtuSize) {
   private val logTag = "Assembler"
-  private val seqNumberReservedByteSize = 2
-  private val mtuReservedByteSize = 2
-  private val chunkMetaSize = seqNumberReservedByteSize + mtuReservedByteSize
-  private var data: ByteArray = byteArrayOf()
-  private var chunkCount: Int = 0
+  private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
+  private val totalChunkCount = getTotalChunkCount(totalSize)
+  private var chunkReceivedMarker = ByteArray(totalChunkCount.toInt())
+  private val chunkReceivedMarkerByte: Byte = 1
 
   init {
     Log.d(logTag, "expected total chunk size: $totalSize")
@@ -19,45 +19,61 @@ class Assembler(private val totalSize: Int) {
     }
   }
 
-  fun addChunk(chunkData: ByteArray) {
-    Log.d(logTag, "received add chunk: chunk size: ${chunkData.size}")
+  fun addChunk(chunkData: ByteArray): Int {
     if (chunkData.size < chunkMetaSize) {
-      throw CorruptedChunkReceivedException(chunkData.size, 0, 0)
+      Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
+      return 0
     }
-    val seqNumber = twoBytesToInt(chunkData.copyOfRange(0, 2))
-    val mtuSize = twoBytesToInt(chunkData.copyOfRange(2, 4))
-    if (chunkData.size > mtuSize) {
-      throw CorruptedChunkReceivedException(chunkData.size, seqNumber, mtuSize)
+    val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
+    val chunkSizeInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(2, 4))
+    val expectedPayloadSizeInChunk = chunkSizeInMeta - chunkMetaSize
+    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
+    if (payloadSizeDidNotMatchTheSizeInMeta(chunkData, chunkSizeInMeta)) {
+      Log.e(logTag, "payloadSizeDidNotMatchTheSizeInMeta chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk, chunkSizeInMeta: $chunkSizeInMeta")
+      return seqNumberInMeta
     }
-    if (data.size + (chunkData.size - chunkMetaSize) > totalSize) {
-      throw CorruptedChunkReceivedException(chunkData.size, seqNumber, mtuSize)
+    if (chunkSizeGreaterThanMtuSize(chunkData)) {
+      Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
+      return seqNumberInMeta
     }
-    if (lastReadSeqNumber != null && (seqNumber - lastReadSeqNumber!!) == 1) {
-      lastReadSeqNumber = seqNumber
+    if (addingLastChunkShouldNotBeMoreThanExpectedSize(seqNumberInMeta, expectedPayloadSizeInChunk)) {
+      Log.e(logTag, "addingLastChunkShouldNotBeMoreThanExpectedSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
+      return seqNumberInMeta
     }
-    chunkCount++
-    data = data.plus(
-      chunkData.copyOfRange(
-        chunkMetaSize,
-        chunkData.size
-      )
-    )
-    Log.d(logTag, "received add chunk complete: chunk size: ${chunkData.size}, chunkCount: $chunkCount")
+    lastReadSeqNumber = seqNumberInMeta
+    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, expectedPayloadSizeInChunk)
+    chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
+    Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
+    return seqNumberInMeta
   }
 
+  private fun payloadSizeDidNotMatchTheSizeInMeta(
+      chunkData: ByteArray,
+      payloadSizeInChunk: Int
+  ) = chunkData.size != payloadSizeInChunk
+
+  private fun chunkSizeGreaterThanMtuSize(chunkData: ByteArray) = chunkData.size > mtuSize
+
+  private fun addingLastChunkShouldNotBeMoreThanExpectedSize(
+      seqNumber: Int,
+      payloadSizeInChunk: Int
+  ) = (seqNumber * effectivePayloadSize) + payloadSizeInChunk > totalSize
+
   fun isComplete(): Boolean {
-    Log.d(logTag, "assembler assembled data size : ${data.size}, expected total size: $totalSize , isComplete: ${data.size == totalSize} and remaining byte count: ${totalSize - data.size} left")
-    return data.size == totalSize
+    return chunkReceivedMarker.none { it != chunkReceivedMarkerByte }
+  }
+
+  fun getMissedSequenceNumbers(): IntArray {
+    val missedSeqNumbers = intArrayOf()
+    chunkReceivedMarker.forEachIndexed() { i, elem ->
+      if (elem != chunkReceivedMarkerByte) {
+        missedSeqNumbers + i
+      }
+    }
+    return missedSeqNumbers
   }
 
   fun data(): ByteArray {
     return data
-  }
-
-  private fun twoBytesToInt(num: ByteArray): Int {
-    //TODO: Document endianness here
-    val firstByte = num[0]
-    val secondByte = num[1]
-    return secondByte.toInt() + (256 * firstByte.toInt())
   }
 }

@@ -3,6 +3,7 @@ package io.mosip.tuvali.ble.peripheral.impl
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
+import android.os.Build
 import android.util.Log
 import java.util.UUID
 
@@ -16,19 +17,16 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
-  private lateinit var onReadCallback: (BluetoothGattCharacteristic?, Boolean) -> Unit
 
 
   fun start(
     onDeviceConnected: (Int, Int) -> Unit,
     onDeviceNotConnected: (Int, Int) -> Unit,
-    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit,
-    onRead: (BluetoothGattCharacteristic?, Boolean) -> Unit
+    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
   ) {
     onDeviceConnectedCallback = onDeviceConnected
     onDeviceNotConnectedCallback = onDeviceNotConnected
     onReceivedWriteCallback = onReceivedWrite
-    onReadCallback = onRead
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
   }
@@ -57,10 +55,20 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState")
     bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
       onDeviceConnectedCallback(status, newState)
+      device?.let { setPhy(it) }
+
       device
     } else {
       onDeviceNotConnectedCallback(status, newState)
       null
+    }
+  }
+
+  private fun setPhy(bluetoothDevice: BluetoothDevice) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      gattServer.readPhy(bluetoothDevice)
+      gattServer.setPreferredPhy(bluetoothDevice, 2, 2, 0)
+      gattServer.readPhy(bluetoothDevice)
     }
   }
 
@@ -80,14 +88,12 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     }
   }
 
-  // TODO: Confirm if this is needed, if peripheral always sends data through notification
   override fun onCharacteristicReadRequest(
     device: BluetoothDevice?,
     requestId: Int,
     offset: Int,
     characteristic: BluetoothGattCharacteristic?
   ) {
-    Log.d(logTag, "onCharacteristicReadRequest: uuid: ${characteristic?.uuid} and value: ${characteristic?.value} and value size: ${characteristic?.value?.size}")
     val isSuccessful = gattServer.sendResponse(
       device,
       requestId,
@@ -95,7 +101,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
       offset,
       characteristic?.value
     )
-    onReadCallback(characteristic, isSuccessful)
+    Log.d(logTag, "onCharacteristicReadRequest: isSuccessful: ${isSuccessful}, uuid: ${characteristic?.uuid} and value: ${characteristic?.value} and value size: ${characteristic?.value?.size}")
   }
 
   override fun onDescriptorWriteRequest(
@@ -110,6 +116,14 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
+  }
+
+  override fun onPhyRead(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
+    Log.d(logTag, "Peripheral onPhyRead: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
+  }
+
+  override fun onPhyUpdate(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
+    Log.d(logTag, "Peripheral onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
   }
 
   fun disconnect() {

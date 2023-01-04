@@ -20,10 +20,17 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     HandlerThread("PeripheralHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   init {
-    //TODO: Call quit once instance is done
     handlerThread.start()
     messageSender = StateHandler(handlerThread.looper, controller, peripheralListener)
     controller.setHandlerThread(messageSender)
+  }
+
+  fun stop() {
+    stopAdvertisement()
+    disconnect()
+    close()
+    //TODO: Wait for all necessary callbacks
+    handlerThread.quitSafely()
   }
 
   fun setupService(service: BluetoothGattService) {
@@ -62,5 +69,9 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
 
   fun close() {
     messageSender.sendMessage(CloseServerMessage())
+  }
+
+  fun stopAdvertisement() {
+    messageSender.sendMessage(AdvertisementStopMessage())
   }
 }
