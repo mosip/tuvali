@@ -1,11 +1,13 @@
 package io.mosip.tuvali.openid4vpble
 
 import android.util.Log
+import android.util.TimeUtils
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
 import org.json.JSONObject
+import java.util.concurrent.TimeUnit
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -24,12 +26,15 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
+    Log.d(logTag, "getConnectionParameters new verifier object at ${System.nanoTime()}")
     synchronized (mutex) {
       if (verifier == null) {
+        Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
         verifier = Verifier(reactContext, this::emitNearbyEvent)
         verifier?.generateKeyPair()
       }
-      val payload = verifier?.getAdvIdentifier("OVPMOSIP");
+      val payload = verifier?.getAdvIdentifier("OVPMOSIP")
+      Log.d(logTag, "synchronized getConnectionParameters called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}")
       return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
     }
   }
@@ -41,35 +46,48 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
-    if (wallet == null) {
-      wallet = Wallet(reactContext, this::emitNearbyEvent)
+    Log.d(logTag, "setConnectionParameters at ${System.nanoTime()}")
+    synchronized (mutex) {
+      if (wallet == null) {
+        Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
+        wallet = Wallet(reactContext, this::emitNearbyEvent)
+      }
+      val paramsObj = JSONObject(params)
+      val firstPartOfPk = paramsObj.getString("pk")
+      Log.d(logTag, "synchronized setConnectionParameters called with $params and $firstPartOfPk at ${System.nanoTime()}")
+      wallet?.setAdvIdentifier(firstPartOfPk)
     }
-    val paramsObj = JSONObject(params)
-    val firstPartOfPk = paramsObj.getString("pk")
-    Log.d(LOG_TAG, "setConnectionParameters called with $params and $firstPartOfPk")
-    wallet?.setAdvIdentifier(firstPartOfPk)
   }
 
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
-    Log.d(LOG_TAG, "createConnection: received request with mode $mode")
-    when (mode) {
-      "advertiser" -> {
-        verifier?.startAdvertisement("OVPMOSIP", callback)
-      }
-      "discoverer" -> {
-        wallet?.startScanning("OVPMOSIP", callback)
+    Log.d(logTag, "createConnection: received request with mode $mode at ${System.nanoTime()}")
+    synchronized (mutex) {
+      Log.d(logTag, "synchronized createConnection: received request with mode $mode at ${System.nanoTime()}")
+      when (mode) {
+        "advertiser" -> {
+          verifier?.startAdvertisement("OVPMOSIP", callback)
+        }
+        "discoverer" -> {
+          wallet?.startScanning("OVPMOSIP", callback)
+        }
+        else -> {
+          Log.e(logTag, "synchronizedcreateConnection: received unknown mode: $mode at ${System.nanoTime()}")
+        }
       }
     }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun destroyConnection() {
+    Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     synchronized (mutex) {
       if (wallet != null) {
+        Log.d(logTag, "synchronized destroyConnection called for wallet at ${System.nanoTime()}")
         stopWallet()
       }
       if (verifier != null) {
+        Log.d(logTag, "synchronized destroyConnection called for verifier at ${System.nanoTime()}")
         stopVerifier()
       }
     }
@@ -79,6 +97,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     try {
       verifier?.stop()
     } finally {
+      Log.d(logTag, "stopVerifier setting to null")
       verifier = null
     }
   }
@@ -86,14 +105,20 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private fun stopWallet() {
     try {
       wallet?.stop()
-    } finally {
+    } catch (e: Exception) {
+      Log.e(logTag, "stopWallet: exception: ${e.message}")
+      Log.e(logTag, "stopWallet: exception: ${e.stackTrace}")
+      Log.e(logTag, "stopWallet: exception: $e")
+    }
+    finally {
+      Log.d(logTag, "stopWallet setting to null")
       wallet = null
     }
   }
 
   @ReactMethod
   fun send(message: String, callback: Callback) {
-    Log.d(LOG_TAG, "send: message $message")
+    Log.d(logTag, "send: message $message at ${System.nanoTime()}")
     val messageSplits = message.split("\n", limit = 2)
     when(messageSplits[0]) {
       "exchange-receiver-info" -> {
@@ -160,6 +185,6 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
   companion object {
     const val NAME = "Openid4vpBle"
-    const val LOG_TAG = "Openid4vpBleModule"
+    const val logTag = "Openid4vpBleModule"
   }
 }

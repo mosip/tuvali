@@ -55,8 +55,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   fun stop() {
-    handlerThread.quit()
     central.stop()
+    handlerThread.quitSafely()
   }
 
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
@@ -211,13 +211,13 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
+        central.subscribe(Verifier.SERVICE_UUID, GattService.SEMAPHORE_CHAR_UUID)
         central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
   }
 
   override fun onResponseSent() {
-    central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -240,8 +240,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnect()
-        central.close()
       }
     }
   }

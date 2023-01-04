@@ -58,8 +58,8 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   fun stop() {
-    handlerThread.quit()
     peripheral.stop();
+    handlerThread.quitSafely()
   }
 
   fun generateKeyPair() {
@@ -179,8 +179,6 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           if (!isSent){
             Log.e(logTag, "onSendDataFail: Failed to notify verification status to wallet about")
           }
-          peripheral.disconnect()
-          peripheral.close()
         }
       }
     }

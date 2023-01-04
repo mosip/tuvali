@@ -17,6 +17,7 @@ class StateHandler(
   private val logTag = "CentralHandlerThread"
   private var currentState: States = States.Init
 
+  //TODO: Add explicit ordinal value for below enum
   enum class States {
     Init,
     Scanning,

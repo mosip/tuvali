@@ -25,7 +25,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     stopScan()
     disconnect()
     close()
-    handlerThread.quit()
+    //TODO: Wait for all necessary callbacks
+    handlerThread.quitSafely()
   }
 
   fun scan(serviceUuid: UUID, advIdentifier: String) {

@@ -29,7 +29,8 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     stopAdvertisement()
     disconnect()
     close()
-    handlerThread.quit()
+    //TODO: Wait for all necessary callbacks
+    handlerThread.quitSafely()
   }
 
   fun setupService(service: BluetoothGattService) {
