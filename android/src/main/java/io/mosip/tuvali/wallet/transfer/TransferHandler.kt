@@ -5,18 +5,17 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.transfer.Chunker
-import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
-import io.mosip.tuvali.verifier.transfer.message.ResponseTransferFailedMessage
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID, private val transferListener: ITransferListener) :
   Handler(looper) {
+  private lateinit var retryChunker: RetryChunker
   private val logTag = "TransferHandler"
-  private var readCounter = 0;
   private var chunkCounter = 0;
+  private var isRetryFrame = false;
 
   enum class States {
     UnInitialised,
@@ -26,7 +25,10 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     ResponseWritePending,
     ResponseWriteFailed,
     TransferComplete,
-    PendingSemaphoreAck
+    WaitingForTransferReport,
+    HandlingTransferReport,
+    TransferVerified,
+    PartiallyTransferred,
   }
 
   enum class VerificationStates {
@@ -65,73 +67,73 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         currentState = States.ResponseWritePending
         sendResponseChunk()
       }
-      IMessage.TransferMessageTypes.READ_SEMAPHORE_STATUS.ordinal -> {
-        currentState = States.PendingSemaphoreAck
-        readSemaphoreStatus()
+      IMessage.TransferMessageTypes.READ_TRANSMISSION_REPORT.ordinal -> {
+        currentState = States.WaitingForTransferReport
+        requestTransmissionReport()
       }
-      IMessage.TransferMessageTypes.CHUNK_WRITE_TO_REMOTE_STATUS_UPDATED.ordinal -> {
-        val chunkWriteToRemoteStatusUpdatedMessage =
-          msg.obj as ChunkWriteToRemoteStatusUpdatedMessage
-        when (chunkWriteToRemoteStatusUpdatedMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal -> {
-            Log.d(logTag, "Semaphore is still pending: ${readCounter++}")
-            if(readCounter < 50) {
-              readSemaphoreAckDelayed()
-            }
-          }
-          Semaphore.SemaphoreMarker.FailedToRead.ordinal -> {
-            Log.d(logTag, "Failed to read semaphore: ${readCounter++}")
-            if(readCounter < 50) {
-              readSemaphoreAckDelayed()
-            }
-          }
-          Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal -> {
-            currentState = States.ResponseWritePending
-            sendResponseChunk()
-          }
-          Semaphore.SemaphoreMarker.ResendChunk.ordinal -> {
-            Log.d(logTag, "handleMessage: resend chunk requested")
-          }
-          Semaphore.SemaphoreMarker.Error.ordinal -> {
-            Log.d(logTag, "handleMessage: chunk marked as error while reading by remote")
-            currentState = States.ResponseWriteFailed
-            this.sendMessage(ResponseTransferFailureMessage("Chunk Failure"))
-          }
-        }
+      IMessage.TransferMessageTypes.HANDLE_TRANSMISSION_REPORT.ordinal -> {
+        currentState = States.HandlingTransferReport
+        val handleTransmissionReportMessage = msg.obj as HandleTransmissionReportMessage
+        handleTransmissionReport(handleTransmissionReportMessage.report)
       }
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_WRITE_SUCCESS.ordinal -> {
-        setSemaphoreToPending()
-        chunkCounter++
+        if(isRetryFrame) {
+          sendRetryResponseChunk()
+        } else {
+          sendResponseChunk()
+          chunkCounter++
+        }
+      }
+      IMessage.TransferMessageTypes.RESPONSE_CHUNK_WRITE_FAILURE.ordinal -> {
+        val responseChunkWriteFailureMessage = msg.obj as ResponseChunkWriteFailureMessage
+        this.sendMessage(ResponseTransferFailureMessage("chunk write failed with err: ${responseChunkWriteFailureMessage.err}"))
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         // TODO: Let higher level know
-        Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         currentState = States.TransferComplete
-        transferListener.onResponseSent()
+        this.sendMessage(ReadTransmissionReportMessage())
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
-        val responseTransferFailedMessage = msg.obj as ResponseTransferFailedMessage
+        val responseTransferFailureMessage = msg.obj as ResponseTransferFailureMessage
         Log.d(logTag, "handleMessage: response transfer failed")
-        transferListener.onResponseSendFailure(responseTransferFailedMessage.errorMsg)
-        currentState = States.ResponseSizeWriteFailed
+        transferListener.onResponseSendFailure(responseTransferFailureMessage.errorMsg)
+        currentState = States.ResponseWriteFailed
+      }
+      IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
+        val initRetryTransferMessage = msg.obj as InitRetryTransferMessage
+        isRetryFrame = true
+        retryChunker = RetryChunker(chunker!!, initRetryTransferMessage.missedSequences)
+        sendRetryResponseChunk()
       }
     }
   }
 
-  private fun setSemaphoreToPending() {
-    central.write(
-      serviceUUID,
-      GattService.SEMAPHORE_CHAR_UUID,
-      byteArrayOf(Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal.toByte())
-    )
+  private fun sendRetryResponseChunk() {
+    if (retryChunker.isComplete()) {
+      this.sendMessage(ReadTransmissionReportMessage())
+    } else {
+      writeResponseChunk(retryChunker.next())
+    }
   }
 
-  private fun readSemaphoreStatus() {
-    central.read(serviceUUID, GattService.SEMAPHORE_CHAR_UUID)
+  private fun handleTransmissionReport(report: TransferReport) {
+    if (report.type == TransferReport.ReportType.SUCCESS) {
+      currentState = States.TransferVerified
+      transferListener.onResponseSent()
+      Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
+    } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
+      currentState = States.PartiallyTransferred
+      this.sendMessage(InitRetryTransferMessage(report.missingSequences))
+    } else {
+      this.sendMessage(ResponseTransferFailureMessage("Invalid Report"))
+    }
+  }
+
+  private fun requestTransmissionReport() {
+    central.write(serviceUUID, GattService.SEMAPHORE_CHAR_UUID, byteArrayOf(Semaphore.SemaphoreMarker.RequestReport.ordinal.toByte()))
   }
 
   private fun sendResponseChunk() {
-    Log.d(logTag, "Writing Chunk: $chunkCounter and is complete: ${chunker?.isComplete()}")
     if (chunker?.isComplete() == true) {
       this.sendMessage(ResponseTransferCompleteMessage())
       return
@@ -139,18 +141,17 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
     val chunkArray = chunker?.next()
     if (chunkArray != null) {
-      central.write(
-        serviceUUID,
-        GattService.RESPONSE_CHAR_UUID,
-        byteArrayOf(0, 1, 73, Byte.MAX_VALUE) + chunkArray
-      )
-
-      readCounter = 0
+      Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkArray)}")
+      writeResponseChunk(chunkArray)
     }
   }
 
-  fun readSemaphoreAckDelayed() {
-    this.sendMessageDelayed(ReadSemaphoreStatusMessage(), 5)
+  private fun writeResponseChunk(chunkArray: ByteArray) {
+    central.write(
+      serviceUUID,
+      GattService.RESPONSE_CHAR_UUID,
+      chunkArray
+    )
   }
 
   private fun initResponseChunkSend() {
@@ -166,13 +167,6 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     this.sendMessage(message)
   }
 
-
-  private fun sendMessageDelayed(msg: IMessage, delayMillis: Long) {
-    val message = this.obtainMessage()
-    message.what = msg.msgType.ordinal
-    message.obj = msg
-    this.sendMessageDelayed(message, delayMillis)
-  }
 
   private fun sendResponseSize(size: Int) {
     central.write(

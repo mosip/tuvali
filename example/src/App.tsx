@@ -9,7 +9,10 @@ export default function App() {
   const [connectionParams, setConnectionParams] = React.useState<string>();
 
   React.useEffect(() => {
-    setConnectionParams(Openid4vpBle.getConnectionParameters());
+    Openid4vpBle.send('discoverer', () => {
+      console.log('SEND CREATED');
+    });
+    setConnectionParams('SEND DONE');
   }, []);
 
   return (

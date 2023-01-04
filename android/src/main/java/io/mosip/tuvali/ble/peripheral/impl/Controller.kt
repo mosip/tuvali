@@ -5,26 +5,23 @@ import android.content.Context
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
 
-class Controller(context: Context) {
-  private var advertiser: Advertiser
-  private var gattServer: GattServer
+class Controller(val context: Context) {
+  private lateinit var advertiser: Advertiser
+  private lateinit var gattServer: GattServer
   private lateinit var messageSender: IMessageSender
-
-  init {
-    gattServer = GattServer(context)
-    advertiser = Advertiser(context)
-    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onRead)
-  }
 
   fun setHandlerThread(messageSender: IMessageSender) {
     this.messageSender = messageSender
   }
 
   fun setupGattService(gattServiceMessage: SetupGattServiceMessage) {
+    gattServer = GattServer(context)
+    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
     gattServer.addService(gattServiceMessage.service, this::onServiceAdded)
   }
 
   fun startAdvertisement(advertisementStartMessage: AdvertisementStartMessage) {
+    advertiser = Advertiser(context)
     advertiser.start(
       advertisementStartMessage.serviceUUID,
       advertisementStartMessage.scanRespUUID,
@@ -76,16 +73,15 @@ class Controller(context: Context) {
     messageSender.sendMessage(receivedWriteMessage)
   }
 
-  private fun onRead(characteristic: BluetoothGattCharacteristic?, isRead: Boolean) {
-    val onReadMessage = OnReadMessage(characteristic, isRead)
-    messageSender.sendMessage(onReadMessage)
-  }
-
   fun closeServer() {
     gattServer.close()
   }
 
   fun disconnect() {
     gattServer.disconnect()
+  }
+
+  fun stopAdvertisement() {
+    advertiser.stop()
   }
 }

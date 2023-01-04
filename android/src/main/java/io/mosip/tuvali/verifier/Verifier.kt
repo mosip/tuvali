@@ -57,8 +57,12 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
+  fun stop() {
+    peripheral.stop();
+    handlerThread.quitSafely()
+  }
+
   fun generateKeyPair() {
-    // TODO: Should it be generated each time?
     verifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
     publicKey = verifierCryptoBox.publicKey()
     Log.i(logTag, "Verifier public key: ${Hex.toHexString(publicKey)}")
@@ -100,6 +104,11 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onAdvertisementStartFailed(errorCode: Int) {
     Log.e(logTag, "onAdvertisementStartFailed: $errorCode")
+    // TODO: Handle error
+  }
+
+  override fun sendDataOverNotification(charUUID: UUID, data: ByteArray) {
+    peripheral.sendData(SERVICE_UUID, charUUID, data)
   }
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
@@ -132,14 +141,12 @@ class Verifier(context: Context, private val responseListener: (String, String) 
             return
           }
           val semaphoreValue = value[0].toInt()
-          if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkPending.ordinal) {
-            val chunkWroteByRemoteStatusUpdatedMessage =
-              ChunkWroteByRemoteStatusUpdatedMessage(semaphoreValue)
-            transferHandler.sendMessage(chunkWroteByRemoteStatusUpdatedMessage)
-          } else if (semaphoreValue == Semaphore.SemaphoreMarker.ProcessChunkComplete.ordinal) {
-            val chunkReadByRemoteStatusUpdatedMessage =
-              ChunkReadByRemoteStatusUpdatedMessage(semaphoreValue)
-            transferHandler.sendMessage(chunkReadByRemoteStatusUpdatedMessage)
+          if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
+            val remoteRequestedTransferReportMessage =
+              RemoteRequestedTransferReportMessage(semaphoreValue)
+            transferHandler.sendMessage(remoteRequestedTransferReportMessage)
+          } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
+            onResponseReceivedFailed("received error on semaphore from remote")
           }
         }
       }
@@ -154,58 +161,22 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       }
       GattService.RESPONSE_CHAR_UUID -> {
         if (value != null) {
-          Log.d(logTag, "received response chunk on characteristic: $value")
+          Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
           transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
         }
       }
     }
   }
 
-  //TODO: Remove if not needed
-  override fun onRead(uuid: UUID?, read: Boolean) {
-    Log.d(logTag, "onRead: called, does nothing")
-  }
-
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.ResponseReadPending) {
-          if (isSent) {
-            Log.d(logTag, "Value was written to semaphore")
-          } else {
-            Log.d(logTag, "Failed to write value to semaphore")
-          }
-        }
-      }
-      GattService.REQUEST_SIZE_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.RequestSizeWritePending) {
-          if (isSent) {
-            transferHandler.sendMessage(RequestSizeWriteSuccessMessage())
-          } else {
-            transferHandler.sendMessage(RequestSizeWriteFailedMessage("notifying request size write to remote failed"))
-          }
-        } else {
-          Log.e(
-            logTag,
-            "onSendDataSuccessful: on unknown state of transfer handler: ${transferHandler.getCurrentState()}"
-          )
-        }
-      }
-      GattService.REQUEST_CHAR_UUID -> {
-        if (transferHandler.getCurrentState() == TransferHandler.States.RequestWritePending) {
-          if (isSent) {
-            transferHandler.sendMessage(RequestChunkWriteSuccessMessage())
-          } else {
-            transferHandler.sendMessage(RequestChunkWriteFailedMessage("notifying chunk write to remote failed"))
-          }
-        }
+        //TODO: Can re-send report if failed to send notification with exponential backoff
+        Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
-          if (isSent) {
-            peripheral.disconnect()
-            peripheral.close()
-          } else {
+          if (!isSent){
             Log.e(logTag, "onSendDataFail: Failed to notify verification status to wallet about")
           }
         }
@@ -213,10 +184,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     }
   }
 
-  // TODO: Can remove this
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
+    peripheral.stopAdvertisement()
 
     deviceConnectedCallback?.let {
       it()
@@ -229,14 +200,18 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     val decryptedData = secretsTranslator?.decryptUponReceive(data)
     if (decryptedData != null) {
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
-      responseListener("send-vc", String(decryptedData))
+      val decompressedData = Util.decompress(decryptedData)
+      Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
+      responseListener("send-vc", String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
+      // TODO: Handle error
     }
   }
 
   override fun onResponseReceivedFailed(errorMsg: String) {
     Log.d(logTag, "onResponseReceiveFailed errorMsg: $errorMsg")
+    // TODO: Handle error
   }
 
   fun getAdvIdentifier(identifier: String): String {
