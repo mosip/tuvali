@@ -14,16 +14,13 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
-import io.mosip.tuvali.wallet.transfer.message.ChunkWriteToRemoteStatusUpdatedMessage
-import io.mosip.tuvali.wallet.transfer.message.InitResponseTransferMessage
-import io.mosip.tuvali.wallet.transfer.message.ResponseChunkWriteSuccessMessage
-import io.mosip.tuvali.wallet.transfer.message.ResponseSizeWriteSuccessMessage
+import io.mosip.tuvali.wallet.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
@@ -57,6 +54,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
+  fun stop() {
+    central.stop()
+    handlerThread.quitSafely()
+  }
+
   fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
     callbacks[CentralCallbacks.CONNECTION_ESTABLISHED] = connectionEstablishedCallback
     central.scan(
@@ -84,6 +86,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onScanStartedFailed(errorCode: Int) {
     Log.d(logTag, "onScanStartedFailed: $errorCode")
+    //TODO: Handle error
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
@@ -138,6 +141,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
+    //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
 
     connectionEstablishedCallBack?.let {
@@ -152,21 +156,10 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
-//    Log.d(logTag, "Read from $charUUID successfully and value is $value")
+    Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        value?.let {
-          Log.d(logTag, "onReadSuccess: size of semaphore value: ${value.size}")
-        }
-        if (value != null && value.isNotEmpty()) {
-          Log.d(logTag, "on semaphore read success value: ${value[0].toInt()}")
-          transferHandler.sendMessage(
-            ChunkWriteToRemoteStatusUpdatedMessage(value[0].toInt())
-          )
-        } else {
-          transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
-        }
       }
     }
   }
@@ -174,26 +167,36 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   override fun onReadFailure(charUUID: UUID?, err: Int) {
     when (charUUID) {
       GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.sendMessage(ChunkWriteToRemoteStatusUpdatedMessage(Semaphore.SemaphoreMarker.FailedToRead.ordinal))
       }
     }
   }
 
   override fun onSubscriptionSuccess(charUUID: UUID) {
-    // TODO("Not yet implemented")
+    // Do nothing
   }
 
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
-    // TODO("Not yet implemented")
+    //TODO: Close and send event to higher layer
   }
 
   override fun onDeviceDisconnected() {
-    //TODO Handle Disconnect
+    //TODO: Close and send event to higher layer
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
+
+    when(charUUID) {
+      GattService.RESPONSE_CHAR_UUID -> {
+        transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
+      }
+      GattService.SEMAPHORE_CHAR_UUID -> {
+      transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
+      }
+    }
   }
+
+  // TODO: move all subscriptions and unsubscriptions to one place
 
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
@@ -208,21 +211,26 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.readSemaphoreAckDelayed()
+        central.subscribe(Verifier.SERVICE_UUID, GattService.SEMAPHORE_CHAR_UUID)
+        central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
   }
 
   override fun onResponseSent() {
-    central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
-  //    TODO("Not yet implemented")
+    // TODO: Handle error
   }
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
     when (charUUID) {
+      GattService.SEMAPHORE_CHAR_UUID -> {
+        value?.let {
+          transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
+        }
+      }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
@@ -232,8 +240,6 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnect()
-        central.close()
       }
     }
   }
@@ -245,12 +251,14 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
   fun sendData(data: String) {
     val dataInBytes = data.toByteArray()
     Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
-    val encryptedData = secretsTranslator?.encryptToSend(dataInBytes)
+    val compressedBytes = Util.compress(dataInBytes)
+    Log.e(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
+    val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
     if (encryptedData != null) {
       Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
       transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
     } else {
-      Log.e(logTag, "failed to encrypt data with size: ${dataInBytes.size}")
+      Log.e(logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}")
     }
   }
 }

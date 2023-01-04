@@ -17,6 +17,7 @@ class StateHandler(
   private val logTag = "CentralHandlerThread"
   private var currentState: States = States.Init
 
+  //TODO: Add explicit ordinal value for below enum
   enum class States {
     Init,
     Scanning,
@@ -225,6 +226,9 @@ class StateHandler(
     val message = this.obtainMessage()
     message.what = msg.commandType.ordinal
     message.obj = msg
-    this.sendMessage(message)
+    val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+    }
   }
 }

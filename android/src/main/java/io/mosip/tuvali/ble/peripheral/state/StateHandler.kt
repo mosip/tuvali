@@ -18,13 +18,14 @@ class StateHandler(
   private val logTag = "PeripheralHandlerThread"
 
   enum class States {
+    Init,
     GattServerReady,
     Advertising,
     ConnectedToDevice,
     CommunicationReady
   }
 
-  private lateinit var currentState: States
+  private var currentState: States = States.Init
 
   override fun handleMessage(msg: Message) {
     when (msg.what) {
@@ -39,11 +40,16 @@ class StateHandler(
         if (gattServiceAddedMessage.status == BluetoothGatt.GATT_SUCCESS) {
           currentState = States.GattServerReady
         }
+        //TODO: Handle this
       }
 
       IMessage.PeripheralMessageTypes.ADV_START.ordinal -> {
         Log.d(logTag, "start advertisement")
         controller.startAdvertisement(msg.obj as AdvertisementStartMessage)
+      }
+      IMessage.PeripheralMessageTypes.ADV_STOP.ordinal -> {
+        Log.d(logTag, "stopping advertisement")
+        controller.stopAdvertisement()
       }
       IMessage.PeripheralMessageTypes.ADV_START_SUCCESS.ordinal -> {
         Log.d(logTag, "advertisement started successfully")
@@ -75,15 +81,6 @@ class StateHandler(
         }
       }
 
-      // TODO: Can be removed not hit
-      IMessage.PeripheralMessageTypes.ON_READ.ordinal -> {
-        val onReadMessage = msg.obj as OnReadMessage
-        Log.d(logTag, "on Read: characteristicUUID: ${onReadMessage.characteristic?.uuid}, isReadSuccessful: ${onReadMessage.isRead}")
-        if (onReadMessage.characteristic != null) {
-          peripheralListener.onRead(onReadMessage.characteristic.uuid, onReadMessage.isRead)
-        }
-      }
-
       IMessage.PeripheralMessageTypes.ENABLE_COMMUNICATION.ordinal -> {
         currentState = States.CommunicationReady
         Log.d(logTag, "enabled communication")
@@ -110,6 +107,7 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
         Log.d(logTag, "closing gatt server")
         controller.closeServer()
+        currentState = States.Init
       }
     }
   }
@@ -122,6 +120,9 @@ class StateHandler(
     val message = this.obtainMessage()
     message.what = msg.commandType.ordinal
     message.obj = msg
-    this.sendMessage(message)
+    val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+    }
   }
 }
