@@ -69,7 +69,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
   }
 
   fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
-    callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK] = successCallback
+    callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK] = successCallback
     peripheral.start(
       SERVICE_UUID,
       SCAN_RESPONSE_SERVICE_UUID,
@@ -95,10 +95,10 @@ class Verifier(context: Context, private val responseListener: (String, String) 
 
   override fun onAdvertisementStartSuccessful() {
     Log.d(logTag, "onAdvertisementStartSuccess")
+    // Avoid spurious device connected events to be sent to higher layer before advertisement starts successfully
     val successCallback = callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK]
     successCallback?.let {
-      it()
-      callbacks.remove(PeripheralCallbacks.ADV_SUCCESS_CALLBACK)
+      callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK] = it
     }
   }
 
