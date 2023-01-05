@@ -8,6 +8,7 @@
 
 import Foundation
 import CoreBluetooth
+import os
 
 class Central: NSObject {
     private var centralManager: CBCentralManager!

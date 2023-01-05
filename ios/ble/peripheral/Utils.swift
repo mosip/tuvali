@@ -13,7 +13,8 @@ struct Utils {
     
     static func createCBMutableCharacteristics() -> [CBMutableCharacteristic] {
         return characteristics.map {key, chrTuple in
-            return CBMutableCharacteristic(type: key, value: chrTuple.value, properties: chrTuple.properties, permissions: chrTuple.permissions)
+            let keyUUID = CBUUID(string: key)
+            return CBMutableCharacteristic(type: keyUUID, properties: chrTuple.properties, value: chrTuple.value, permissions: chrTuple.permissions)
         }
     }
 }
