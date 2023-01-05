@@ -52,11 +52,10 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
-    Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState")
+    Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState, device: $device, deviceHash: ${device.hashCode()}, deviceBondState: ${device?.bondState}")
     bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
       onDeviceConnectedCallback(status, newState)
       device?.let { setPhy(it) }
-
       device
     } else {
       onDeviceNotConnectedCallback(status, newState)
