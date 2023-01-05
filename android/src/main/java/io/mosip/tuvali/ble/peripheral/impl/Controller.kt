@@ -6,7 +6,7 @@ import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
 
 class Controller(val context: Context) {
-  private lateinit var advertiser: Advertiser
+  private var advertiser: Advertiser? = null
   private lateinit var gattServer: GattServer
   private lateinit var messageSender: IMessageSender
 
@@ -22,7 +22,7 @@ class Controller(val context: Context) {
 
   fun startAdvertisement(advertisementStartMessage: AdvertisementStartMessage) {
     advertiser = Advertiser(context)
-    advertiser.start(
+    advertiser?.start(
       advertisementStartMessage.serviceUUID,
       advertisementStartMessage.scanRespUUID,
       advertisementStartMessage.advPayload,
@@ -82,6 +82,8 @@ class Controller(val context: Context) {
   }
 
   fun stopAdvertisement() {
-    advertiser.stop()
+    if (advertiser != null) {
+      advertiser?.stop()
+    }
   }
 }

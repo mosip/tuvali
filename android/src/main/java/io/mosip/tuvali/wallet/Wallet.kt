@@ -240,6 +240,8 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
+        central.disconnect()
+        central.close()
       }
     }
   }
