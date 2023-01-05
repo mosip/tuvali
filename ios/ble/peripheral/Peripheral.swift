@@ -12,10 +12,13 @@ class Peripheral: NSObject {
         peripheralManager = CBPeripheralManager(delegate: self, queue: nil, options: [CBPeripheralManagerOptionShowPowerAlertKey: true])
     }
     
-    func setupPeripheral() {
-        let bleService = CBMutableService(type: Self.SERVICE_UUID, primary: Self.SCAN_RESPONSE_SERVICE_UUID)
+    func setupPeripheralsAndStartAdvertising() {
+        let bleService = CBMutableService(type: Self.SERVICE_UUID, primary: true)
         bleService.characteristics = Utils.createCBMutableCharacteristics()
         
         peripheralManager.add(bleService)
+        
+        // start advertising
+        peripheralManager.startAdvertising([CBAdvertisementDataServiceUUIDsKey: [Self.SERVICE_UUID, Self.SCAN_RESPONSE_SERVICE_UUID], CBAdvertisementDataLocalNameKey: "verifier"])
     }
 }

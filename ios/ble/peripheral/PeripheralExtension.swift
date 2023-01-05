@@ -7,8 +7,7 @@ extension Peripheral: CBPeripheralManagerDelegate {
         switch peripheral.state {
         case .poweredOn:
             os_log("Peripheral is in ON state", log: .default, type: .info)
-            self.setupPeripheral()
-            self.peripheralManager.startAdvertising([Self.SCAN_RESPONSE_SERVICE_UUID])
+            self.setupPeripheralsAndStartAdvertising()
         case .poweredOff:
             os_log("Peripheral is in OFF state", log: .default, type: .error)
         default:
