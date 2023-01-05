@@ -11,7 +11,7 @@ import java.util.UUID
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
-  private lateinit var gattClient: GattClient
+  private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender
   //TODO: Move it to gatt client instance
   private var peripheralDevice: BluetoothDevice? = null;
@@ -37,28 +37,28 @@ class Controller(val context: Context) {
   @SuppressLint("MissingPermission")
   fun connect(device: BluetoothDevice) {
     gattClient = GattClient(context)
-    gattClient.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
+    gattClient?.connect(device, this::onDeviceConnected, this::onDeviceDisconnected)
   }
 
   fun write(writeMessage: WriteMessage) {
     //TODO: handle no device case
     peripheralDevice?.let {
-      gattClient.write(it, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
+      gattClient?.write(it, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
     }
   }
 
   fun read(readMessage: ReadMessage) {
-    gattClient.read(readMessage.serviceUUID, readMessage.charUUID, this::onReadSuccess, this::onReadFailed)
+    gattClient?.read(readMessage.serviceUUID, readMessage.charUUID, this::onReadSuccess, this::onReadFailed)
   }
 
   fun subscribe(subscribeMessage: SubscribeMessage) {
-    val subscribed = gattClient.subscribe(
+    val subscribed = gattClient?.subscribe(
       subscribeMessage.serviceUUID,
       subscribeMessage.charUUID,
       this::onNotificationReceived
     )
 
-    if(subscribed) {
+    if(subscribed == true) {
       messageSender.sendMessage(SubscribeSuccessMessage(subscribeMessage.charUUID))
     } else {
       messageSender.sendMessage(SubscribeFailureMessage(subscribeMessage.charUUID,
@@ -68,12 +68,12 @@ class Controller(val context: Context) {
   }
 
   fun unsubscribe(unsubscribeMessage: UnsubscribeMessage) {
-    val unsubscribe = gattClient.unsubscribe(
+    val unsubscribe = gattClient?.unsubscribe(
       unsubscribeMessage.serviceUUID,
       unsubscribeMessage.charUUID,
     )
 
-    if(unsubscribe) {
+    if(unsubscribe == true) {
       messageSender.sendMessage(UnsubscribeSuccessMessage(unsubscribeMessage.charUUID))
     } else {
       messageSender.sendMessage(UnsubscribeFailureMessage(unsubscribeMessage.charUUID, BluetoothGatt.GATT_FAILURE))
@@ -81,19 +81,19 @@ class Controller(val context: Context) {
   }
 
   fun discoverServices() {
-    gattClient.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
+    gattClient?.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
   }
 
   fun requestMTU(mtu: Int) {
-    gattClient.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+    gattClient?.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
   }
 
   fun disconnect() {
-    gattClient.disconnect()
+    gattClient?.disconnect()
   }
 
   fun close() {
-    gattClient.close()
+    gattClient?.close()
   }
 
   private fun onNotificationReceived(charUUID: UUID, data: ByteArray) {
