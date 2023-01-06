@@ -23,7 +23,6 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
   fun next(): ByteArray {
     val seqNumber = chunksReadCounter
     chunksReadCounter++
-//    return chunk(seqNumber)
     return preSlicedChunks[seqNumber]!!
   }
 
@@ -45,6 +44,15 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
     }
   }
 
+  /*
+  <------------------------------------------------------- MTU ------------------------------------------------------------------->
+  +-----------------------+-----------------------------+-------------------------------------------------------------------------+
+  |                       |                             |                                                                         |
+  |  chunk sequence no    |     total chunk length      |         chunk payload                                                   |
+  |      (2 bytes)        |         (2 bytes)           |       (upto MTU-4 bytes)                                                |
+  |                       |                             |                                                                         |
+  +-----------------------+-----------------------------+-------------------------------------------------------------------------+
+   */
   private fun frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int): ByteArray {
     Log.d(
       logTag,
