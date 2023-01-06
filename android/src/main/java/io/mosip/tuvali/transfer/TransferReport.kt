@@ -25,7 +25,13 @@ class TransferReport  {
                             { acc, twoBytes -> acc + Util.twoBytesToIntBigEndian(twoBytes.toByteArray())}
   }
 
-  // TODO: Document the byte array representation
+  /*
+  +---------+------------------+---------------------+-------------------+-------------------+-------------------+
+  |         |                  |                     |                   |                   |                   |
+  | type    |   total pages    |    missed seq no.0  | missed seq no. 1  |  missed seq no.2  |      . . . . .    |
+  |(1 byte) |    (2 bytes)     |       (2 bytes)     |    (2 bytes)      |     (2 bytes)     |                   |
+  +---------+------------------+---------------------+-------------------+-------------------+-------------------+
+  */
   fun toByteArray(): ByteArray {
     val missingSeqBytes = missingSequences?.fold(byteArrayOf()) { acc, sNo -> acc + Util.intToTwoBytesBigEndian(sNo) }
     val metadata = byteArrayOf(type.ordinal.toByte()) + Util.intToTwoBytesBigEndian(totalPages)
