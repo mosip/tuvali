@@ -23,9 +23,8 @@ class StateHandler(
     Scanning,
     WaitingToConnect,
     Connecting,
-    Disconnecting,
-    Connected,
     Disconnected,
+    Connected,
     DiscoveringServices,
     RequestingMTU,
     Writing,
@@ -72,7 +71,7 @@ class StateHandler(
         Log.d(logTag, "disconnecting device")
 
         controller.disconnect()
-        currentState = States.Disconnecting
+        currentState = States.Disconnected
       }
       IMessage.CentralStates.CLOSE.ordinal -> {
         Log.d(logTag, "closing gatt client")
@@ -220,6 +219,10 @@ class StateHandler(
         currentState = States.Connected
       }
     }
+  }
+
+  override fun getCurrentState() : States {
+    return currentState
   }
 
   override fun sendMessage(msg: IMessage) {

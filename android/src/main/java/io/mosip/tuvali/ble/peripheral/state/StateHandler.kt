@@ -22,6 +22,7 @@ class StateHandler(
     GattServerReady,
     Advertising,
     ConnectedToDevice,
+    NotConnectedToDevice,
     CommunicationReady
   }
 
@@ -71,6 +72,8 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {
         val deviceNotConnectedMessage = msg.obj as DeviceNotConnectedMessage
         Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState}")
+        currentState = States.NotConnectedToDevice
+        peripheralListener.onDeviceNotConnected()
       }
 
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {

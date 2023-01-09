@@ -1,13 +1,11 @@
 package io.mosip.tuvali.openid4vpble
 
 import android.util.Log
-import android.util.TimeUtils
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
 import org.json.JSONObject
-import java.util.concurrent.TimeUnit
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -30,7 +28,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     synchronized (mutex) {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
-        verifier = Verifier(reactContext, this::emitNearbyEvent)
+        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
         verifier?.generateKeyPair()
       }
       val payload = verifier?.getAdvIdentifier("OVPMOSIP")
@@ -50,7 +48,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     synchronized (mutex) {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, this::emitNearbyEvent)
+        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")
@@ -144,10 +142,16 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
       .emit(eventName, data)
   }
 
-  private fun emitNearbyEvent(eventType: String, data: String) {
+  private fun emitNearbyMessage(eventType: String, data: String) {
     val writableMap = Arguments.createMap()
     writableMap.putString("data", "$eventType\n${data}")
     writableMap.putString("type", "msg")
+    emitEvent("EVENT_NEARBY", writableMap)
+  }
+
+  private fun emitNearbyEvent(eventType: String) {
+    val writableMap = Arguments.createMap()
+    writableMap.putString("type", eventType)
     emitEvent("EVENT_NEARBY", writableMap)
   }
 

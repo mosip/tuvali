@@ -25,7 +25,11 @@ import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 
-class Wallet(context: Context, private val responseListener: (String, String) -> Unit) :
+class Wallet(
+  context: Context,
+  private val messageResponseListener: (String, String) -> Unit,
+  private val eventResponseListener: (String) -> Unit
+) :
   ICentralListener, ITransferListener {
   private val logTag = "Wallet"
 
@@ -181,6 +185,11 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
 
   override fun onDeviceDisconnected() {
     //TODO: Close and send event to higher layer
+    if(!central.isDisconnecting()) {
+      central.stop()
+    }
+
+    eventResponseListener("onDisconnected")
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
@@ -202,7 +211,7 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-        responseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
+        messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -234,9 +243,9 @@ class Wallet(context: Context, private val responseListener: (String, String) ->
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          responseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value)
+          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value)
         } else {
-          responseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.REJECTED.value)
+          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.REJECTED.value)
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)

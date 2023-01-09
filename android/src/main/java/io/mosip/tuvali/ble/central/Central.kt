@@ -84,4 +84,8 @@ class Central(context: Context, centralLister: ICentralListener) {
   fun close() {
     messageSender.sendMessage(CloseMessage())
   }
+
+  fun isDisconnecting(): Boolean {
+    return messageSender.getCurrentState() === StateHandler.States.Disconnected
+  }
 }

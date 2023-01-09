@@ -18,9 +18,14 @@ import io.mosip.tuvali.verifier.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
+import kotlin.reflect.KFunction2
 
 
-class Verifier(context: Context, private val responseListener: (String, String) -> Unit) :
+class Verifier(
+  context: Context,
+  private val messageResponseListener: (String, String) -> Unit,
+  private val eventResponseListener: (String) -> Unit
+) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
   private val logTag = "Verifier"
@@ -131,7 +136,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
           )
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPubKey)
           // TODO: Validate pub key, how to handle if not valid?
-          responseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
+          messageResponseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
         }
       }
@@ -195,6 +200,15 @@ class Verifier(context: Context, private val responseListener: (String, String) 
     }
   }
 
+  override fun onDeviceNotConnected() {
+    //TODO: Close and send event to higher layer
+    if(!peripheral.isDisconnecting()) {
+      peripheral.stop()
+    }
+
+    eventResponseListener("onDisconnected")
+  }
+
   override fun onResponseReceived(data: ByteArray) {
     Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
     val decryptedData = secretsTranslator?.decryptUponReceive(data)
@@ -202,7 +216,7 @@ class Verifier(context: Context, private val responseListener: (String, String) 
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
       val decompressedData = Util.decompress(decryptedData)
       Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-      responseListener("send-vc", String(decompressedData!!))
+      messageResponseListener("send-vc", String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
       // TODO: Handle error
