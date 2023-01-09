@@ -1,7 +1,8 @@
 #import <Foundation/Foundation.h>
 #import <React/RCTBridgeModule.h>
+#import <React/RCTEventEmitter.h>
 
-@interface RCT_EXTERN_MODULE(Openid4vpBle, NSObject)
+@interface RCT_EXTERN_MODULE(Openid4vpBle, RCTEventEmitter)
 
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(getConnectionParameters)
 
