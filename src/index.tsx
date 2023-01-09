@@ -26,6 +26,15 @@ if (Platform.OS === 'android') {
     eventEmitter.addListener('EVENT_LOG', callback);
 }
 
+if (Platform.OS === 'ios') {
+  console.log(`IOS PLATFORM`);
+  const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
+  Openid4vpBle.handleNearbyEvents = (callback) =>
+    eventEmitter.addListener('EVENT_NEARBY', callback);
+  Openid4vpBle.handleLogEvents = (callback) =>
+    eventEmitter.addListener('EVENT_LOG', callback);
+}
+
 export default {
   Openid4vpBle,
 };

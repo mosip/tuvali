@@ -16,6 +16,7 @@
 		8D069F6B29644B7C00AB61A9 /* PeripheralExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */; };
 		8D069F6D2964724700AB61A9 /* Characteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F6C2964724700AB61A9 /* Characteristics.swift */; };
 		8D069F732967BEC200AB61A9 /* PeripheralDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F722967BEC200AB61A9 /* PeripheralDelegate.swift */; };
+		8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F742968305A00AB61A9 /* EventEmitter.swift */; };
 		8D179C892954871400017EE5 /* CipherBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C882954871400017EE5 /* CipherBox.swift */; };
 		8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */; };
 		8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8C29548AB400017EE5 /* CryptoBox.swift */; };
@@ -54,6 +55,7 @@
 		8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralExtension.swift; sourceTree = "<group>"; };
 		8D069F6C2964724700AB61A9 /* Characteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Characteristics.swift; sourceTree = "<group>"; };
 		8D069F722967BEC200AB61A9 /* PeripheralDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralDelegate.swift; sourceTree = "<group>"; };
+		8D069F742968305A00AB61A9 /* EventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEmitter.swift; sourceTree = "<group>"; };
 		8D179C882954871400017EE5 /* CipherBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CipherBox.swift; sourceTree = "<group>"; };
 		8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiperBoxImpl.swift; sourceTree = "<group>"; };
 		8D179C8C29548AB400017EE5 /* CryptoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBox.swift; sourceTree = "<group>"; };
@@ -98,6 +100,7 @@
 				8D069F5E2964369000AB61A9 /* Wallet */,
 				8D069F5F296436AD00AB61A9 /* Verifier */,
 				B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */,
+				8D069F742968305A00AB61A9 /* EventEmitter.swift */,
 				8D069F612964454700AB61A9 /* ble */,
 				F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -274,6 +277,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */,
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
 				8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */,
 				8D069F652964466900AB61A9 /* Central.swift in Sources */,
@@ -346,6 +350,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -390,6 +395,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"HEADER_SEARCH_PATHS[arch=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;

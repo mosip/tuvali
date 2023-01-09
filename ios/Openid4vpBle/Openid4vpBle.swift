@@ -1,7 +1,12 @@
 import Foundation
 
 @objc(Openid4vpBle)
-class Openid4vpBle: NSObject {
+class Openid4vpBle: RCTEventEmitter {
+    
+    override init() {
+        super.init()
+        EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
+    }
     
     @objc
     func noop() -> Void {}
@@ -12,7 +17,7 @@ class Openid4vpBle: NSObject {
     }
     
     @objc
-    func setConnectionParameters(params: String) -> Void {
+    func setConnectionParameters(params: String) {
         print("SetConnectionParameters->Params::\(params)")
     }
     
@@ -22,9 +27,9 @@ class Openid4vpBle: NSObject {
     }
     
     @objc
-    func destroyConnection() -> Void {}
+    func destroyConnection() {}
     
-    @objc(send:withCallback:)
+    @objc
     func send(_ message: String, withCallback callback: RCTResponseSenderBlock) {
         let newMessage = String.init(format: "%::%s", message, "iOS")
         callback([newMessage])
@@ -37,7 +42,12 @@ class Openid4vpBle: NSObject {
     }
     
     @objc
-    static func requiresMainQueueSetup() -> Bool {
+     override func supportedEvents() -> [String]! {
+        return EventEmitter.sharedInstance.allEvents
+    }
+    
+    @objc
+    override static func requiresMainQueueSetup() -> Bool {
         return false
     }
 }
