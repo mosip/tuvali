@@ -74,4 +74,6 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   fun stopAdvertisement() {
     messageSender.sendMessage(AdvertisementStopMessage())
   }
+
+  fun isDisconnecting(): Boolean = messageSender.getCurrentState() == StateHandler.States.NotConnectedToDevice
 }
