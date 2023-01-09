@@ -100,7 +100,6 @@
 				8D069F5E2964369000AB61A9 /* Wallet */,
 				8D069F5F296436AD00AB61A9 /* Verifier */,
 				B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */,
-				8D069F742968305A00AB61A9 /* EventEmitter.swift */,
 				8D069F612964454700AB61A9 /* ble */,
 				F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
@@ -126,6 +125,7 @@
 		8D069F60296436C400AB61A9 /* Openid4vpBle */ = {
 			isa = PBXGroup;
 			children = (
+				8D069F742968305A00AB61A9 /* EventEmitter.swift */,
 				F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */,
 			);
 			path = Openid4vpBle;
