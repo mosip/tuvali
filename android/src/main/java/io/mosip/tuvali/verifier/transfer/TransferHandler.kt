@@ -13,6 +13,7 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
+import kotlin.math.ceil
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = "TransferHandler"
@@ -63,9 +64,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
             } else {
               val missedSequenceNumbers = assembler?.getMissedSequenceNumbers()
               val missedCount = missedSequenceNumbers?.size
-              val totalPages:Int = missedCount!!/defaultTransferReportPageSize
-              Log.d(logTag, "failure frame: missedChunksCount: $missedCount, reportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages")
-              transferReport = TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages, missedSequenceNumbers.sliceArray(0..defaultTransferReportPageSize))
+              val totalPages:Double = ceil(missedCount!!.toDouble()/defaultTransferReportPageSize)
+              Log.d(logTag, "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages")
+              transferReport = if (missedCount < defaultTransferReportPageSize) {
+                TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until missedCount))
+              } else {
+                TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until defaultTransferReportPageSize))
+              }
             }
             transferListener.sendDataOverNotification(GattService.SEMAPHORE_CHAR_UUID, transferReport.toByteArray())
           }
