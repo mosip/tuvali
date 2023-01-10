@@ -16,9 +16,26 @@ class Openid4vpBle: RCTEventEmitter {
         return "GetConnectionParameters"
     }
     
-    @objc
-    func setConnectionParameters(params: String) {
+    @objc(setConnectionParameters:)
+    func setConnectionParameters(params: String) -> Any {
         print("SetConnectionParameters->Params::\(params)")
+        var paramsObj = stringToJson(jsonText: params)
+        var firstPartOfPk = paramsObj["pk"]
+        print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
+        Wallet.shared.setAdvIdentifier(advIdentifier: firstPartOfPk as! String)
+        return "data" as Any
+    }
+    
+    func stringToJson(jsonText: String) -> NSDictionary {
+        var dictonary: NSDictionary?
+        if let data = jsonText.data(using: String.Encoding.utf8) {
+            do {
+                dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
+            } catch let error as NSError {
+                print(error)
+            }
+        }
+        return dictonary!
     }
     
     @objc
@@ -27,7 +44,9 @@ class Openid4vpBle: RCTEventEmitter {
     }
     
     @objc
-    func destroyConnection() {}
+    func destroyConnection() -> Any {
+        return "check" as! Any
+    }
     
     @objc
     func send(_ message: String, withCallback callback: RCTResponseSenderBlock) {
