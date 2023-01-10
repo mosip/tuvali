@@ -64,10 +64,11 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   }
 
   fun getMissedSequenceNumbers(): IntArray {
-    val missedSeqNumbers = intArrayOf()
+    var missedSeqNumbers = intArrayOf()
     chunkReceivedMarker.forEachIndexed() { i, elem ->
       if (elem != chunkReceivedMarkerByte) {
-        missedSeqNumbers + i
+        Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
+        missedSeqNumbers += i
       }
     }
     return missedSeqNumbers
