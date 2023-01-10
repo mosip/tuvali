@@ -29,6 +29,7 @@ class StateHandler(
   private var currentState: States = States.Init
 
   override fun handleMessage(msg: Message) {
+    // TODO: Figure out how to enforce exhaustive checks here
     when (msg.what) {
       IMessage.PeripheralMessageTypes.SETUP_SERVICE.ordinal -> {
         Log.d(logTag, "setup service for gatt server")
@@ -121,11 +122,11 @@ class StateHandler(
 
   override fun sendMessage(msg: IMessage) {
     val message = this.obtainMessage()
-    message.what = msg.commandType.ordinal
+    message.what = msg.messageType.ordinal
     message.obj = msg
     val isSent = this.sendMessage(message)
     if (!isSent) {
-      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+      Log.e(logTag, "sendMessage to state handler for ${msg.messageType} failed")
     }
   }
 }
