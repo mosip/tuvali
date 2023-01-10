@@ -2,12 +2,13 @@ import Foundation
 
 @objc(Wallet)
 class Wallet: NSObject {
-
+    
     static let shared = Wallet()
     var advIdentifier: String?
+    var central: Central = Central()
 
     private override init() {}
-
+    
     @objc(getModuleName:withRejecter:)
     func getModuleName(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
         resolve(["iOS Wallet"])
@@ -28,5 +29,9 @@ class Wallet: NSObject {
     
     func setAdvIdentifier(advIdentifier: String) {
         self.advIdentifier = advIdentifier
+    }
+    
+    func startScanning() {
+        central.scanForPeripherals()
     }
 }

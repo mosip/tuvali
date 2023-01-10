@@ -57,7 +57,16 @@ class Openid4vpBle: RCTEventEmitter {
     @objc(createConnection:withCallback:)
     func createConnection(_ mode: String, withCallback callback: RCTResponseSenderBlock) {
         let message = String.init(format: "MODE->%s", mode)
-        callback([message])
+        
+        switch mode {
+        case "advertiser":
+         print("advert")
+        case "discoverer":
+            print("disc")
+            Wallet.shared.startScanning()
+        default:
+            break
+        }
     }
     
     @objc
@@ -69,4 +78,9 @@ class Openid4vpBle: RCTEventEmitter {
     override static func requiresMainQueueSetup() -> Bool {
         return false
     }
+}
+
+enum modeState {
+    case advertiser
+    case discoverer
 }
