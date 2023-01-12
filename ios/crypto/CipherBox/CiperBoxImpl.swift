@@ -41,6 +41,25 @@ extension SharedSecret {
     }
 }
 
+extension String {
+    func hexToString()->String{
+        var finalString = ""
+        let chars = Array(self)
+        
+        for count in stride(from: 0, to: chars.count - 1, by: 2){
+            let firstDigit =  Int.init("\(chars[count])", radix: 16) ?? 0
+            let lastDigit = Int.init("\(chars[count + 1])", radix: 16) ?? 0
+            let decimal = firstDigit * 16 + lastDigit
+            let decimalString = String(format: "%c", decimal) as String
+            finalString.append(Character.init(decimalString))
+        }
+        return finalString
+    }
+    func base64Decoded() -> String? {
+        guard let data = Data(base64Encoded: self) else { return nil }
+        return String(data: data, encoding: .init(rawValue: 0))
+    }
+}
 
 
 
