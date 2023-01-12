@@ -6,7 +6,7 @@ export interface OpenIDBLEShare {
   setConnectionParameters: (params: string) => void;
   getConnectionParametersDebug: () => string;
   createConnection: (mode: ConnectionMode, callback: () => void) => void;
-  destroyConnection: () => void;
+  destroyConnection: (callback: () => void) => void;
   send: (message: string, callback: () => void) => void;
   handleNearbyEvents: (
     callback: (events: NearbyEvent) => void

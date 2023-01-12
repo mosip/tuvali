@@ -48,6 +48,7 @@ class Wallet(
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<CentralCallbacks, Callback>()
@@ -58,7 +59,8 @@ class Wallet(
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
-  fun stop() {
+  fun stop(onDestroy: Callback) {
+    callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroy
     central.stop()
     handlerThread.quitSafely()
   }
@@ -183,10 +185,10 @@ class Wallet(
     //TODO: Close and send event to higher layer
   }
 
-  override fun onDeviceDisconnected() {
+  override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
     //TODO: Close and send event to higher layer
-    if(!central.isDisconnecting()) {
-      central.stop()
+    if(isManualDisconnect) {
+      central.close()
     }
 
     eventResponseListener("onDisconnected")
@@ -249,9 +251,19 @@ class Wallet(
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnect()
-        central.close()
+        central.disconnectAndClose()
       }
+    }
+  }
+
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    central.quitHandler()
+    val onClosedCallback = callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      it()
+      callbacks.remove(CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
     }
   }
 

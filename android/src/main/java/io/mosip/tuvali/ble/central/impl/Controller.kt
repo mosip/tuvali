@@ -88,8 +88,11 @@ class Controller(val context: Context) {
     gattClient?.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
   }
 
-  fun disconnect() {
-    gattClient?.disconnect()
+  fun disconnect(): Boolean {
+    return if(gattClient != null) {
+      gattClient!!.disconnect()
+      true
+    } else false
   }
 
   fun close() {

@@ -8,7 +8,7 @@ interface ICentralListener {
   fun onScanStartedFailed(errorCode: Int)
   fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?)
   fun onDeviceConnected(device: BluetoothDevice)
-  fun onDeviceDisconnected()
+  fun onDeviceDisconnected(isManualDisconnect: Boolean)
   fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int)
   fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID)
   fun onServicesDiscovered()
@@ -20,4 +20,5 @@ interface ICentralListener {
   fun onSubscriptionSuccess(charUUID: UUID)
   fun onSubscriptionFailure(charUUID: UUID, err: Int)
   fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
+  fun onClosed()
 }

@@ -7,6 +7,7 @@ interface IPeripheralListener {
   fun onAdvertisementStartFailed(errorCode: Int)
   fun onReceivedWrite(uuid: UUID, value: ByteArray?)
   fun onDeviceConnected()
-  fun onDeviceNotConnected()
+  fun onDeviceNotConnected(isManualDisconnect: Boolean)
   fun onSendDataNotified(uuid: UUID, isSent: Boolean)
+  fun onClosed()
 }
