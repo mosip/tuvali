@@ -27,10 +27,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
 
   fun stop() {
     stopAdvertisement()
-    disconnect()
-    close()
-    //TODO: Wait for all necessary callbacks
-    handlerThread.quitSafely()
+    disconnectAndClose()
   }
 
   fun setupService(service: BluetoothGattService) {
@@ -75,5 +72,11 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     messageSender.sendMessage(AdvertisementStopMessage())
   }
 
-  fun isDisconnecting(): Boolean = messageSender.getCurrentState() == StateHandler.States.NotConnectedToDevice
+  fun quitHandler() {
+    handlerThread.quitSafely()
+  }
+
+  fun disconnectAndClose() {
+    messageSender.sendMessage(DisconnectAndCloseMessage())
+  }
 }

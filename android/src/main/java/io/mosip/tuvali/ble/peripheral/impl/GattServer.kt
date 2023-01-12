@@ -125,10 +125,11 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     Log.d(logTag, "Peripheral onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
   }
 
-  fun disconnect() {
-    if(bluetoothDevice != null) {
+  fun disconnect(): Boolean {
+    return if(bluetoothDevice != null) {
       gattServer.cancelConnection(bluetoothDevice)
       bluetoothDevice = null
-    }
+      true
+    } else false
   }
 }

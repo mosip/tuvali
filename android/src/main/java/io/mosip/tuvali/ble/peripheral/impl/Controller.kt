@@ -77,8 +77,8 @@ class Controller(val context: Context) {
     gattServer.close()
   }
 
-  fun disconnect() {
-    gattServer.disconnect()
+  fun disconnect(): Boolean {
+    return gattServer.disconnect()
   }
 
   fun stopAdvertisement() {

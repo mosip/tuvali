@@ -15,10 +15,10 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.*
+import io.mosip.tuvali.wallet.Wallet
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
-import kotlin.reflect.KFunction2
 
 
 class Verifier(
@@ -49,7 +49,7 @@ class Verifier(
     ADV_FAILURE_CALLBACK,
     DEVICE_CONNECTED_CALLBACK,
     RESPONSE_RECEIVE_SUCCESS_CALLBACK,
-    RESPONSE_RECEIVED_FAILED_CALLBACK
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
@@ -62,7 +62,8 @@ class Verifier(
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
-  fun stop() {
+  fun stop(onDestroySuccessCallback: Callback) {
+    callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroySuccessCallback
     peripheral.stop();
     handlerThread.quitSafely()
   }
@@ -189,6 +190,18 @@ class Verifier(
     }
   }
 
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    peripheral.quitHandler()
+    val onClosedCallback = callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
+    }
+  }
+
+
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
@@ -200,13 +213,13 @@ class Verifier(
     }
   }
 
-  override fun onDeviceNotConnected() {
-    //TODO: Close and send event to higher layer
-    if(!peripheral.isDisconnecting()) {
+  override fun onDeviceNotConnected(isManualDisconnect: Boolean) {
+    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
+    if(isManualDisconnect) {
       peripheral.stop()
+    } else {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onResponseReceived(data: ByteArray) {

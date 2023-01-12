@@ -38,21 +38,25 @@ class GattClient(var context: Context) {
         }
       }
       Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
+      Log.i(
+        logTag,
+        "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
+      )
 
       if(status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
         peripheral?.let {
-          characteristic?.uuid?.let {
-              uuid -> onWriteFailed(it, uuid, status)
-          } }
+          characteristic?.uuid?.let { uuid ->
+            onWriteFailed(it, uuid, status)
+          }
+        }
 
         return
       }
 
       peripheral?.let {
-        characteristic?.let {
-            char -> onWriteSuccess(it, char.uuid) }
+        characteristic?.let { char -> onWriteSuccess(it, char.uuid) }
       }
     }
 
@@ -69,7 +73,7 @@ class GattClient(var context: Context) {
       characteristic: BluetoothGattCharacteristic?,
       status: Int
     ) {
-      if(status == GATT_SUCCESS && characteristic != null) {
+      if (status == GATT_SUCCESS && characteristic != null) {
         onReadSuccess(characteristic.uuid, characteristic.value)
         Log.i(logTag, "Successfully read char: : ${characteristic.uuid}")
       } else {
@@ -82,11 +86,14 @@ class GattClient(var context: Context) {
       gatt: BluetoothGatt?,
       characteristic: BluetoothGattCharacteristic?
     ) {
-      Log.i(logTag, "Got notification from char ${characteristic?.uuid} and value ${
-        characteristic?.value?.get(0)?.toInt()}")
+      Log.i(
+        logTag, "Got notification from char ${characteristic?.uuid} and value ${
+          characteristic?.value?.get(0)?.toInt()
+        }"
+      )
 
       characteristic?.let {
-        if(onNotificationReceived != null) {
+        if (onNotificationReceived != null) {
           onNotificationReceived?.let { it1 -> it1(it.uuid, it.value) }
         } else {
           Log.d(logTag, "Notification receiver callback is not set")
@@ -97,7 +104,7 @@ class GattClient(var context: Context) {
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
 
-      if(status == GATT_SUCCESS) {
+      if (status == GATT_SUCCESS) {
         onRequestMTUSuccess(mtu)
         Log.i(logTag, "Successfully changed mtu size: $mtu")
       } else {
@@ -138,10 +145,7 @@ class GattClient(var context: Context) {
   @SuppressLint("MissingPermission")
   private fun closeGatt() {
     bluetoothGatt?.close()
-    peripheral?.let { onDeviceDisconnected() };
-
     bluetoothGatt = null
-
   }
 
   @SuppressLint("MissingPermission", "NewApi")
@@ -179,8 +183,8 @@ class GattClient(var context: Context) {
     onSuccess: (BluetoothDevice, UUID) -> Unit,
     onFailed: (BluetoothDevice, UUID, Int) -> Unit
   ) {
-    if(bluetoothGatt == null){
-        return onFailed(device, charUUID, GATT_FAILURE)
+    if (bluetoothGatt == null) {
+      return onFailed(device, charUUID, GATT_FAILURE)
     }
     Log.i(logTag, "Initiating write to peripheral char: $charUUID")
 
@@ -233,12 +237,12 @@ class GattClient(var context: Context) {
       val characteristic = service.getCharacteristic(charUUID)
       val read = bluetoothGatt!!.readCharacteristic(characteristic)
 
-      if(!read) {
+      if (!read) {
         Log.d(logTag, "Failed to start reading")
         onFailure(charUUID, GATT_FAILURE)
       }
 
-    } catch(e: Error) {
+    } catch (e: Error) {
       onFailure(charUUID, GATT_FAILURE)
     }
   }
@@ -257,14 +261,14 @@ class GattClient(var context: Context) {
       val notificationsEnabled =
         bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
 
-      return if(notificationsEnabled) {
+      return if (notificationsEnabled) {
         true
       } else {
         Log.d(logTag, "Failed to subscribe to $charUUID")
         false
       }
 
-    } catch(e: Error) {
+    } catch (e: Error) {
       return false
     }
   }
@@ -283,28 +287,29 @@ class GattClient(var context: Context) {
         bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
       onNotificationReceived = null
 
-      return if(notificationsEnabled) {
+      return if (notificationsEnabled) {
         true
       } else {
         Log.d(logTag, "Failed to unsubscribe to $charUUID")
         false
       }
 
-    } catch(e: Error) {
+    } catch (e: Error) {
       return false
     }
   }
 
   @SuppressLint("MissingPermission")
-  fun disconnect() {
-    if(bluetoothGatt != null) {
+  fun disconnect(): Boolean {
+    return if (bluetoothGatt != null) {
       bluetoothGatt!!.disconnect()
-    }
+      true
+    } else false
   }
 
   @SuppressLint("MissingPermission")
   fun close() {
-    if(bluetoothGatt != null) {
+    if (bluetoothGatt != null) {
       bluetoothGatt!!.close()
       bluetoothGatt = null
     }

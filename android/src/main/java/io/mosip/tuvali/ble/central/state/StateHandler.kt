@@ -23,6 +23,7 @@ class StateHandler(
     Scanning,
     WaitingToConnect,
     Connecting,
+    Disconnecting,
     Disconnected,
     Connected,
     DiscoveringServices,
@@ -30,7 +31,9 @@ class StateHandler(
     Writing,
     Reading,
     Subscribing,
-    Unsubscribing
+    Unsubscribing,
+    Closing,
+    Closed
   }
 
   @SuppressLint("MissingPermission")
@@ -71,13 +74,26 @@ class StateHandler(
         Log.d(logTag, "disconnecting device")
 
         controller.disconnect()
-        currentState = States.Disconnected
+        currentState = States.Disconnecting
+      }
+      IMessage.CentralStates.DISCONNECT_AND_CLOSE_DEVICE.ordinal -> {
+        Log.d(logTag, "disconnect and close gatt client")
+
+        val disconnecting = controller.disconnect()
+
+        currentState = if(disconnecting) {
+          States.Closing
+        } else {
+          this.sendMessage(CloseMessage())
+          States.Disconnected
+        }
       }
       IMessage.CentralStates.CLOSE.ordinal -> {
         Log.d(logTag, "closing gatt client")
 
         controller.close()
-        currentState = States.Init
+        currentState = States.Closed
+        listener.onClosed()
       }
       IMessage.CentralStates.DEVICE_CONNECTED.ordinal -> {
         val deviceConnectedMessage = msg.obj as DeviceConnectedMessage
@@ -88,8 +104,13 @@ class StateHandler(
       }
       IMessage.CentralStates.DEVICE_DISCONNECTED.ordinal -> {
         Log.d(logTag, "device got disconnected.")
-        listener.onDeviceDisconnected()
-        currentState = States.Init
+
+        if(currentState == States.Closing) {
+          this.sendMessage(CloseMessage())
+        } else {
+          listener.onDeviceDisconnected(currentState == States.Disconnecting)
+        }
+        currentState = States.Disconnected
       }
       IMessage.CentralStates.DISCOVER_SERVICES.ordinal -> {
         Log.d(logTag, "discovering services.")

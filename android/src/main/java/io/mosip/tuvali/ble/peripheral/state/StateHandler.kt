@@ -9,6 +9,8 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import com.facebook.common.util.Hex
+import io.mosip.tuvali.ble.central.state.StateHandler
+import io.mosip.tuvali.ble.central.state.message.CloseMessage
 
 class StateHandler(
   looper: Looper,
@@ -22,8 +24,11 @@ class StateHandler(
     GattServerReady,
     Advertising,
     ConnectedToDevice,
+    Disconnecting,
     NotConnectedToDevice,
-    CommunicationReady
+    CommunicationReady,
+    Closing,
+    Closed
   }
 
   private var currentState: States = States.Init
@@ -72,9 +77,14 @@ class StateHandler(
       }
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {
         val deviceNotConnectedMessage = msg.obj as DeviceNotConnectedMessage
-        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState}")
+        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState} $currentState")
+
+        if(currentState == States.Closing) {
+          this.sendMessage(CloseServerMessage())
+        } else {
+          peripheralListener.onDeviceNotConnected(currentState == States.Disconnecting)
+        }
         currentState = States.NotConnectedToDevice
-        peripheralListener.onDeviceNotConnected()
       }
 
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
@@ -106,12 +116,24 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.DISCONNECT.ordinal -> {
         Log.d(logTag, "disconnecting device")
         controller.disconnect()
+        currentState = States.Disconnecting
       }
+      IMessage.PeripheralMessageTypes.DISCONNECT_AND_CLOSE_DEVICE.ordinal -> {
+        Log.d(logTag, "disconnect and close gatt server")
+        val disconnecting = controller.disconnect()
 
+        currentState = if(disconnecting) {
+          States.Closing
+        } else {
+          this.sendMessage(CloseServerMessage())
+          States.NotConnectedToDevice
+        }
+      }
       IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
         Log.d(logTag, "closing gatt server")
         controller.closeServer()
-        currentState = States.Init
+        currentState = States.Closed
+        peripheralListener.onClosed()
       }
     }
   }
