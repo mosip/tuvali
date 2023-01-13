@@ -2,7 +2,9 @@ import Foundation
 
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
+    
     var callbk: RCTResponseSenderBlock?
+    
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -64,7 +66,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("advert")
         case "discoverer":
             print("disc")
-            Wallet.shared.startScanning()
+            Wallet.shared.central = Central()
         default:
             break
         }

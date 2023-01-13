@@ -5,7 +5,7 @@ class Wallet: NSObject {
     
     static let shared = Wallet()
     var advIdentifier: String?
-    var central: Central = Central()
+    var central: Central?
     var secretTranslator: SecretTranslator?
     
     private override init() {}
@@ -37,9 +37,9 @@ class Wallet: NSObject {
         self.advIdentifier = advIdentifier
     }
     
-    func startScanning() {
-        central.scanForPeripherals()
-    }
+//    func startScanning() {
+//        central.scanForPeripherals()
+//    }
     
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         // let advertisementPayloadStr = String(decoding: advertisementPayload, as: UTF8.self)

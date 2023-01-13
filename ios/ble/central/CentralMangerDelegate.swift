@@ -27,7 +27,10 @@ extension Central: CBCentralManagerDelegate {
                 let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
                 Wallet.shared.setSecretTranslator(ss: secretsTranslator)
                 if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
-                    central.stopScan()
+                    //central.stopScan()
+                    peripheral.delegate = self
+                    central.connect(peripheral)
+                    connectedPeripheral = peripheral
                     NotificationCenter.default.post(name: Notification.Name(rawValue: "CONNECTED"), object: nil)
                 }
             } else {
@@ -40,6 +43,7 @@ extension Central: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         os_log("Connected to peripheral: %@", String(describing: peripheral.name))
         central.stopScan()
+        peripheral.discoverServices([Peripheral.SERVICE_UUID])
     }
     
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
