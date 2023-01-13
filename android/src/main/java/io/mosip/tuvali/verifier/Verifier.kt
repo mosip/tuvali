@@ -139,6 +139,7 @@ class Verifier(
           // TODO: Validate pub key, how to handle if not valid?
           messageResponseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
+          peripheral.stopAdvertisement()
         }
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
@@ -205,7 +206,6 @@ class Verifier(
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
-    peripheral.stopAdvertisement()
 
     deviceConnectedCallback?.let {
       it()
@@ -215,9 +215,7 @@ class Verifier(
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
-    if(isManualDisconnect) {
-      peripheral.stop()
-    } else {
+    if(!isManualDisconnect) {
       eventResponseListener("onDisconnected")
     }
   }
