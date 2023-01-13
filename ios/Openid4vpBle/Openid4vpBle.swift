@@ -2,7 +2,7 @@ import Foundation
 
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-    
+    var callbk: RCTResponseSenderBlock?
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -55,12 +55,13 @@ class Openid4vpBle: RCTEventEmitter {
     }
     
     @objc(createConnection:withCallback:)
-    func createConnection(_ mode: String, withCallback callback: RCTResponseSenderBlock) {
+    func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let message = String.init(format: "MODE->%s", mode)
-        
+        callbk = callback
+         NotificationCenter.default.addObserver(self, selector: #selector(handleCallback), name: Notification.Name(rawValue: "CONNECTED"), object: nil)
         switch mode {
         case "advertiser":
-         print("advert")
+            print("advert")
         case "discoverer":
             print("disc")
             Wallet.shared.startScanning()
@@ -68,7 +69,12 @@ class Openid4vpBle: RCTEventEmitter {
             break
         }
     }
-    
+
+    @objc
+    func handleCallback(notification: Notification) {
+        callbk!(["data"])
+    }
+
     @objc
      override func supportedEvents() -> [String]! {
         return EventEmitter.sharedInstance.allEvents
