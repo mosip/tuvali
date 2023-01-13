@@ -13,7 +13,7 @@ class Central: NSObject {
     }
     
     func scanForPeripherals() {
-        centralManager.scanForPeripherals(withServices: [Peripheral.SERVICE_UUID, Peripheral.SCAN_RESPONSE_SERVICE_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
+        centralManager.scanForPeripherals(withServices: [Peripheral.SERVICE_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
         os_log("scanning happening ::::::::")
     }
     
