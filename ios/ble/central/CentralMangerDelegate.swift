@@ -17,21 +17,22 @@ extension Central: CBCentralManagerDelegate {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
         let dataDict = advertisementData["kCBAdvDataServiceData"] as? [CBUUID: Any?]
-        let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
-        let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
-        
-        let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
-        if #available(iOS 13.0, *) {
-            let cryptoBox = WalletCryptoBoxBuilder().build()
-            let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
-            Wallet.shared.setSecretTranslator(ss: secretsTranslator)
-           
-            if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
-                print("scan stopped")
-                central.stopScan()
+        if let uuidDict = dataDict, let data = uuidDict[CBUUID(string: "AB2A")], let data = data {
+            let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
+            let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
+            
+            let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
+            if #available(iOS 13.0, *) {
+                let cryptoBox = WalletCryptoBoxBuilder().build()
+                let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
+                Wallet.shared.setSecretTranslator(ss: secretsTranslator)
+                if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
+                    central.stopScan()
+                    NotificationCenter.default.post(name: Notification.Name(rawValue: "CONNECTED"), object: nil)
+                }
+            } else {
+                print ("deployment target is less")
             }
-        } else {
-           print ("deployment target is less")
         }
     }
 
