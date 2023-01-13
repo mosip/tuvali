@@ -186,12 +186,9 @@ class Wallet(
   }
 
   override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
-    //TODO: Close and send event to higher layer
-    if(isManualDisconnect) {
-      central.close()
+    if(!isManualDisconnect) {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
@@ -262,6 +259,7 @@ class Wallet(
     val onClosedCallback = callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
 
     onClosedCallback?.let {
+      Log.d(logTag, "calling onDestroy callback")
       it()
       callbacks.remove(CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
     }

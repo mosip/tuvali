@@ -91,7 +91,6 @@ class Controller(val context: Context) {
   fun disconnect(): Boolean {
     return if(gattClient != null) {
       gattClient!!.disconnect()
-      true
     } else false
   }
 
