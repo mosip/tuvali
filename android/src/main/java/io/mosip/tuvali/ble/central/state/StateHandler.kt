@@ -82,10 +82,18 @@ class StateHandler(
         val disconnecting = controller.disconnect()
 
         currentState = if(disconnecting) {
+          sendMessageDelayed(CloseOnDisconnectTimeoutMessage(), 50)
           States.Closing
         } else {
           this.sendMessage(CloseMessage())
           States.Disconnected
+        }
+      }
+      IMessage.CentralStates.CLOSE_ON_DISCONNECT_TIMEOUT.ordinal -> {
+        if(currentState === States.Closing) {
+          Log.d(logTag, "closing gatt client due to disconnect timeout")
+          this.sendMessage(CloseMessage())
+          currentState = States.Disconnected
         }
       }
       IMessage.CentralStates.CLOSE.ordinal -> {
@@ -251,6 +259,16 @@ class StateHandler(
     message.what = msg.commandType.ordinal
     message.obj = msg
     val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+    }
+  }
+
+  override fun sendMessageDelayed(msg: IMessage, delay: Long) {
+    val message = this.obtainMessage()
+    message.what = msg.commandType.ordinal
+    message.obj = msg
+    val isSent = this.sendMessageDelayed(message, delay)
     if (!isSent) {
       Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
     }
