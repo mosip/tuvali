@@ -135,17 +135,11 @@ class GattClient(var context: Context) {
 
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         Log.i(logTag, "Disconnected from the peripheral")
-        closeGatt()
+        peripheral?.let{ onDeviceDisconnected() }
 
         peripheral = null;
       }
     }
-  }
-
-  @SuppressLint("MissingPermission")
-  private fun closeGatt() {
-    bluetoothGatt?.close()
-    bluetoothGatt = null
   }
 
   @SuppressLint("MissingPermission", "NewApi")
@@ -167,7 +161,7 @@ class GattClient(var context: Context) {
       BluetoothDevice.TRANSPORT_LE
     )
 
-    gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
+    gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH)
     gatt.readPhy()
     gatt.setPreferredPhy(2, 2, 0)
     gatt.readPhy()
@@ -301,7 +295,7 @@ class GattClient(var context: Context) {
 
   @SuppressLint("MissingPermission")
   fun disconnect(): Boolean {
-    return if (bluetoothGatt != null) {
+    return if (bluetoothGatt != null && peripheral != null) {
       bluetoothGatt!!.disconnect()
       true
     } else false
