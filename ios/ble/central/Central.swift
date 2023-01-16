@@ -3,9 +3,13 @@ import CoreBluetooth
 import os
 
 class Central: NSObject {
-    private var centralManager: CBCentralManager!
     
+    private var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
+    var  walletVm: WalletViewModel = WalletViewModel()
+    var transferCharacteristic: CBCharacteristic?
+    var writeCharacteristic: CBCharacteristic?
+    var identifyRequestCharacteristic: CBCharacteristic?
     
     override init() {
         super.init()
@@ -23,6 +27,16 @@ class Central: NSObject {
     }
     
     func writeData(message: String) {
+        
+    }
+    
+    @available(iOS 11.0, *)
+    func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
+        if let connectedPeripheral = connectedPeripheral {
+            if connectedPeripheral.canSendWriteWithoutResponse {
+                let mtu = connectedPeripheral.maximumWriteValueLength(for: .withoutResponse)
+                connectedPeripheral.writeValue(data, for: writeCharacteristic!, type: .withoutResponse)
+            }
+        }
     }
 }
-

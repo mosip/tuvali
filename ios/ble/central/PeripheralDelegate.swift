@@ -25,7 +25,19 @@ extension Central: CBPeripheralDelegate {
         
         guard let serviceCharacteristics = service.characteristics else { return }
         for characteristic in serviceCharacteristics {
-            peripheral.setNotifyValue(true, for: characteristic)
+            if characteristic.uuid == TransferService.characteristicUUID {
+                self.transferCharacteristic = characteristic
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+            if characteristic.uuid == TransferService.writeCharacteristic {
+                self.writeCharacteristic = characteristic
+                // No notify required, right?
+            }
+            if characteristic.uuid == TransferService.identifyRequestCharacteristic {
+                self.identifyRequestCharacteristic = characteristic
+//                sendPublicKey()
+//                print(characteristic)
+            }
         }
     }
     
