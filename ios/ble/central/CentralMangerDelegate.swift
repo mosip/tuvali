@@ -20,18 +20,18 @@ extension Central: CBCentralManagerDelegate {
         if let uuidDict = dataDict, let data = uuidDict[CBUUID(string: "AB2A")], let data = data {
             let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
             let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
-            
+            print("adv data::", advertisementData, "scan resuly:::", scanResponseData)
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
+            print("veri pub key::", publicKeyData)
             if #available(iOS 13.0, *) {
                 let cryptoBox = WalletCryptoBoxBuilder().build()
                 let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
-                Wallet.shared.setSecretTranslator(ss: secretsTranslator)
-                if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
+                walletVm.setSecretTranslator(ss: secretsTranslator, publicKeyData: publicKeyData)
+                if walletVm.isSameAdvIdentifier(advertisementPayload: advertisementData) {
                     //central.stopScan()
                     peripheral.delegate = self
                     central.connect(peripheral)
                     connectedPeripheral = peripheral
-                    NotificationCenter.default.post(name: Notification.Name(rawValue: "CONNECTED"), object: nil)
                 }
             } else {
                 print ("deployment target is less")
@@ -42,6 +42,7 @@ extension Central: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         os_log("Connected to peripheral: %@", String(describing: peripheral.name))
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "CONNECTED"), object: nil)
         central.stopScan()
         peripheral.discoverServices([Peripheral.SERVICE_UUID])
     }

@@ -3,6 +3,23 @@ import CoreBluetooth
 
 typealias CharacteristicTuple = (properties: CBCharacteristicProperties, permissions: CBAttributePermissions, value: Data?)
 
+struct CBcharatcteristic {
+
+    let IDENTITY_CHARACTERISTIC = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.IDENTITY_CHARACTERISTIC_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.IDENTITY_CHARACTERISTIC_UUID.rawValue]!.properties, value: nil, permissions: characteristicsMap[CharacteristicIds.IDENTITY_CHARACTERISTIC_UUID.rawValue]!.permissions)
+    
+    let REQUEST_SIZE_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.REQUEST_SIZE_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.REQUEST_SIZE_CHAR_UUID.rawValue]!.properties, value: nil, permissions: characteristicsMap[CharacteristicIds.REQUEST_SIZE_CHAR_UUID.rawValue]!.permissions)
+
+    let REQUEST_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.REQUEST_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.REQUEST_CHAR_UUID.rawValue]!.properties, value: nil, permissions: characteristicsMap[CharacteristicIds.REQUEST_CHAR_UUID.rawValue]!.permissions)
+
+    let RESPONSE_SIZE_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.RESPONSE_SIZE_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.RESPONSE_SIZE_CHAR_UUID.rawValue]!.properties, value: nil, permissions: characteristicsMap[CharacteristicIds.RESPONSE_SIZE_CHAR_UUID.rawValue]!.permissions)
+    
+    let RESPONSE_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.RESPONSE_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.RESPONSE_CHAR_UUID.rawValue]!.properties, value: characteristicsMap[CharacteristicIds.RESPONSE_CHAR_UUID.rawValue]!.value, permissions: characteristicsMap[CharacteristicIds.RESPONSE_CHAR_UUID.rawValue]!.permissions)
+
+    let SEMAPHORE_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.SEMAPHORE_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.SEMAPHORE_CHAR_UUID.rawValue]!.properties, value: characteristicsMap[CharacteristicIds.SEMAPHORE_CHAR_UUID.rawValue]!.value, permissions: characteristicsMap[CharacteristicIds.SEMAPHORE_CHAR_UUID.rawValue]!.permissions)
+                                                     
+    let VERIFICATION_STATUS_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.properties, value: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.value, permissions: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.permissions)
+}
+
 enum CharacteristicIds: String, CaseIterable {
     case IDENTITY_CHARACTERISTIC_UUID = "00002030-0000-1000-8000-00805f9b34fb"
     case REQUEST_SIZE_CHAR_UUID = "00002031-0000-1000-8000-00805f9b34fb"
@@ -13,7 +30,7 @@ enum CharacteristicIds: String, CaseIterable {
     case VERIFICATION_STATUS_CHAR_UUID = "00002036-0000-1000-8000-00805f9b34fb"
 }
 
-let characteristics: [String: CharacteristicTuple] = [
+let characteristicsMap: [String: CharacteristicTuple] = [
     "00002030-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write,]), permissions: CBAttributePermissions([.writeable]), value: nil),
     "00002031-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
     "00002032-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
@@ -22,3 +39,22 @@ let characteristics: [String: CharacteristicTuple] = [
     "00002035-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.readable, .writeable]), value: nil),
     "00002036-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
 ]
+
+struct TransferService {
+    static let identifyRequestCharacteristic = CBUUID(string: "00002030-0000-1000-8000-00805f9b34fb")
+    static let requestSizeCharacteristic = CBUUID(string: "00002031-0000-1000-8000-00805f9b34fb")
+    static let requestCharacteristic = CBUUID(string: "00002032-0000-1000-8000-00805f9b34fb")
+    static let responseSizeCharacteristic = CBUUID(string: "00002033-0000-1000-8000-00805f9b34fb")
+    static let responseCharacteristic = CBUUID(string: "00002034-0000-1000-8000-00805f9b34fb")
+    static let semaphoreCharacteristic = CBUUID(string: "00002035-0000-1000-8000-00805f9b34fb")
+    static let verificationStatusCharacteristic = CBUUID(string: "00002036-0000-1000-8000-00805f9b34fb")
+
+
+    static let serviceUUID = CBUUID(string: "0000AB29-0000-1000-8000-00805f9b34fb") // same
+    static let scanResponseServiceUUID = CBUUID(string: "0000AB2A-0000-1000-8000-00805f9b34fb")
+
+    // older stuff
+    // @deprecated
+    static let characteristicUUID = CBUUID(string: "00002032-0000-1000-8000-00805f9b34fb") //read characteristics
+    static let writeCharacteristic = CBUUID(string: "00002031-0000-1000-8000-00805f9b34fb")
+}
