@@ -57,11 +57,8 @@ extension Central: CBPeripheralDelegate {
         if let error = error {
             os_log("Unable to write to characteristic: %@", error.localizedDescription)
         }
-        if characteristic == TransferService.identifyRequestCharacteristic {
-            print("Wrote to Identity Characteristic")
-            print("Emitting 'exchange-receiver-info")
-            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
-        }
+        print("TS::: Identify:::", characteristic.uuid)
+        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
         print("Central was able to write value for the characteristic: ", characteristic.uuid.uuidString)
     }
     
