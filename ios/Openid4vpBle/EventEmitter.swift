@@ -25,7 +25,7 @@ class EventEmitter {
     
     func emitNearbyMessage(event: String, data: String) {
         var eventData: [String: String] = [:]
-        eventData["data"] = String(format: "%s\n%s", event, data)
+        eventData["data"] = event + "\n" + data
         eventData["type"] = "msg"
         
         dispatch(name: "EVENT_NEARBY", body: eventData)
