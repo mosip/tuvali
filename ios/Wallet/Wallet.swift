@@ -1,4 +1,5 @@
 import Foundation
+import Gzip
 
 @objc(Wallet)
 @available(iOS 13.0, *)
@@ -61,7 +62,17 @@ class Wallet: NSObject {
         }
         return data
     }
-    
+
+    func sendData(data: String){
+        var dataInBytes = Data(data.utf8)
+        var compressedBytes = try! dataInBytes.gzipped()
+        var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
+        if (encryptedData != nil) {
+//              transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
+            } else {
+
+            }
+
     @available(iOS 13.0, *)
     func writeIdentity() {
         print("::: write idendity called ::: ")
