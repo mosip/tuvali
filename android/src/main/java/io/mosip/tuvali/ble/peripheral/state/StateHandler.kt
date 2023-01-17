@@ -9,8 +9,6 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import com.facebook.common.util.Hex
-import io.mosip.tuvali.ble.central.state.StateHandler
-import io.mosip.tuvali.ble.central.state.message.CloseMessage
 
 class StateHandler(
   looper: Looper,
@@ -123,10 +121,18 @@ class StateHandler(
         val disconnecting = controller.disconnect()
 
         currentState = if(disconnecting) {
+          sendMessageDelayed(CloseOnDisconnectTimeoutMessage(), 50)
           States.Closing
         } else {
           this.sendMessage(CloseServerMessage())
           States.NotConnectedToDevice
+        }
+      }
+      IMessage.PeripheralMessageTypes.CLOSE_ON_DISCONNECT_TIMEOUT.ordinal -> {
+        if(currentState === States.Closing) {
+          Log.d(logTag, "closing gatt client due to disconnect timeout")
+          this.sendMessage(CloseServerMessage())
+          currentState = States.NotConnectedToDevice
         }
       }
       IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
@@ -147,6 +153,16 @@ class StateHandler(
     message.what = msg.messageType.ordinal
     message.obj = msg
     val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.messageType} failed")
+    }
+  }
+
+  override fun sendMessageDelayed(msg: IMessage, delay: Long) {
+    val message = this.obtainMessage()
+    message.what = msg.messageType.ordinal
+    message.obj = msg
+    val isSent = this.sendMessageDelayed(message, delay)
     if (!isSent) {
       Log.e(logTag, "sendMessage to state handler for ${msg.messageType} failed")
     }

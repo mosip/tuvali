@@ -150,6 +150,11 @@ class GattClient(var context: Context) {
   ) {
     Log.i(logTag, "Initiating connect to ble peripheral")
 
+    if(peripheral != null) {
+      Log.i(logTag, "Device is already connected.")
+      return
+    }
+
     this.onDeviceConnected = onDeviceConnected;
     this.onDeviceDisconnected = onDeviceDisconnected;
     peripheral = device;
@@ -296,16 +301,23 @@ class GattClient(var context: Context) {
   @SuppressLint("MissingPermission")
   fun disconnect(): Boolean {
     return if (bluetoothGatt != null && peripheral != null) {
+      Log.i(logTag, "Disconnecting connection")
       bluetoothGatt!!.disconnect()
       true
-    } else false
+    } else {
+      Log.i(logTag, "Ignoring disconnect request")
+      false
+    }
   }
 
   @SuppressLint("MissingPermission")
   fun close() {
     if (bluetoothGatt != null) {
+      Log.i(logTag, "Closing Bluetooth client")
       bluetoothGatt!!.close()
       bluetoothGatt = null
+    } else {
+      Log.i(logTag, "Ignoring close Bluetooth client request")
     }
   }
 
