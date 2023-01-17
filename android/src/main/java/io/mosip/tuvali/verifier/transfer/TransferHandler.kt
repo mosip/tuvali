@@ -101,7 +101,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     if (assembler?.isComplete() == true) {
       return
     }
-    Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkData)}")
+//    Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
 
     if (assembler?.isComplete() == true) {
