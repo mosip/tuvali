@@ -1,11 +1,9 @@
 import Foundation
 
+@available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
     
-    var callbk: RCTResponseSenderBlock?
-    var viewModel: WalletViewModel = WalletViewModel()
-
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -25,7 +23,7 @@ class Openid4vpBle: RCTEventEmitter {
         var paramsObj = stringToJson(jsonText: params)
         var firstPartOfPk = paramsObj["pk"]
         print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
-        viewModel.setAdvIdentifier(advIdentifier: firstPartOfPk as! String)
+        Wallet.shared.setAdvIdentifier(identifier: firstPartOfPk as! String)
         return "data" as Any
     }
     
@@ -40,7 +38,6 @@ class Openid4vpBle: RCTEventEmitter {
         }
         return dictonary!
     }
-    
     @objc
     func getConnectionParametersDebug() -> String {
         return "GetConnectionParametersDebug"
@@ -52,45 +49,37 @@ class Openid4vpBle: RCTEventEmitter {
     }
     
     @objc
-    func send(_ message: String, withCallback callback: RCTResponseSenderBlock) {
-        let newMessage = String.init(format: "%::%s", message, "iOS")
-        let recivedInfoSplits = message.components(separatedBy: "\n")
-        if recivedInfoSplits[0] == "exchange-sender-info" {
-            if #available(iOS 13.0, *) {
-                viewModel.writeIdentity()
-            } else {
-                // Fallback on earlier versions
-            }
+    func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
+        let messageComponents = message.components(separatedBy: "\n")
+        print("new message is :::: ", messageComponents)
+        
+        switch messageComponents[0] {
+        case "exchange-receiver-info":
+            print("EXCHANGE-RECEIVER-INFO")
+            callback([])
+        case "exchange-sender-info":
+            print("EXCHANGE-SENDER-INFO")
+            callback([])
+            // Wallet.shared.registerCallbackForEvent(event: "EXCHANGE-SENDER-INFO", callback: callback)
+            Wallet.shared.writeIdentity()
+        default:
+            print("DEFAULT SEND: MESSAGE:: ", message)
         }
-        print("new message is :::: ", message)
-        callback([newMessage])
     }
     
     @objc(createConnection:withCallback:)
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
-        let message = String.init(format: "MODE->%s", mode)
-        callbk = callback
-         NotificationCenter.default.addObserver(self, selector: #selector(handleCallback), name: Notification.Name(rawValue: "CONNECTED"), object: nil)
         switch mode {
         case "advertiser":
-            print("advert")
+            print("Advertiser")
         case "discoverer":
-            print("disc")
+            print("Discoverer")
             Wallet.shared.central = Central()
-            if #available(iOS 13.0, *) {
-               
-            } else {
-                print("target is low")
-            }
+            Wallet.shared.registerCallbackForEvent(event: "CREATE_CONNECTION", callback: callback)
         default:
+            print("DEFAULT CASE: MESSAGE:: ", mode)
             break
         }
-    }
-
-    @objc
-    func handleCallback(notification: Notification) {
-        print("call back called")
-        callbk!(["data"])
     }
 
     @objc
@@ -102,9 +91,4 @@ class Openid4vpBle: RCTEventEmitter {
     override static func requiresMainQueueSetup() -> Bool {
         return false
     }
-}
-
-enum modeState {
-    case advertiser
-    case discoverer
 }

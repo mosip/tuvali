@@ -1,6 +1,7 @@
 
 import Foundation
 
+@available(iOS 13.0, *)
 struct WalletViewModel {
     var advIdentifiers: String?
     var secretTranslators: SecretTranslator?

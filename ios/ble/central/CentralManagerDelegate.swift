@@ -2,17 +2,8 @@ import Foundation
 import CoreBluetooth
 import os
 
-extension Central: CBCentralManagerDelegate {
-    
-    func centralManagerDidUpdateState(_ central: CBCentralManager) {
-        switch central.state {
-        case .poweredOn:
-            print("Central Manager state is powered ON")
-            scanForPeripherals()
-        default:
-            print("Central Manager is in powered OFF")
-        }
-    }
+@available(iOS 13.0, *)
+extension Central {
     
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
         
@@ -26,9 +17,8 @@ extension Central: CBCentralManagerDelegate {
             if #available(iOS 13.0, *) {
                 let cryptoBox = WalletCryptoBoxBuilder().build()
                 let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
-                walletVm.setSecretTranslator(ss: secretsTranslator, publicKeyData: publicKeyData)
-                if walletVm.isSameAdvIdentifier(advertisementPayload: advertisementData) {
-                    //central.stopScan()
+                Wallet.shared.setSecretTranslator(ss: secretsTranslator, publicKeyData: publicKeyData)
+                if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
                     peripheral.delegate = self
                     central.connect(peripheral)
                     connectedPeripheral = peripheral
@@ -42,7 +32,6 @@ extension Central: CBCentralManagerDelegate {
     
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         os_log("Connected to peripheral: %@", String(describing: peripheral.name))
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "CONNECTED"), object: nil)
         central.stopScan()
         peripheral.discoverServices([Peripheral.SERVICE_UUID])
     }
