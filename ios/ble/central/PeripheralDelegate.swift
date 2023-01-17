@@ -2,6 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
+@available(iOS 13.0, *)
 extension Central: CBPeripheralDelegate {
     
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
@@ -30,6 +31,7 @@ extension Central: CBPeripheralDelegate {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
             if characteristic.uuid == TransferService.writeCharacteristic {
+                print("Found write characteristic")
                 self.writeCharacteristic = characteristic
                 // No notify required, right?
             }
@@ -39,6 +41,7 @@ extension Central: CBPeripheralDelegate {
 //                print(characteristic)
             }
         }
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "CREATE_CONNECTION"), object: nil)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -54,6 +57,12 @@ extension Central: CBPeripheralDelegate {
         if let error = error {
             os_log("Unable to write to characteristic: %@", error.localizedDescription)
         }
+        if characteristic == TransferService.identifyRequestCharacteristic {
+            print("Wrote to Identity Characteristic")
+            print("Emitting 'exchange-receiver-info")
+            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
+        }
+        print("Central was able to write value for the characteristic: ", characteristic.uuid.uuidString)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {}

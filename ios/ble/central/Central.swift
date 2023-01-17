@@ -2,18 +2,34 @@ import Foundation
 import CoreBluetooth
 import os
 
-class Central: NSObject {
+@available(iOS 13.0, *)
+class Central: NSObject, CBCentralManagerDelegate {
     
     private var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
-    var  walletVm: WalletViewModel = WalletViewModel()
     var transferCharacteristic: CBCharacteristic?
     var writeCharacteristic: CBCharacteristic?
     var identifyRequestCharacteristic: CBCharacteristic?
     
+    var chars: [String: CBCharacteristic] = [:]
+    
     override init() {
         super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
+    }
+    
+    func centralManagerDidUpdateState(_ central: CBCentralManager) {
+        switch central.state {
+        case .poweredOn:
+            print("Central Manager state is powered ON")
+            scanForPeripherals()
+        default:
+            print("Central Manager is in powered OFF")
+        }
+    }
+    
+    deinit {
+        print("Central is DeInitializing")
     }
     
     func scanForPeripherals() {
@@ -21,22 +37,31 @@ class Central: NSObject {
         os_log("scanning happening ::::::::")
     }
     
-    func connectToPeripheral(peripheral: CBPeripheral) {
-        os_log("Coonecting to peripheral")
-        centralManager.connect(peripheral)
-    }
-    
-    func writeData(message: String) {
-        
-    }
-    
-    @available(iOS 11.0, *)
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
+        if chars.contains(where: { key, value in
+            if key == charUUID.uuidString { return true }
+            return false
+        }) {
+            print("Value in chars... stopping write")
+            return
+        }
+        
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
-                let mtu = connectedPeripheral.maximumWriteValueLength(for: .withoutResponse)
-                connectedPeripheral.writeValue(data, for: writeCharacteristic!, type: .withoutResponse)
+                guard let writeCharacteristic = self.identifyRequestCharacteristic else {
+                    print("Write characteristic is NIL")
+                    return
+                }
+                let mtu = connectedPeripheral.maximumWriteValueLength(for: .withResponse)
+                print("Write MTU: ", mtu)
+                let bytesToCopy: size_t = min(mtu, data.count)
+                let messageData = Data(bytes: Array(data), count: bytesToCopy)
+                connectedPeripheral.writeValue(messageData, for: writeCharacteristic, type: .withResponse)
             }
         }
+    }
+    
+    func stopWritingToCharacteristic(characteristic: CBCharacteristic) {
+        self.chars[characteristic.uuid.uuidString] = characteristic
     }
 }
