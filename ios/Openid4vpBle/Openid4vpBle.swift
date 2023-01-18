@@ -60,7 +60,7 @@ class Openid4vpBle: RCTEventEmitter {
         case "exchange-sender-info":
             print("EXCHANGE-SENDER-INFO")
             callback([])
-            // Wallet.shared.registerCallbackForEvent(event: "EXCHANGE-SENDER-INFO", callback: callback)
+            //Wallet.shared.registerCallbackForEvent(event: "EXCHANGE-SENDER-INFO", callback: callback)
             Wallet.shared.writeIdentity()
         case "send-vc":
             callback([])

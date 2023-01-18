@@ -3,26 +3,13 @@
 import Foundation
 
 class Chunker {
-    /*
-     (private val data: ByteArray, private val mtuSize: Int = DEFAULT_CHUNK_SIZE) :
-     ChunkerBase(mtuSize)
-     **/
-    
+
     private var logTag = "Chunker"
     private var chunksReadCounter: Int = 0
     private var preSlicedChunks: [Data]?
     private var chunkData: Data?
     private var mtuSize: Int = BLEConstants.DEFAULT_CHUNK_SIZE
     private var chunkMetaSize = BLEConstants.seqNumberReservedByteSize + BLEConstants.mtuReservedByteSize
-    
-    
-    //  init {
-    //    val startTime = System.currentTimeMillis()
-    //    for (idx in 0 until totalChunkCount) {
-    //      preSlicedChunks[idx] = chunk(idx)
-    //    }
-    //    Log.d(logTag, "Chunks pre-populated in ${System.currentTimeMillis() - startTime} ms time")
-    //  }
     
     init(chunkData: Data, mtuSize: Int?) {
         self.chunkData = chunkData
@@ -35,7 +22,7 @@ class Chunker {
     
     func getTotalChunkCount(dataSize: Int) -> Double {
         var resulydouble = Double(dataSize)/Double(effectivePayloadSize)
-        return ceill(resulydouble)
+        return Double(ceill(resulydouble))
     }
     
     var lastChunkByteCount: Int {
@@ -85,14 +72,11 @@ class Chunker {
     private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
         print("fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber"
         )
-        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.copyOfRange(
-            fromIndex,
-            toIndex
-        )
+        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
     }
     
     func isComplete() -> Bool {
-        var isComplete = chunksReadCounter > (totalChunkCount - 1)
+        let isComplete = chunksReadCounter > (totalChunkCount - 1)
         if (isComplete) {
                 print("isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadCounter"
             )
@@ -100,13 +84,11 @@ class Chunker {
         return isComplete
     }
     
-    func intToTwoBytesBigEndian(num: Int) -> Data {
-        if (num < 256) {
-          var minValue = 0
-            var result = num - minValue
-            return Data(result)
+    func intToTwoBytesBigEndian(num: Int) -> [UInt8] {
+        if num < 256 {
+            let minValue: UInt8 = 0
+            return [minValue, UInt8(num)]
         }
-        var result1 = num/256 - (num%256)
-        return Data(result1)
-      }
+        return [UInt8(num/256), UInt8(num%256)]
+    }
 }
