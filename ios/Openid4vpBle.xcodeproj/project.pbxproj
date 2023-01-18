@@ -32,6 +32,7 @@
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
 		E2F1AFCD2971883500AC3355 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */; };
 		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
+		FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA18F3E2977B69A00290433 /* CRC16.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -75,6 +76,7 @@
 		E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBle.swift; sourceTree = "<group>"; };
+		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -99,6 +101,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				FDA18F3D2977B67C00290433 /* crc */,
 				8D069F612964454700AB61A9 /* ble */,
 				8D179C82295486B500017EE5 /* crypto */,
 				8D069F60296436C400AB61A9 /* Openid4vpBle */,
@@ -234,6 +237,14 @@
 			path = Utility;
 			sourceTree = "<group>";
 		};
+		FDA18F3D2977B67C00290433 /* crc */ = {
+			isa = PBXGroup;
+			children = (
+				FDA18F3E2977B69A00290433 /* CRC16.swift */,
+			);
+			path = crc;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -294,6 +305,7 @@
 				8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */,
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
 				8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */,
+				FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */,
 				8D069F652964466900AB61A9 /* Central.swift in Sources */,
 				8D31C3F42956AD8B0073B710 /* KeyGenerator.swift in Sources */,
 				8D069F672964475A00AB61A9 /* CentralManagerDelegate.swift in Sources */,
