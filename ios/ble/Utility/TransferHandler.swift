@@ -5,6 +5,7 @@ class TransferHandler {
     var data: Data
     private var currentState: States = States.UnInitialised
     private var responseStartTimeInMillis: UInt64 = 0
+    var chunker: Chunker?
     init(data: Data) {
         self.data = data
     }
@@ -17,17 +18,20 @@ class TransferHandler {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data
             print("Total response size of data",responseData.count)
-            let chunker = Chunker(chunkData: responseData)
+            chunker = Chunker(chunkData: responseData)
             currentState = States.ResponseSizeWritePending
             sendMessage(msg: imessage(msgType: .ResponseSizeWritePendingMessage, data: responseData, dataSize: responseData.count))
         }
         else if msg.msgType == .ResponseSizeWritePendingMessage {
             sendResponseSize(msg.dataSize)
         }
-        else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS{
+        else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
           responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
           currentState = States.ResponseSizeWriteSuccess
           initResponseChunkSend()
+        } else if msg.msgType == .INIT_RESPONSE_CHUNK_TRANSFER {
+            currentState = .ResponseWritePending
+            sendResponseChunk()
         }
         else {
             print("out of scope")
@@ -46,6 +50,21 @@ class TransferHandler {
       print(logTag, "initResponseChunkSend")
       sendMessage(imessage(msgType: .ResponseSizeWritePendingMessage))
     }
+    
+    private func sendResponseChunk() {
+        if chunker?.isComplete() {
+            print("Data send complete")
+            sendMessage(msg: imessage(msgType: .RESPONSE_TRANSFER_COMPLETE))
+            return
+        }
+        
+        var done = false
+        while !done {
+            if let chunk = chunker?.next() {
+                Central.write(serviceUuid: serviceUUID, charUUID: TransferService.responseCharacteristic, data: chunk)
+            }
+        }
+    }
 }
 
 enum TransferMessageTypes {
@@ -53,6 +72,7 @@ enum TransferMessageTypes {
     case ResponseSizeWritePendingMessage
     case RESPONSE_SIZE_WRITE_SUCCESS
     case INIT_RESPONSE_CHUNK_TRANSFER
+    case RESPONSE_TRANSFER_COMPLETE
 }
 
 struct imessage {
