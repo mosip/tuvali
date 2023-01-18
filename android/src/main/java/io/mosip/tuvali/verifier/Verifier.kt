@@ -15,7 +15,6 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.*
-import io.mosip.tuvali.wallet.Wallet
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
@@ -42,6 +41,7 @@ class Verifier(
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
     val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+    const val DISCONNECT_STATUS = 1
   }
 
   private enum class PeripheralCallbacks {
@@ -64,7 +64,7 @@ class Verifier(
 
   fun stop(onDestroySuccessCallback: Callback) {
     callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroySuccessCallback
-    peripheral.stop();
+    peripheral.stop(SERVICE_UUID)
     handlerThread.quitSafely()
   }
 
@@ -213,9 +213,9 @@ class Verifier(
     }
   }
 
-  override fun onDeviceNotConnected(isManualDisconnect: Boolean) {
+  override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
-    if(!isManualDisconnect) {
+    if(!isManualDisconnect && isConnected) {
       eventResponseListener("onDisconnected")
     }
   }

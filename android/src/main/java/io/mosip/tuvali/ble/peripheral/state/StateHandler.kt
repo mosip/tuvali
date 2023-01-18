@@ -22,9 +22,9 @@ class StateHandler(
     GattServerReady,
     Advertising,
     ConnectedToDevice,
+    CommunicationReady,
     Disconnecting,
     NotConnectedToDevice,
-    CommunicationReady,
     Closing,
     Closed
   }
@@ -80,7 +80,7 @@ class StateHandler(
         if(currentState == States.Closing) {
           this.sendMessage(CloseServerMessage())
         } else {
-          peripheralListener.onDeviceNotConnected(currentState == States.Disconnecting)
+          peripheralListener.onDeviceNotConnected(currentState >= States.Disconnecting, currentState == States.CommunicationReady)
         }
         currentState = States.NotConnectedToDevice
       }
@@ -116,6 +116,7 @@ class StateHandler(
         controller.disconnect()
         currentState = States.Disconnecting
       }
+
       IMessage.PeripheralMessageTypes.DISCONNECT_AND_CLOSE_DEVICE.ordinal -> {
         Log.d(logTag, "disconnect and close gatt server")
         val disconnecting = controller.disconnect()

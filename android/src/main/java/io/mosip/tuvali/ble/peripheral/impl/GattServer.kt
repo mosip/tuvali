@@ -41,6 +41,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: ByteArray): Boolean {
+    if(bluetoothDevice == null) return false
+
     val service = gattServer.getService(serviceUUID)
     val characteristic = service.getCharacteristic(charUUID)
     characteristic.value = data

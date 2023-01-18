@@ -18,6 +18,7 @@ import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
+import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -149,6 +150,7 @@ class Wallet(
     Log.d(logTag, "onRequestMTUSuccess")
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
+    central.subscribe(Verifier.SERVICE_UUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -249,6 +251,14 @@ class Wallet(
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
         central.disconnectAndClose()
+      }
+      GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID -> {
+        val status = value?.get(0)?.toInt()
+
+        if(status != null && status == DISCONNECT_STATUS) {
+          central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
+          central.disconnectAndClose()
+        }
       }
     }
   }
