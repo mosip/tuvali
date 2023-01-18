@@ -60,6 +60,7 @@ extension Central: CBPeripheralDelegate {
         print("TS::: Identify:::", characteristic.uuid)
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
         print("Central was able to write value for the characteristic: ", characteristic.uuid.uuidString)
+        NotificationCenter.default.post(name: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {}
