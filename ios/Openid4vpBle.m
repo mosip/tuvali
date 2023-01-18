@@ -20,7 +20,7 @@ RCT_EXTERN_METHOD(send:(NSString *)message withCallback:(RCTResponseSenderBlock)
 
 RCT_EXTERN_METHOD(createConnection:(NSString *)mode withCallback:(RCTResponseSenderBlock)callback)
 
-RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(destroyConnection)
+RCT_EXTERN_METHOD(destroyConnection:(RCTResponseSenderBlock)callback)
 
 @end
 
