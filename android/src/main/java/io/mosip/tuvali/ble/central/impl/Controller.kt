@@ -158,8 +158,8 @@ class Controller(val context: Context) {
     messageSender.sendMessage(scanStartFailureMessage)
   }
 
-  private fun onServicesDiscovered(){
-    messageSender.sendMessage(DiscoverServicesSuccessMessage())
+  private fun onServicesDiscovered(services: List<UUID>){
+    messageSender.sendMessage(DiscoverServicesSuccessMessage(services))
   }
 
   private fun onServiceDiscoveryFailure(errorCode: Int){

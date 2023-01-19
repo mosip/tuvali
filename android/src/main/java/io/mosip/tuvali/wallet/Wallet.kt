@@ -14,6 +14,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.retrymechanism.lib.BackOffStrategy
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -39,13 +40,16 @@ class Wallet(
   private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
   private var secretsTranslator: SecretsTranslator? = null
 
-  private var advIdentifier: String? = null;
+  private var advIdentifier: String? = null
   private var transferHandler: TransferHandler
   private val handlerThread =
     HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   private var central: Central
   private val maxMTU = 517
+
+  private val retryDiscoverServices =
+    BackOffStrategy(100, 10, 2, 2)
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
@@ -57,7 +61,8 @@ class Wallet(
   init {
     central = Central(context, this@Wallet)
     handlerThread.start()
-    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
+    transferHandler =
+      TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
   fun stop(onDestroy: Callback) {
@@ -134,14 +139,31 @@ class Wallet(
     central.discoverServices()
   }
 
-  override fun onServicesDiscovered() {
-    Log.d(logTag, "onServicesDiscovered")
-    central.requestMTU(maxMTU)
+  override fun onServicesDiscovered(services : List<UUID>) {
+
+    if(services.contains(Verifier.SERVICE_UUID)){
+      retryDiscoverServices.reset()
+      Log.d(logTag, "onServicesDiscovered with specific service")
+      central.requestMTU(maxMTU)
+    }
+      else{
+      retryServiceDiscovery()
+      }
   }
 
   override fun onServicesDiscoveryFailed(errorCode: Int) {
-    Log.d(logTag, "onServicesDiscoveryFailed")
-    //TODO: Handle services discovery failure
+    Log.d(logTag, "onServicesDiscoveryFailed retrying to find the services")
+    retryServiceDiscovery()
+  }
+
+  private fun retryServiceDiscovery() {
+    if (retryDiscoverServices.shouldRetry()) {
+      central.discoverServicesDelayed(retryDiscoverServices.getWaitTime())
+    }
+    else{
+      Log.d(logTag, "Retrying to find the services failed after multiple attempts")
+      retryDiscoverServices.reset()
+    }
   }
 
   override fun onRequestMTUSuccess(mtu: Int) {
@@ -202,7 +224,7 @@ class Wallet(
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
-      transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
+        transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
   }
@@ -289,9 +311,17 @@ class Wallet(
     val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
     if (encryptedData != null) {
       //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
+
+      Log.d(
+        logTag,
+        "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}"
+      )
       transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
     } else {
-      Log.e(logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}")
+      Log.e(
+        logTag,
+        "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
+      )
     }
   }
 }
