@@ -1,6 +1,7 @@
 
 import Foundation
 
+@available(iOS 13.0, *)
 class TransferHandler {
     var data: Data
     private var currentState: States = States.UnInitialised
@@ -10,23 +11,23 @@ class TransferHandler {
         self.data = data
     }
     
-    func sendMessage(msg: imessage) {
+    func sendMessage(message: imessage) {
         handleMessage(msg: message)
     }
     
     private func handleMessage(msg: imessage){
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
-            var responseData = msg.data
+            var responseData = msg.data!
             print("Total response size of data",responseData.count)
-            chunker = Chunker(chunkData: responseData)
+            chunker = Chunker(chunkData: responseData, mtuSize: BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
-            sendMessage(msg: imessage(msgType: .ResponseSizeWritePendingMessage, data: responseData, dataSize: responseData.count))
+            sendMessage(message: imessage(msgType: .ResponseSizeWritePendingMessage, data: responseData, dataSize: responseData.count))
         }
         else if msg.msgType == .ResponseSizeWritePendingMessage {
-            sendResponseSize(msg.dataSize)
+            sendResponseSize(size: msg.dataSize)
         }
         else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
-          responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
+          responseStartTimeInMillis =Utils.currentTimeInMilliSeconds()
           currentState = States.ResponseSizeWriteSuccess
           initResponseChunkSend()
         } else if msg.msgType == .INIT_RESPONSE_CHUNK_TRANSFER {
@@ -39,29 +40,29 @@ class TransferHandler {
     }
     
     private func sendResponseSize(size: Int) {
-        Central.write(serviceUuid: serviceUUID, charUUID: TransferService.responseSizeCharacteristic, data: Data(size))
+        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.responseSizeCharacteristic, data: Data([UInt8(size)]))
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
-            sendMessage(msg: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS))
+            sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS))
         }
     }
     
     private func initResponseChunkSend() {
-      print(logTag, "initResponseChunkSend")
-      sendMessage(imessage(msgType: .ResponseSizeWritePendingMessage))
+      print("initResponseChunkSend")
+        sendMessage(message: imessage(msgType: .ResponseSizeWritePendingMessage))
     }
     
     private func sendResponseChunk() {
-        if chunker?.isComplete() {
+        if ((chunker?.isComplete()) != nil) {
             print("Data send complete")
-            sendMessage(msg: imessage(msgType: .RESPONSE_TRANSFER_COMPLETE))
+            sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_COMPLETE))
             return
         }
         
         var done = false
         while !done {
             if let chunk = chunker?.next() {
-                Central.write(serviceUuid: serviceUUID, charUUID: TransferService.responseCharacteristic, data: chunk)
+                Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.responseCharacteristic, data: chunk)
             }
         }
     }

@@ -77,7 +77,8 @@ class Openid4vpBle: RCTEventEmitter {
             print("Advertiser")
         case "discoverer":
             print("Discoverer")
-            Wallet.shared.central = Central()
+            Central.shared.initialize()
+            Wallet.shared.central = Central.shared
             Wallet.shared.registerCallbackForEvent(event: "CREATE_CONNECTION", callback: callback)
         default:
             print("DEFAULT CASE: MESSAGE:: ", mode)

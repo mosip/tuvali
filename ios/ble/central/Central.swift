@@ -13,8 +13,9 @@ class Central: NSObject, CBCentralManagerDelegate {
     
     var chars: [String: CBCharacteristic] = [:]
     
-    override init() {
-        super.init()
+    public static var shared = Central()
+    
+    func initialize() {
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
     
