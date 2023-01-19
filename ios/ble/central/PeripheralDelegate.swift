@@ -45,6 +45,7 @@ extension Central: CBPeripheralDelegate {
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
+        print("Central was able to update value for the characteristic: ", characteristic.uuid.uuidString)
         if let error = error {
             os_log("Unable to recieve updates from device: %s", error.localizedDescription)
             return
@@ -60,7 +61,15 @@ extension Central: CBPeripheralDelegate {
         print("TS::: Identify:::", characteristic.uuid)
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
         print("Central was able to write value for the characteristic: ", characteristic.uuid.uuidString)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil)
+        if characteristic.uuid.uuidString == "2033" {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil)
+        } else if characteristic.uuid.uuidString == "2035" {
+            let report = characteristic.value
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: report)
+        }
+        else {
+            
+        }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {}

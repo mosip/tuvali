@@ -6,7 +6,7 @@ class Chunker {
 
     private var logTag = "Chunker"
     private var chunksReadCounter: Int = 0
-    private var preSlicedChunks: [Data]?
+    private var preSlicedChunks: [Data] = []
     private var chunkData: Data?
     private var mtuSize: Int = BLEConstants.DEFAULT_CHUNK_SIZE
     private var chunkMetaSize = BLEConstants.seqNumberReservedByteSize + BLEConstants.mtuReservedByteSize
@@ -14,10 +14,20 @@ class Chunker {
     init(chunkData: Data, mtuSize: Int?) {
         self.chunkData = chunkData
         self.mtuSize = mtuSize!
+        assignPreSlicedChunks()
     }
     
     func getLastChunkByteCount(dataSize: Int) -> Int {
         return dataSize % effectivePayloadSize
+    }
+    
+    func assignPreSlicedChunks(){
+        print("preSlicedChunks called ::: ")
+        for i in 0..<totalChunkCount {
+            print(i)
+            preSlicedChunks.append(chunk(seqNumber: i))
+            print(preSlicedChunks ?? [])
+        }
     }
     
     func getTotalChunkCount(dataSize: Int) -> Double {
@@ -40,21 +50,27 @@ class Chunker {
     func next() -> Data {
         var seqNumber = chunksReadCounter
         chunksReadCounter += 1
-        return (preSlicedChunks?[seqNumber])!
+        if seqNumber <= totalChunkCount - 1 {
+            return (preSlicedChunks[seqNumber])
+        }
+       else
+        {
+           return Data()
+       }
     }
     
     func chunkBySequenceNumber(num: Int) -> Data {
-        return (preSlicedChunks?[num])!
+        return (preSlicedChunks[num])
     }
     
     private func chunk(seqNumber: Int) -> Data {
-        var fromIndex = seqNumber * effectivePayloadSize
+        let fromIndex = seqNumber * effectivePayloadSize
         if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
             print( "fetching last chunk")
-            var chunkLength = lastChunkByteCount + chunkMetaSize
+            let chunkLength = lastChunkByteCount + chunkMetaSize
             return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
-            var toIndex = (seqNumber + 1) * effectivePayloadSize
+            let toIndex = (seqNumber + 1) * effectivePayloadSize
             return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
     }
@@ -70,25 +86,32 @@ class Chunker {
      */
     
     private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
-        print("fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber"
-        )
-        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
+        print("fetching chunk size:",toIndex,"-", fromIndex,"}, chunkSequenceNumber(0-indexed):", seqNumber)
+//        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
+        if let chunkData = chunkData {
+            return intToBytes(UInt16(seqNumber)) + intToBytes(UInt16(chunkLength)) + chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
+        }
+        return Data() //
     }
     
     func isComplete() -> Bool {
         let isComplete = chunksReadCounter > (totalChunkCount - 1)
-        if (isComplete) {
-                print("isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadCounter"
-            )
+        if isComplete {
+                print("isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadCounter")
         }
-        return isComplete
+       return isComplete
     }
     
-    func intToTwoBytesBigEndian(num: Int) -> [UInt8] {
-        if num < 256 {
-            let minValue: UInt8 = 0
-            return [minValue, UInt8(num)]
-        }
-        return [UInt8(num/256), UInt8(num%256)]
+//    func intToTwoBytesBigEndian(num: Int) -> [UInt8] {
+//        if num < 256 {
+//            let minValue: UInt8 = 0
+//            return [minValue, UInt8(num)]
+//        }
+//        return [UInt8(num/256), UInt8(num%256)]
+//    }
+    
+    func intToBytes(_ value: UInt16) -> Data {
+        var value = value.bigEndian
+        return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
     }
 }

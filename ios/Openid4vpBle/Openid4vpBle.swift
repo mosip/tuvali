@@ -64,7 +64,7 @@ class Openid4vpBle: RCTEventEmitter {
             Wallet.shared.writeIdentity()
         case "send-vc":
             callback([])
-            Wallet.shared.sendData(data: messageComponents[0])
+            Wallet.shared.sendData(data: messageComponents[1])
         default:
             print("DEFAULT SEND: MESSAGE:: ", message)
         }

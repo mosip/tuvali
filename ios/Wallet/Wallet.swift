@@ -67,9 +67,12 @@ class Wallet: NSObject {
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
         if (encryptedData != nil) {
-            let transferHandler: TransferHandler = TransferHandler(data: encryptedData!)
-            let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
-            transferHandler.sendMessage(message: imsgBuilder)
+            DispatchQueue.main.async {
+                let transferHandler = TransferHandler.shared
+                transferHandler.initialize(initdData: encryptedData!)
+                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
+                transferHandler.sendMessage(message: imsgBuilder)
+            }
         } else {
             
         }
