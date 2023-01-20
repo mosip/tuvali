@@ -38,14 +38,15 @@ class Openid4vpBle: RCTEventEmitter {
         }
         return dictonary!
     }
+    
     @objc
     func getConnectionParametersDebug() -> String {
         return "GetConnectionParametersDebug"
     }
     
-    @objc
-    func destroyConnection() -> Any {
-        return "check" as! Any
+    @objc(destroyConnection:)
+    func destroyConnection(callback: @escaping RCTResponseSenderBlock) -> Any {
+        callback([])
     }
     
     @objc
