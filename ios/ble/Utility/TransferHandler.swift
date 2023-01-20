@@ -25,6 +25,7 @@ class TransferHandler {
             var responseData = msg.data!
             print("Total response size of data",responseData.count)
             chunker = Chunker(chunkData: responseData, mtuSize: BLEConstants.DEFAULT_CHUNK_SIZE)
+            print("MTU found to be", BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
             sendMessage(message: imessage(msgType: .ResponseSizeWritePendingMessage, data: responseData, dataSize: responseData.count))
         }

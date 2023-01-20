@@ -23,7 +23,6 @@ extension Central: CBPeripheralDelegate {
             os_log("Error discovering Characteristics: %s", error.localizedDescription)
             return
         }
-        
         guard let serviceCharacteristics = service.characteristics else { return }
         for characteristic in serviceCharacteristics {
             if characteristic.uuid == TransferService.characteristicUUID {
@@ -32,6 +31,9 @@ extension Central: CBPeripheralDelegate {
             }
             if characteristic.uuid == TransferService.writeCharacteristic {
                 print("Found write characteristic")
+                // kludge: create a static side-effect for default chunk size
+                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: characteristic)
+                print("MTU set to be", BLEConstants.DEFAULT_CHUNK_SIZE)
                 self.writeCharacteristic = characteristic
                 // No notify required, right?
             }
