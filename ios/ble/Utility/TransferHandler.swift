@@ -56,7 +56,7 @@ class TransferHandler {
     
     private func requestTransmissionReport() {
         var notifyObj: Data = Data()
-        Central.shared.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: TransferService.semaphoreCharacteristic, data: withUnsafeBytes(of: 1.bigEndian) { Data($0) })
+        Central.shared.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.semaphoreCharacteristic, data: withUnsafeBytes(of: 1.bigEndian) { Data($0) })
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             notifyObj = notification.object as! Data
@@ -79,8 +79,11 @@ class TransferHandler {
      }
 
     private func sendResponseSize(size: Int) {
-        let dataSize = withUnsafeBytes(of: size.bigEndian) { Data($0) }
-        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.responseSizeCharacteristic, data: dataSize)
+        // TODO: Send a stringified number in a byte array
+        let decimalString = String(size)
+        let d = decimalString.data(using: .utf8)
+        print(d!)
+        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.responseSizeCharacteristic, data: d!)
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS, data: data))
@@ -102,13 +105,14 @@ class TransferHandler {
 
             var done = false
             while !done {
+                sleep(10)
                 let chunk = chunker.next()
                 if chunk.isEmpty {
                     done = true
                     sendMessage(message: imessage(msgType: .INIT_RESPONSE_CHUNK_TRANSFER, data: data, dataSize: data?.count))
                 }
                 else {
-                    Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.responseCharacteristic, data: chunk)
+                    Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.responseCharacteristic, data: chunk)
                 }
                 
             }
@@ -151,3 +155,4 @@ enum SemaphoreMarker: Int {
     case RequestReport = 1
     case Error = 2
   }
+

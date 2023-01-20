@@ -4,7 +4,6 @@ import os
 
 @available(iOS 13.0, *)
 extension Central: CBPeripheralDelegate {
-    
     func peripheral(_ peripheral: CBPeripheral, didDiscoverServices error: Error?) {
         if let error = error {
             os_log("Error while discovering services: %s", error.localizedDescription)
@@ -25,23 +24,28 @@ extension Central: CBPeripheralDelegate {
         }
         guard let serviceCharacteristics = service.characteristics else { return }
         for characteristic in serviceCharacteristics {
-            if characteristic.uuid == TransferService.characteristicUUID {
-                self.transferCharacteristic = characteristic
-                peripheral.setNotifyValue(true, for: characteristic)
-            }
-            if characteristic.uuid == TransferService.writeCharacteristic {
-                print("Found write characteristic")
-                // kludge: create a static side-effect for default chunk size
-                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withResponse)
-                print("MTU set to be", BLEConstants.DEFAULT_CHUNK_SIZE)
-                self.writeCharacteristic = characteristic
-                // No notify required, right?
-            }
-            if characteristic.uuid == TransferService.identifyRequestCharacteristic {
-                self.identifyRequestCharacteristic = characteristic
-//                sendPublicKey()
-//                print(characteristic)
-            }
+            // store a reference to the discovered characteristic in the Central for write.
+            print("Characteristic UUID:: ", characteristic.uuid.uuidString)
+            self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
+            
+            // TODO - subscribe to the characteristics for (2035, 2036, 2037)
+            
+            //            if characteristic.uuid == TransferService.characteristicUUID {
+            //                self.transferCharacteristic = characteristic
+            //                peripheral.setNotifyValue(true, for: characteristic)
+            //            }
+            //            if characteristic.uuid == TransferService.writeCharacteristic {
+            //                print("Found write characteristic")
+            //                // kludge: create a static side-effect for default chunk size
+            //                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withResponse)
+            //                print("MTU set to be", BLEConstants.DEFAULT_CHUNK_SIZE)
+            //                self.writeCharacteristic = characteristic
+            //                // No notify required, right?
+            //            }
+            //            if characteristic.uuid == TransferService.identifyRequestCharacteristic {
+            //                self.identifyRequestCharacteristic = characteristic
+            ////                sendPublicKey()
+            ////                print(characteristic)
         }
         NotificationCenter.default.post(name: Notification.Name(rawValue: "CREATE_CONNECTION"), object: nil)
     }
@@ -74,5 +78,8 @@ extension Central: CBPeripheralDelegate {
         }
     }
     
-    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {}
+    func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
+        
+    }
 }
+

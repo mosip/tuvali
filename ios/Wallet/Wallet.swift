@@ -88,9 +88,10 @@ class Wallet: NSObject {
             }
             self.secretTranslator = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: verifierPublicKey)
             var iv = (self.secretTranslator?.initializationVector())!
-            central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.identifyRequestCharacteristic, data: iv + publicKey)
+            central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
             NotificationCenter.default.post(name: Notification.Name(rawValue: "EXCHANGE-SENDER-INFO"), object: nil)
         }
     }
 
     
+

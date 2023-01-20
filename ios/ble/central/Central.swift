@@ -9,9 +9,10 @@ class Central: NSObject, CBCentralManagerDelegate {
     var connectedPeripheral: CBPeripheral?
     var transferCharacteristic: CBCharacteristic?
     var writeCharacteristic: CBCharacteristic?
-    var identifyRequestCharacteristic: CBCharacteristic?
+    var identityRequestCharacteristic: CBCharacteristic?
     
-    var chars: [String: CBCharacteristic] = [:]
+    var cbCharacteristics: [String: CBCharacteristic] = [:]
+    
     
     public static var shared = Central()
     
@@ -39,30 +40,33 @@ class Central: NSObject, CBCentralManagerDelegate {
     }
     
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
-        if chars.contains(where: { key, value in
-            if key == charUUID.uuidString { return true }
-            return false
-        }) {
-            print("Value in chars... stopping write")
-            return
-        }
+//        if chars.contains(where: { key, value in
+//            if key == charUUID.uuidString { return true }
+//            return false
+//        }) {
+//            print("Value in chars... stopping write")
+//            return
+//        }
         
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
-                guard let writeCharacteristic = self.identifyRequestCharacteristic else {
-                    print("Write characteristic is NIL")
+                guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
+                    print("Did not find the characteristic to write")
                     return
                 }
                 let mtu = connectedPeripheral.maximumWriteValueLength(for: .withResponse)
                 print("Write MTU: ", mtu)
                 let bytesToCopy: size_t = min(mtu, data.count)
                 let messageData = Data(bytes: Array(data), count: bytesToCopy)
-                connectedPeripheral.writeValue(messageData, for: writeCharacteristic, type: .withResponse)
+                // TBD: Make it big!!
+                connectedPeripheral.writeValue(messageData, for: characteristic, type: .withResponse)
             }
         }
     }
-    
+/*
     func stopWritingToCharacteristic(characteristic: CBCharacteristic) {
         self.chars[characteristic.uuid.uuidString] = characteristic
     }
+ */
 }
+

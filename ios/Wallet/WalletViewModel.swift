@@ -38,7 +38,7 @@ struct WalletViewModel {
         print("verifier pub key:::", BLEConstants.verifierPublicKey)
         secretTranslators = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: BLEConstants.verifierPublicKey)
         var iv = (secretTranslators?.initializationVector())!
-        central.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: TransferService.identifyRequestCharacteristic, data: iv + publicKey)
+        central.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
      }
 
     mutating func setAdvIdentifier(advIdentifier: String) {
@@ -51,3 +51,4 @@ struct WalletViewModel {
         BLEConstants.verifierPublicKey = publicKeyData
     }
 }
+

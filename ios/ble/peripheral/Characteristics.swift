@@ -58,3 +58,14 @@ struct TransferService {
     static let characteristicUUID = CBUUID(string: "00002032-0000-1000-8000-00805f9b34fb") //read characteristics
     static let writeCharacteristic = CBUUID(string: "00002031-0000-1000-8000-00805f9b34fb")
 }
+
+struct NetworkCharNums {
+    static let identifyRequestCharacteristic = CBUUID(string: "2030")
+    static let requestSizeCharacteristic = CBUUID(string: "2031")
+    static let requestCharacteristic = CBUUID(string: "2032")
+    static let responseSizeCharacteristic = CBUUID(string: "2033")
+    static let responseCharacteristic = CBUUID(string: "2034")
+    static let semaphoreCharacteristic = CBUUID(string: "2035")
+    static let verificationStatusCharacteristic = CBUUID(string: "2036")
+}
+
