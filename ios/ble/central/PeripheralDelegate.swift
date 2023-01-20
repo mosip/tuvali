@@ -32,7 +32,7 @@ extension Central: CBPeripheralDelegate {
             if characteristic.uuid == TransferService.writeCharacteristic {
                 print("Found write characteristic")
                 // kludge: create a static side-effect for default chunk size
-                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: characteristic)
+                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withResponse)
                 print("MTU set to be", BLEConstants.DEFAULT_CHUNK_SIZE)
                 self.writeCharacteristic = characteristic
                 // No notify required, right?
