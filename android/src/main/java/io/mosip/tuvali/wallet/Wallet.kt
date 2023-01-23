@@ -212,7 +212,7 @@ class Wallet(
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-        messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
+        messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_RECEIVER_INFO.value, "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -228,6 +228,7 @@ class Wallet(
   }
 
   override fun onResponseSent() {
+    messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.RECEIVED.value)
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -244,9 +245,9 @@ class Wallet(
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value)
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.ACCEPTED.value)
         } else {
-          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.REJECTED.value)
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.REJECTED.value)
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
