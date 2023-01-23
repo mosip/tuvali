@@ -41,6 +41,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: ByteArray): Boolean {
+    if(bluetoothDevice == null) return false
+
     val service = gattServer.getService(serviceUUID)
     val characteristic = service.getCharacteristic(charUUID)
     characteristic.value = data
@@ -54,6 +56,10 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
     Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState, device: $device, deviceHash: ${device.hashCode()}, deviceBondState: ${device?.bondState}")
     bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
+      // Required by Android SDK to connect from peripheral side
+      val connect = gattServer.connect(device, false)
+      Log.d(logTag, "connecting from Peripheral to central: $connect")
+
       onDeviceConnectedCallback(status, newState)
       device?.let { setPhy(it) }
       device
@@ -125,10 +131,11 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     Log.d(logTag, "Peripheral onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
   }
 
-  fun disconnect() {
-    if(bluetoothDevice != null) {
+  fun disconnect(): Boolean {
+    return if(bluetoothDevice != null) {
       gattServer.cancelConnection(bluetoothDevice)
       bluetoothDevice = null
-    }
+      true
+    } else false
   }
 }

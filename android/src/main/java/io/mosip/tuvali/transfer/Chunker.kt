@@ -35,12 +35,10 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
 
     return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
       Log.d(logTag, "fetching last chunk")
-
-      val chunkLength = lastChunkByteCount + chunkMetaSize
-      frameChunk(seqNumber, chunkLength, fromIndex, fromIndex + lastChunkByteCount)
+      frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
     } else {
       val toIndex = (seqNumber + 1) * effectivePayloadSize
-      frameChunk(seqNumber, mtuSize, fromIndex, toIndex)
+      frameChunk(seqNumber, fromIndex, toIndex)
     }
   }
 
@@ -48,21 +46,20 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
   <------------------------------------------------------- MTU ------------------------------------------------------------------->
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
   |                       |                             |                                                                         |
-  |  chunk sequence no    |     total chunk length      |         chunk payload                                                   |
+  |  chunk sequence no    |   checksum value of data    |         chunk payload                                                   |
   |      (2 bytes)        |         (2 bytes)           |       (upto MTU-4 bytes)                                                |
   |                       |                             |                                                                         |
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */
-  private fun frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int): ByteArray {
+  private fun frameChunk(seqNumber: Int, fromIndex: Int, toIndex: Int): ByteArray {
     Log.d(
       logTag,
       "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber"
     )
+    val dataChunk = data.copyOfRange(fromIndex, toIndex)
+    val crc = CheckValue.get(dataChunk)
 
-    return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(chunkLength) + data.copyOfRange(
-      fromIndex,
-      toIndex
-    )
+    return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
   }
 
   fun isComplete(): Boolean {

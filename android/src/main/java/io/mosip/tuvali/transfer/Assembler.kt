@@ -25,39 +25,31 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
       return 0
     }
     val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
-    val chunkSizeInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(2, 4))
-    val expectedPayloadSizeInChunk = chunkSizeInMeta - chunkMetaSize
-    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
-    if (payloadSizeDidNotMatchTheSizeInMeta(chunkData, chunkSizeInMeta)) {
-      Log.e(logTag, "payloadSizeDidNotMatchTheSizeInMeta chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk, chunkSizeInMeta: $chunkSizeInMeta")
-      return seqNumberInMeta
-    }
+    val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
+
+    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
+
     if (chunkSizeGreaterThanMtuSize(chunkData)) {
-      Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
+      Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
       return seqNumberInMeta
     }
-    if (addingLastChunkShouldNotBeMoreThanExpectedSize(seqNumberInMeta, expectedPayloadSizeInChunk)) {
-      Log.e(logTag, "addingLastChunkShouldNotBeMoreThanExpectedSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta, expectedPayloadSizeInChunk: $expectedPayloadSizeInChunk")
+    if(crcReceivedIsNotEqualToCrcCalculated(chunkData.copyOfRange(4, chunkData.size), crcReceived)){
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
-    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, expectedPayloadSizeInChunk)
+    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
     chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
     Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
     return seqNumberInMeta
   }
 
-  private fun payloadSizeDidNotMatchTheSizeInMeta(
-      chunkData: ByteArray,
-      payloadSizeInChunk: Int
-  ) = chunkData.size != payloadSizeInChunk
+  private fun crcReceivedIsNotEqualToCrcCalculated(
+    data: ByteArray,
+    crc: UShort
+  ) = !CheckValue.verify(data, crc)
+
 
   private fun chunkSizeGreaterThanMtuSize(chunkData: ByteArray) = chunkData.size > mtuSize
-
-  private fun addingLastChunkShouldNotBeMoreThanExpectedSize(
-      seqNumber: Int,
-      payloadSizeInChunk: Int
-  ) = (seqNumber * effectivePayloadSize) + payloadSizeInChunk > totalSize
 
   fun isComplete(): Boolean {
     return chunkReceivedMarker.none { it != chunkReceivedMarkerByte }

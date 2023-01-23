@@ -9,6 +9,8 @@ import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.StateHandler
 import io.mosip.tuvali.ble.peripheral.state.message.*
+import io.mosip.tuvali.verifier.GattService
+import io.mosip.tuvali.verifier.Verifier
 import java.util.*
 
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
@@ -18,6 +20,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   private var messageSender: IMessageSender
   private val handlerThread: HandlerThread =
     HandlerThread("PeripheralHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
+  var closing = false
 
   init {
     handlerThread.start()
@@ -25,12 +28,15 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     controller.setHandlerThread(messageSender)
   }
 
-  fun stop() {
+  fun stop(serviceUUID: UUID) {
     stopAdvertisement()
-    disconnect()
-    close()
-    //TODO: Wait for all necessary callbacks
-    handlerThread.quitSafely()
+    notifyDisconnect(serviceUUID)
+    //Waiting for notification to send before closing server
+    disconnectAndClose(5)
+  }
+
+  private fun notifyDisconnect(serviceUUID: UUID) {
+    sendData(serviceUUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID, byteArrayOf(Verifier.DISCONNECT_STATUS.toByte()))
   }
 
   fun setupService(service: BluetoothGattService) {
@@ -75,5 +81,11 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
     messageSender.sendMessage(AdvertisementStopMessage())
   }
 
-  fun isDisconnecting(): Boolean = messageSender.getCurrentState() == StateHandler.States.NotConnectedToDevice
+  fun quitHandler() {
+    handlerThread.quitSafely()
+  }
+
+  private fun disconnectAndClose(delay: Long) {
+    messageSender.sendMessageDelayed(DisconnectAndCloseMessage(), delay)
+  }
 }

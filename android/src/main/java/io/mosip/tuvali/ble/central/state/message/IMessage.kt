@@ -36,6 +36,8 @@ abstract class IMessage(val commandType: CentralStates) {
     UNSUBSCRIBE_FAILURE,
     NOTIFICATION_RECEIVED,
 
+    DISCONNECT_AND_CLOSE_DEVICE,
+    CLOSE_ON_DISCONNECT_TIMEOUT,
     CLOSE
   }
 }

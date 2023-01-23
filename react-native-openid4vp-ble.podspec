@@ -12,12 +12,13 @@ Pod::Spec.new do |s|
   s.authors      = package["author"]
 
   s.platforms    = { :ios => "10.0" }
-  s.source       = { :git => "https://github.com/mohammed-strive/react-native-openid4vp-ble.git", :tag => "#{s.version}" }
+  s.source       = { :git => "https://github.com/mosip/tuvali", :tag => "#{s.version}" }
 
   s.source_files = "ios/**/*.{h,m,mm,swift}"
 
   s.dependency "React-Core"
   s.dependency "GzipSwift"
+  s.dependency "CrcSwift", "~> 0.0.3"
 
   # Don't install the dependencies when we run `pod install` in the old architecture.
   if ENV['RCT_NEW_ARCH_ENABLED'] == '1' then

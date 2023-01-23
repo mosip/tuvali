@@ -18,7 +18,6 @@ import io.mosip.tuvali.verifier.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
-import kotlin.reflect.KFunction2
 
 
 class Verifier(
@@ -42,6 +41,7 @@ class Verifier(
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
     val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+    const val DISCONNECT_STATUS = 1
   }
 
   private enum class PeripheralCallbacks {
@@ -49,7 +49,7 @@ class Verifier(
     ADV_FAILURE_CALLBACK,
     DEVICE_CONNECTED_CALLBACK,
     RESPONSE_RECEIVE_SUCCESS_CALLBACK,
-    RESPONSE_RECEIVED_FAILED_CALLBACK
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
@@ -62,8 +62,9 @@ class Verifier(
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
-  fun stop() {
-    peripheral.stop();
+  fun stop(onDestroySuccessCallback: Callback) {
+    callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroySuccessCallback
+    peripheral.stop(SERVICE_UUID)
     handlerThread.quitSafely()
   }
 
@@ -138,6 +139,7 @@ class Verifier(
           // TODO: Validate pub key, how to handle if not valid?
           messageResponseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
+          peripheral.stopAdvertisement()
         }
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
@@ -189,10 +191,21 @@ class Verifier(
     }
   }
 
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    peripheral.quitHandler()
+    val onClosedCallback = callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
+    }
+  }
+
+
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
-    peripheral.stopAdvertisement()
 
     deviceConnectedCallback?.let {
       it()
@@ -200,17 +213,15 @@ class Verifier(
     }
   }
 
-  override fun onDeviceNotConnected() {
-    //TODO: Close and send event to higher layer
-    if(!peripheral.isDisconnecting()) {
-      peripheral.stop()
+  override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
+    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
+    if(!isManualDisconnect && isConnected) {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onResponseReceived(data: ByteArray) {
-    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
+//    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
     val decryptedData = secretsTranslator?.decryptUponReceive(data)
     if (decryptedData != null) {
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")

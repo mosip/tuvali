@@ -22,8 +22,11 @@ class StateHandler(
     GattServerReady,
     Advertising,
     ConnectedToDevice,
+    CommunicationReady,
+    Disconnecting,
     NotConnectedToDevice,
-    CommunicationReady
+    Closing,
+    Closed
   }
 
   private var currentState: States = States.Init
@@ -72,9 +75,14 @@ class StateHandler(
       }
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {
         val deviceNotConnectedMessage = msg.obj as DeviceNotConnectedMessage
-        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState}")
+        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState} $currentState")
+
+        if(currentState == States.Closing) {
+          this.sendMessage(CloseServerMessage())
+        } else {
+          peripheralListener.onDeviceNotConnected(currentState >= States.Disconnecting, currentState == States.CommunicationReady)
+        }
         currentState = States.NotConnectedToDevice
-        peripheralListener.onDeviceNotConnected()
       }
 
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
@@ -106,12 +114,33 @@ class StateHandler(
       IMessage.PeripheralMessageTypes.DISCONNECT.ordinal -> {
         Log.d(logTag, "disconnecting device")
         controller.disconnect()
+        currentState = States.Disconnecting
       }
 
+      IMessage.PeripheralMessageTypes.DISCONNECT_AND_CLOSE_DEVICE.ordinal -> {
+        Log.d(logTag, "disconnect and close gatt server")
+        val disconnecting = controller.disconnect()
+
+        currentState = if(disconnecting) {
+          sendMessageDelayed(CloseOnDisconnectTimeoutMessage(), 50)
+          States.Closing
+        } else {
+          this.sendMessage(CloseServerMessage())
+          States.NotConnectedToDevice
+        }
+      }
+      IMessage.PeripheralMessageTypes.CLOSE_ON_DISCONNECT_TIMEOUT.ordinal -> {
+        if(currentState === States.Closing) {
+          Log.d(logTag, "closing gatt client due to disconnect timeout")
+          this.sendMessage(CloseServerMessage())
+          currentState = States.NotConnectedToDevice
+        }
+      }
       IMessage.PeripheralMessageTypes.CLOSE_SERVER.ordinal -> {
         Log.d(logTag, "closing gatt server")
         controller.closeServer()
-        currentState = States.Init
+        currentState = States.Closed
+        peripheralListener.onClosed()
       }
     }
   }
@@ -125,6 +154,16 @@ class StateHandler(
     message.what = msg.messageType.ordinal
     message.obj = msg
     val isSent = this.sendMessage(message)
+    if (!isSent) {
+      Log.e(logTag, "sendMessage to state handler for ${msg.messageType} failed")
+    }
+  }
+
+  override fun sendMessageDelayed(msg: IMessage, delay: Long) {
+    val message = this.obtainMessage()
+    message.what = msg.messageType.ordinal
+    message.obj = msg
+    val isSent = this.sendMessageDelayed(message, delay)
     if (!isSent) {
       Log.e(logTag, "sendMessage to state handler for ${msg.messageType} failed")
     }

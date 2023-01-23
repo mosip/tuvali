@@ -23,10 +23,15 @@ class Central(context: Context, centralLister: ICentralListener) {
 
   fun stop() {
     stopScan()
-    disconnect()
-    close()
-    //TODO: Wait for all necessary callbacks
+    disconnectAndClose()
+  }
+
+  fun quitHandler() {
     handlerThread.quitSafely()
+  }
+
+  fun disconnectAndClose() {
+    messageSender.sendMessage(DisconnectAndCloseMessage())
   }
 
   fun scan(serviceUuid: UUID, advIdentifier: String) {
@@ -83,9 +88,5 @@ class Central(context: Context, centralLister: ICentralListener) {
 
   fun close() {
     messageSender.sendMessage(CloseMessage())
-  }
-
-  fun isDisconnecting(): Boolean {
-    return messageSender.getCurrentState() === StateHandler.States.Disconnected
   }
 }

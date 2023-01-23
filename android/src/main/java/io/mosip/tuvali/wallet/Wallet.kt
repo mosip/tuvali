@@ -18,6 +18,7 @@ import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
+import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -48,6 +49,7 @@ class Wallet(
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<CentralCallbacks, Callback>()
@@ -58,7 +60,8 @@ class Wallet(
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
-  fun stop() {
+  fun stop(onDestroy: Callback) {
+    callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroy
     central.stop()
     handlerThread.quitSafely()
   }
@@ -147,6 +150,7 @@ class Wallet(
     Log.d(logTag, "onRequestMTUSuccess")
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
+    central.subscribe(Verifier.SERVICE_UUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -183,13 +187,10 @@ class Wallet(
     //TODO: Close and send event to higher layer
   }
 
-  override fun onDeviceDisconnected() {
-    //TODO: Close and send event to higher layer
-    if(!central.isDisconnecting()) {
-      central.stop()
+  override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
+    if(!isManualDisconnect) {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
@@ -249,9 +250,28 @@ class Wallet(
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnect()
-        central.close()
+        central.disconnectAndClose()
       }
+      GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID -> {
+        val status = value?.get(0)?.toInt()
+
+        if(status != null && status == DISCONNECT_STATUS) {
+          central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
+          central.disconnectAndClose()
+        }
+      }
+    }
+  }
+
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    central.quitHandler()
+    val onClosedCallback = callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      Log.d(logTag, "calling onDestroy callback")
+      it()
+      callbacks.remove(CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
     }
   }
 
@@ -263,10 +283,10 @@ class Wallet(
     val dataInBytes = data.toByteArray()
     Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
     val compressedBytes = Util.compress(dataInBytes)
-    Log.e(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
+    Log.i(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
     val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
     if (encryptedData != null) {
-      Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
+      //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
       transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
     } else {
       Log.e(logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}")

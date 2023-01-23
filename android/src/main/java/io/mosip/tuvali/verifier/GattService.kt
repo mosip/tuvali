@@ -14,6 +14,7 @@ class GattService {
     val RESPONSE_CHAR_UUID: UUID = UUID.fromString("00002034-0000-1000-8000-00805f9b34fb")
     val SEMAPHORE_CHAR_UUID: UUID = UUID.fromString("00002035-0000-1000-8000-00805f9b34fb")
     val VERIFICATION_STATUS_CHAR_UUID: UUID = UUID.fromString("00002036-0000-1000-8000-00805f9b34fb")
+    val CONNECTION_STATUS_CHANGE_CHAR_UUID: UUID = UUID.fromString("00002037-0000-1000-8000-00805f9b34fb")
   }
 
   fun create(): BluetoothGattService {
@@ -64,6 +65,12 @@ class GattService {
       BluetoothGattCharacteristic.PERMISSION_READ
     )
 
+    val connectionStatusChar = BluetoothGattCharacteristic(
+      CONNECTION_STATUS_CHANGE_CHAR_UUID,
+      BluetoothGattCharacteristic.PROPERTY_READ or BluetoothGattCharacteristic.PROPERTY_INDICATE,
+      BluetoothGattCharacteristic.PERMISSION_READ
+    )
+
     service.addCharacteristic(identityChar)
     service.addCharacteristic(requestSizeChar)
     service.addCharacteristic(requestChar)
@@ -71,6 +78,7 @@ class GattService {
     service.addCharacteristic(responseChar)
     service.addCharacteristic(semaphoreChar)
     service.addCharacteristic(verificationStatusChar)
+    service.addCharacteristic(connectionStatusChar)
 
     return service
   }
