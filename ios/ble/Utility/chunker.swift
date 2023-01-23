@@ -1,5 +1,3 @@
-
-
 import Foundation
 
 class Chunker {
@@ -89,7 +87,9 @@ class Chunker {
         print("fetching chunk size:",toIndex,"-", fromIndex,"}, chunkSequenceNumber(0-indexed):", seqNumber)
 //        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
         if let chunkData = chunkData {
-            return intToBytes(UInt16(seqNumber)) + intToBytes(UInt16(chunkLength)) + chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
+            let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
+            let payloadCRC = CRC.evaluate(d: payload)
+            return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
         }
         return Data() //
     }
@@ -115,4 +115,3 @@ class Chunker {
         return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
     }
 }
-

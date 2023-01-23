@@ -24,12 +24,13 @@ class TransferHandler {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data!
             print("Total response size of data",responseData.count)
+            // TODO: Init chunker to use the exchanged MTU size
             chunker = Chunker(chunkData: responseData, mtuSize: BLEConstants.DEFAULT_CHUNK_SIZE)
             print("MTU found to be", BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
-            sendMessage(message: imessage(msgType: .ResponseSizeWritePendingMessage, data: responseData, dataSize: responseData.count))
+            sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_PENDING, data: responseData, dataSize: responseData.count))
         }
-        else if msg.msgType == .ResponseSizeWritePendingMessage {
+        else if msg.msgType == .RESPONSE_SIZE_WRITE_PENDING {
             sendResponseSize(size: msg.dataSize!)
         }
         else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
@@ -105,7 +106,6 @@ class TransferHandler {
 
             var done = false
             while !done {
-                sleep(10)
                 let chunk = chunker.next()
                 if chunk.isEmpty {
                     done = true
@@ -122,12 +122,20 @@ class TransferHandler {
 
 enum TransferMessageTypes {
     case INIT_RESPONSE_TRANSFER
-    case ResponseSizeWritePendingMessage
+    case RESPONSE_SIZE_WRITE_PENDING
     case RESPONSE_SIZE_WRITE_SUCCESS
+    case RESPONSE_SIZE_WRITE_FAILED
     case INIT_RESPONSE_CHUNK_TRANSFER
+    case CHUNK_WRITE_TO_REMOTE_STATUS_UPDATED
+    case RESPONSE_CHUNK_WRITE_SUCCESS
+    case RESPONSE_CHUNK_WRITE_FAILURE
     case RESPONSE_TRANSFER_COMPLETE
+    case RESPONSE_TRANSFER_FAILED
+
     case READ_TRANSMISSION_REPORT
     case HANDLE_TRANSMISSION_REPORT
+
+    case INIT_RETRY_TRANSFER
 }
 
 struct imessage {
@@ -155,4 +163,3 @@ enum SemaphoreMarker: Int {
     case RequestReport = 1
     case Error = 2
   }
-

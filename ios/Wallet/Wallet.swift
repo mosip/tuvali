@@ -69,6 +69,7 @@ class Wallet: NSObject {
         if (encryptedData != nil) {
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
+                // DOUBT: why is encrypted data written twice ?
                 transferHandler.initialize(initdData: encryptedData!)
                 let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
                 transferHandler.sendMessage(message: imsgBuilder)
@@ -92,6 +93,3 @@ class Wallet: NSObject {
             NotificationCenter.default.post(name: Notification.Name(rawValue: "EXCHANGE-SENDER-INFO"), object: nil)
         }
     }
-
-    
-

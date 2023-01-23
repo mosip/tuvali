@@ -44,4 +44,3 @@ extension Central {
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
     }
 }
-

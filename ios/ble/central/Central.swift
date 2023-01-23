@@ -56,6 +56,7 @@ class Central: NSObject, CBCentralManagerDelegate {
                 }
                 let mtu = connectedPeripheral.maximumWriteValueLength(for: .withResponse)
                 print("Write MTU: ", mtu)
+                print("Data count", data.count)
                 let bytesToCopy: size_t = min(mtu, data.count)
                 let messageData = Data(bytes: Array(data), count: bytesToCopy)
                 // TBD: Make it big!!

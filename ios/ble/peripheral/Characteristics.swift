@@ -68,4 +68,3 @@ struct NetworkCharNums {
     static let semaphoreCharacteristic = CBUUID(string: "2035")
     static let verificationStatusCharacteristic = CBUUID(string: "2036")
 }
-

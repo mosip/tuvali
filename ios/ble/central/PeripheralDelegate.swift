@@ -27,7 +27,13 @@ extension Central: CBPeripheralDelegate {
             // store a reference to the discovered characteristic in the Central for write.
             print("Characteristic UUID:: ", characteristic.uuid.uuidString)
             self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
-            
+            // subscribe to the characteristics for (2035, 2036, 2037)
+            if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic ||
+                characteristic.uuid == NetworkCharNums.verificationStatusCharacteristic
+            {
+                peripheral.setNotifyValue(true, for: characteristic)
+            }
+
             // TODO - subscribe to the characteristics for (2035, 2036, 2037)
             
             //            if characteristic.uuid == TransferService.characteristicUUID {
@@ -72,6 +78,7 @@ extension Central: CBPeripheralDelegate {
         } else if characteristic.uuid.uuidString == "2035" {
             let report = characteristic.value
             NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: report)
+            //
         }
         else {
             
@@ -82,4 +89,3 @@ extension Central: CBPeripheralDelegate {
         
     }
 }
-

@@ -11,7 +11,7 @@ class CRC {
         if got == expected {
             return true
         }
-        os_log("non-equal CRC; evaluated=\(got), expect=\(expected)")
+        print("non-equal CRC; evaluated=\(got), expect=\(expected)")
         return false
     }
 }
