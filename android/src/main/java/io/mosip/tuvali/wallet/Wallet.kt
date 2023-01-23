@@ -80,7 +80,7 @@ class Wallet(
     val iv = secretsTranslator?.initializationVector()
     central.write(
       Verifier.SERVICE_UUID,
-      GattService.IDENTITY_CHARACTERISTIC_UUID,
+      GattService.IDENTIFY_REQ_CHAR_UUID,
       iv!! + publicKey!!
     )
     Log.d(
@@ -150,7 +150,7 @@ class Wallet(
     Log.d(logTag, "onRequestMTUSuccess")
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
-    central.subscribe(Verifier.SERVICE_UUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID)
+    central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -167,14 +167,14 @@ class Wallet(
     Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
       }
     }
   }
 
   override fun onReadFailure(charUUID: UUID?, err: Int) {
     when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
       }
     }
   }
@@ -197,10 +197,10 @@ class Wallet(
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
 
     when(charUUID) {
-      GattService.RESPONSE_CHAR_UUID -> {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
       transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
@@ -211,17 +211,18 @@ class Wallet(
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
-      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+      GattService.IDENTIFY_REQ_CHAR_UUID -> {
         messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
       }
-      GattService.RESPONSE_CHAR_UUID -> {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
-        central.subscribe(Verifier.SERVICE_UUID, GattService.SEMAPHORE_CHAR_UUID)
+      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
+        central.subscribe(Verifier.SERVICE_UUID,GattService.TRANSFER_REPORT_REQUEST_UUID)
+        central.subscribe(Verifier.SERVICE_UUID, GattService.TRANSFER_REPORT_RESPONSE_UUID)
         central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
@@ -236,7 +237,7 @@ class Wallet(
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
     when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_UUID -> {
         value?.let {
           transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
         }
@@ -252,7 +253,7 @@ class Wallet(
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
         central.disconnectAndClose()
       }
-      GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID -> {
+      GattService.DISCONNECT_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
 
         if(status != null && status == DISCONNECT_STATUS) {

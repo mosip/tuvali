@@ -1,7 +1,7 @@
 package io.mosip.tuvali.transfer
 
-class Semaphore {
-  enum class SemaphoreMarker {
+class TransferReportRequest {
+  enum class TransferReportRequestMarker {
     UnInitialised,
     RequestReport,
     Error
