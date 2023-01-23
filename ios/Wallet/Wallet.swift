@@ -1,4 +1,5 @@
 import Foundation
+import Gzip
 
 @objc(Wallet)
 @available(iOS 13.0, *)
@@ -23,7 +24,6 @@ class Wallet: NSObject {
     }
     
     func registerCallbackForEvent(event: String, callback: @escaping RCTResponseSenderBlock) {
-        
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             callback([])
@@ -61,21 +61,37 @@ class Wallet: NSObject {
         }
         return data
     }
-    
-    @available(iOS 13.0, *)
-    func writeIdentity() {
-        print("::: write idendity called ::: ")
-        let publicKey = WalletCryptoBoxImpl().getPublicKey()
-        print("verifier pub key:::", self.verifierPublicKey)
-        guard let verifierPublicKey = self.verifierPublicKey else {
-            print("Write Identity - Found NO KEY")
-            return
-        }
-        self.secretTranslator = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: verifierPublicKey)
-        var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.identifyRequestCharacteristic, data: iv + publicKey)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "EXCHANGE-SENDER-INFO"), object: nil)
-     }
 
-}
+    func sendData(data: String){
+        var dataInBytes = Data(data.utf8)
+        var compressedBytes = try! dataInBytes.gzipped()
+        var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
+        if (encryptedData != nil) {
+            DispatchQueue.main.async {
+                let transferHandler = TransferHandler.shared
+                transferHandler.initialize(initdData: encryptedData!)
+                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
+                transferHandler.sendMessage(message: imsgBuilder)
+            }
+        } else {
+            
+        }
+    }
+        @available(iOS 13.0, *)
+        func writeIdentity() {
+            print("::: write idendity called ::: ")
+            let publicKey = WalletCryptoBoxImpl().getPublicKey()
+            print("verifier pub key:::", self.verifierPublicKey)
+            guard let verifierPublicKey = self.verifierPublicKey else {
+                print("Write Identity - Found NO KEY")
+                return
+            }
+            self.secretTranslator = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: verifierPublicKey)
+            var iv = (self.secretTranslator?.initializationVector())!
+            central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "EXCHANGE-SENDER-INFO"), object: nil)
+        }
+    }
+
     
+
