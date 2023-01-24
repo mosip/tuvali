@@ -80,7 +80,7 @@ class Wallet(
     val iv = secretsTranslator?.initializationVector()
     central.write(
       Verifier.SERVICE_UUID,
-      GattService.IDENTIFY_REQ_CHAR_UUID,
+      GattService.IDENTIFY_REQUEST_CHAR_UUID,
       iv!! + publicKey!!
     )
     Log.d(
@@ -167,14 +167,14 @@ class Wallet(
     Log.d(logTag, "Read from $charUUID successfully and value is $value")
 
     when (charUUID) {
-      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
       }
     }
   }
 
   override fun onReadFailure(charUUID: UUID?, err: Int) {
     when (charUUID) {
-      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
       }
     }
   }
@@ -200,7 +200,7 @@ class Wallet(
       GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
-      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
       transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
@@ -211,7 +211,7 @@ class Wallet(
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
-      GattService.IDENTIFY_REQ_CHAR_UUID -> {
+      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
@@ -220,9 +220,8 @@ class Wallet(
       GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
-      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
-        central.subscribe(Verifier.SERVICE_UUID,GattService.TRANSFER_REPORT_REQUEST_UUID)
-        central.subscribe(Verifier.SERVICE_UUID, GattService.TRANSFER_REPORT_RESPONSE_UUID)
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+        central.subscribe(Verifier.SERVICE_UUID, GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID)
         central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
@@ -237,7 +236,7 @@ class Wallet(
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
     when (charUUID) {
-      GattService.TRANSFER_REPORT_RESPONSE_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
         value?.let {
           transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
         }

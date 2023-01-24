@@ -7,13 +7,13 @@ import java.util.*
 class GattService {
   //TODO: Update UUIDs as per specification
   companion object {
-    val IDENTIFY_REQ_CHAR_UUID: UUID = UUID.fromString("00002030-0000-1000-8000-00805f9b34fb")
+    val IDENTIFY_REQUEST_CHAR_UUID: UUID = UUID.fromString("00002030-0000-1000-8000-00805f9b34fb")
     val REQUEST_SIZE_CHAR_UUID: UUID = UUID.fromString("00002031-0000-1000-8000-00805f9b34fb")
     val REQUEST_CHAR_UUID: UUID = UUID.fromString("00002032-0000-1000-8000-00805f9b34fb")
     val RESPONSE_SIZE_CHAR_UUID: UUID = UUID.fromString("00002033-0000-1000-8000-00805f9b34fb")
     val SUBMIT_RESPONSE_CHAR_UUID: UUID = UUID.fromString("00002034-0000-1000-8000-00805f9b34fb")
-    val TRANSFER_REPORT_REQUEST_UUID: UUID = UUID.fromString("00002035-0000-1000-8000-00805f9b34fb")
-    val TRANSFER_REPORT_RESPONSE_UUID: UUID = UUID.fromString("00002036-0000-1000-8000-00805f9b34fb")
+    val TRANSFER_REPORT_REQUEST_CHAR_UUID: UUID = UUID.fromString("00002035-0000-1000-8000-00805f9b34fb")
+    val TRANSFER_REPORT_RESPONSE_CHAR_UUID: UUID = UUID.fromString("00002036-0000-1000-8000-00805f9b34fb")
     val VERIFICATION_STATUS_CHAR_UUID: UUID = UUID.fromString("00002037-0000-1000-8000-00805f9b34fb")
     val DISCONNECT_CHAR_UUID: UUID = UUID.fromString("00002038-0000-1000-8000-00805f9b34fb")
   }
@@ -25,7 +25,7 @@ class GattService {
     )
 
     val identifyRequestChar = BluetoothGattCharacteristic(
-      IDENTIFY_REQ_CHAR_UUID,
+      IDENTIFY_REQUEST_CHAR_UUID,
       BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or BluetoothGattCharacteristic.PROPERTY_WRITE,
       BluetoothGattCharacteristic.PERMISSION_WRITE
     )
@@ -55,14 +55,14 @@ class GattService {
     )
 
     val transferReportRequestChar = BluetoothGattCharacteristic(
-      TRANSFER_REPORT_REQUEST_UUID,
+      TRANSFER_REPORT_REQUEST_CHAR_UUID,
       BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or
         BluetoothGattCharacteristic.PROPERTY_WRITE or BluetoothGattCharacteristic.PROPERTY_READ,
       BluetoothGattCharacteristic.PERMISSION_READ or BluetoothGattCharacteristic.PERMISSION_WRITE
     )
 
     val transferReportResponseChar = BluetoothGattCharacteristic(
-      TRANSFER_REPORT_RESPONSE_UUID,
+      TRANSFER_REPORT_RESPONSE_CHAR_UUID,
        BluetoothGattCharacteristic.PROPERTY_INDICATE,
       BluetoothGattCharacteristic.PERMISSION_READ
     )

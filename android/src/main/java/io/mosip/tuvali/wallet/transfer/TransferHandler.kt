@@ -130,7 +130,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   }
 
   private fun requestTransmissionReport() {
-    central.write(serviceUUID, GattService.TRANSFER_REPORT_REQUEST_UUID, byteArrayOf(TransferReportRequest.TransferReportRequestMarker.RequestReport.ordinal.toByte()))
+    central.write(serviceUUID, GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID, byteArrayOf(TransferReportRequest.ReportType.RequestReport.ordinal.toByte()))
   }
 
   private fun sendResponseChunk() {

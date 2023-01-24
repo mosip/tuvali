@@ -119,7 +119,7 @@ class Verifier(
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
-      GattService.IDENTIFY_REQ_CHAR_UUID -> {
+      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         value?.let {
           // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
           if (value.size < 12 + 32) {
@@ -142,17 +142,17 @@ class Verifier(
           peripheral.stopAdvertisement()
         }
       }
-      GattService.TRANSFER_REPORT_REQUEST_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
         value?.let {
           if (value.isEmpty()) {
             return
           }
-          val transferReportRequestValue = value[0].toInt()
-          if (transferReportRequestValue == TransferReportRequest.TransferReportRequestMarker.RequestReport.ordinal) {
+          val receivedReportType = value[0].toInt()
+          if (receivedReportType == TransferReportRequest.ReportType.RequestReport.ordinal) {
             val remoteRequestedTransferReportMessage =
-              RemoteRequestedTransferReportMessage(transferReportRequestValue)
+              RemoteRequestedTransferReportMessage(receivedReportType)
             transferHandler.sendMessage(remoteRequestedTransferReportMessage)
-          } else if (transferReportRequestValue == TransferReportRequest.TransferReportRequestMarker.Error.ordinal) {
+          } else if (receivedReportType == TransferReportRequest.ReportType.Error.ordinal) {
             onResponseReceivedFailed("received error on transfer Report request from remote")
           }
         }
@@ -177,7 +177,7 @@ class Verifier(
 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
-      GattService.TRANSFER_REPORT_RESPONSE_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
         //TODO: Can re-send report if failed to send notification with exponential backoff
         Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
       }

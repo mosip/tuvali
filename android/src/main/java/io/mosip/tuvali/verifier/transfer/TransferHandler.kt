@@ -55,7 +55,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       IMessage.TransferMessageTypes.REMOTE_REQUESTED_TRANSFER_REPORT.ordinal -> {
         val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
         when(remoteRequestedTransferReportMessage.transferReportRequestCharValue) {
-          TransferReportRequest.TransferReportRequestMarker.RequestReport.ordinal -> {
+          TransferReportRequest.ReportType.RequestReport.ordinal -> {
             var transferReport: TransferReport
             if (assembler?.isComplete() == true) {
               Log.d(logTag, "success frame: transfer completed")
@@ -71,9 +71,9 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
                 TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until defaultTransferReportPageSize))
               }
             }
-            transferListener.sendDataOverNotification(GattService.TRANSFER_REPORT_RESPONSE_UUID, transferReport.toByteArray())
+            transferListener.sendDataOverNotification(GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID, transferReport.toByteArray())
           }
-          TransferReportRequest.TransferReportRequestMarker.Error.ordinal -> {
+          TransferReportRequest.ReportType.Error.ordinal -> {
             transferListener.onResponseReceivedFailed("received error on transfer Report request from remote")
           }
           else -> {
