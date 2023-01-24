@@ -21,6 +21,8 @@ class Chunker {
     
     func assignPreSlicedChunks(){
         print("preSlicedChunks called ::: ")
+        print("expected total data size: \(chunkData?.count) and totalChunkCount: \(totalChunkCount)")
+        print(">> SHA256 \(chunkData?.sha256())")
         for i in 0..<totalChunkCount {
             print(i)
             preSlicedChunks.append(chunk(seqNumber: i))

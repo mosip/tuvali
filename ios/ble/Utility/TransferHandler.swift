@@ -7,6 +7,8 @@ class TransferHandler {
     private var currentState: States = States.UnInitialised
     private var responseStartTimeInMillis: UInt64 = 0
     var chunker: Chunker?
+    private var chunkCounter = 0;
+    private var isRetryFrame = false;
     
     public static var shared = TransferHandler()
     
@@ -20,7 +22,7 @@ class TransferHandler {
     deinit{
         print("deinit happend in transferh")
     }
-    private func handleMessage(msg: imessage){
+    private func handleMessage(msg: imessage) {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data!
             print("Total response size of data",responseData.count)
@@ -34,9 +36,12 @@ class TransferHandler {
             sendResponseSize(size: msg.dataSize!)
         }
         else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
-          responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
-          currentState = States.ResponseSizeWriteSuccess
-          initResponseChunkSend()
+            responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
+            currentState = States.ResponseSizeWriteSuccess
+            initResponseChunkSend()
+        } else if msg.msgType == .RESPONSE_SIZE_WRITE_FAILED {
+            print("failed to write response size")
+            currentState = States.ResponseWriteFailed
         } else if msg.msgType == .INIT_RESPONSE_CHUNK_TRANSFER {
             currentState = .ResponseWritePending
             sendResponseChunk()
@@ -49,12 +54,36 @@ class TransferHandler {
             currentState = States.HandlingTransferReport
             var handleTransmissionReportMessage = msg.data
             handleTransmissionReport(report: handleTransmissionReportMessage!)
+        } else if msg.msgType == .RESPONSE_CHUNK_WRITE_SUCCESS {
+            // send retry resp chunk or resp chunk
+            if (isRetryFrame) {
+                sendRetryRespChunk()
+            } else {
+                sendResponseChunk()
+                chunkCounter+=1
+            }
+        } else if msg.msgType == .RESPONSE_CHUNK_WRITE_FAILURE {
+            sendMessage(message: imessage(msgType: .RESPONSE_CHUNK_WRITE_FAILURE, data: msg.data))
+        } else if msg.msgType == .RESPONSE_TRANSFER_COMPLETE {
+            currentState = States.TransferComplete
+            sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
+        } else if msg.msgType == .RESPONSE_TRANSFER_FAILED {
+            // handle failures?
+            sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: msg.data, dataSize: msg.dataSize))
+            currentState = States.ResponseWriteFailed
+        } else if msg.msgType == .INIT_RETRY_TRANSFER {
+            isRetryFrame = true
+            // create a RetryChunker object
+            sendRetryRespChunk()
         }
         else {
             print("out of scope")
         }
     }
     
+    private func sendRetryRespChunk() {
+        print("called to send out retry resp chunk!")
+    }
     private func requestTransmissionReport() {
         var notifyObj: Data = Data()
         Central.shared.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.semaphoreCharacteristic, data: withUnsafeBytes(of: 1.bigEndian) { Data($0) })
@@ -64,21 +93,21 @@ class TransferHandler {
         }
         sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: notifyObj))
     }
-
+    
     private func handleTransmissionReport(report: Data) {
-//       if (report.type == TransferReport.ReportType.SUCCESS) {
-//         currentState = States.TransferVerified
-//         transferListener.onResponseSent()
-//         print(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
-//       } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
-//         currentState = States.PartiallyTransferred
-//         this.sendMessage(InitRetryTransferMessage(report.missingSequences))
-//       } else {
-//         this.sendMessage(ResponseTransferFailureMessage("Invalid Report"))
-//       }
+        //       if (report.type == TransferReport.ReportType.SUCCESS) {
+        //         currentState = States.TransferVerified
+        //         transferListener.onResponseSent()
+        //         print(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
+        //       } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
+        //         currentState = States.PartiallyTransferred
+        //         this.sendMessage(InitRetryTransferMessage(report.missingSequences))
+        //       } else {
+        //         this.sendMessage(ResponseTransferFailureMessage("Invalid Report"))
+        //       }
         print("report is :::", String(data: report, encoding: .utf8))
-     }
-
+    }
+    
     private func sendResponseSize(size: Int) {
         // TODO: Send a stringified number in a byte array
         let decimalString = String(size)
@@ -92,7 +121,7 @@ class TransferHandler {
     }
     
     private func initResponseChunkSend() {
-         print("initResponseChunkSend")
+        print("initResponseChunkSend")
         sendMessage(message: imessage(msgType: .INIT_RESPONSE_CHUNK_TRANSFER, data: data, dataSize: data?.count))
     }
     
@@ -103,7 +132,7 @@ class TransferHandler {
                 sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
                 return
             }
-
+            
             var done = false
             while !done {
                 let chunk = chunker.next()
@@ -131,10 +160,10 @@ enum TransferMessageTypes {
     case RESPONSE_CHUNK_WRITE_FAILURE
     case RESPONSE_TRANSFER_COMPLETE
     case RESPONSE_TRANSFER_FAILED
-
+    
     case READ_TRANSMISSION_REPORT
     case HANDLE_TRANSMISSION_REPORT
-
+    
     case INIT_RETRY_TRANSFER
 }
 
@@ -162,4 +191,5 @@ enum SemaphoreMarker: Int {
     case UnInitialised = 0
     case RequestReport = 1
     case Error = 2
-  }
+}
+

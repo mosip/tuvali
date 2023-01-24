@@ -1,5 +1,6 @@
 import Foundation
 import CoreBluetooth
+import CryptoKit
 
 struct Utils {
     static func createCBMutableCharacteristics() -> [CBMutableCharacteristic] {
@@ -13,5 +14,12 @@ struct Utils {
         let currentDate = Date()
         let since1970 = currentDate.timeIntervalSince1970
         return UInt64(since1970 * 1000)
+    }
+    
+    static func symKeyToString(key: SymmetricKey) -> String {
+        let hexKey = key.withUnsafeBytes {
+            return Data(Array($0)).toHex()
+        }
+        return hexKey
     }
 }

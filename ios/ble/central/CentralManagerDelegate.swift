@@ -15,9 +15,7 @@ extension Central {
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             print("veri pub key::", publicKeyData)
             if #available(iOS 13.0, *) {
-                let cryptoBox = WalletCryptoBoxBuilder().build()
-                let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
-                Wallet.shared.setSecretTranslator(ss: secretsTranslator, publicKeyData: publicKeyData)
+                Wallet.shared.buildSecretTranslator(publicKeyData: publicKeyData)
                 if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
                     peripheral.delegate = self
                     central.connect(peripheral)

@@ -71,6 +71,7 @@ class Openid4vpBle: RCTEventEmitter {
             Wallet.shared.writeIdentity()
         case "send-vc":
             callback([])
+            print(">> raw message size", messageComponents[1].count)
             Wallet.shared.sendData(data: messageComponents[1])
         default:
             print("DEFAULT SEND: MESSAGE:: ", message)
@@ -86,7 +87,10 @@ class Openid4vpBle: RCTEventEmitter {
             print("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
-            Wallet.shared.registerCallbackForEvent(event: "CREATE_CONNECTION", callback: callback)
+            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {
+                            notification in
+                            callback([])
+                        }
         default:
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break
