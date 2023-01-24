@@ -2,6 +2,7 @@ import Foundation
 import CoreBluetooth
 import CryptoKit
 
+@available(iOS 13.0, *)
 struct Utils {
     static func createCBMutableCharacteristics() -> [CBMutableCharacteristic] {
         return characteristicsMap.map {key, chrTuple in

@@ -8,11 +8,11 @@ class Wallet: NSObject {
     static let shared = Wallet()
     var central: Central?
     var secretTranslator: SecretTranslator?
-    var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build()
+    var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
     
-   static let EXCHANGE_RECEIVER_INFO_DATA = "{\"device\":\"wallet\"}"
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"device\":\"wallet\"}"
     
     private override init() {}
     
@@ -93,11 +93,4 @@ class Wallet: NSObject {
             EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         }
     }
-}
-
-enum NotificationEvent: String {
-    case EXCHANGE_RECEIVER_INFO = "EXCHANGE_RECEIVER_INFO"
-    case CREATE_CONNECTION = "CREATE_CONNECTION"
-    case RESPONSE_SIZE_WRITE_SUCCESS = "RESPONSE_SIZE_WRITE_SUCCESS"
-    case HANDLE_TRANSMISSION_REPORT = "HANDLE_TRANSMISSION_REPORT"
 }

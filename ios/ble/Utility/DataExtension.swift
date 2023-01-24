@@ -1,8 +1,8 @@
 import Foundation
 import CommonCrypto
 
-extension Data{
-    public func sha256() -> String{
+extension Data {
+    public func sha256() -> String {
         return hexStringFromData(input: digest(input: self as NSData))
     }    
     private func digest(input : NSData) -> NSData {
