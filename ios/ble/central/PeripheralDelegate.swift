@@ -33,27 +33,9 @@ extension Central: CBPeripheralDelegate {
             {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
-
-            // TODO - subscribe to the characteristics for (2035, 2036, 2037)
-            
-            //            if characteristic.uuid == TransferService.characteristicUUID {
-            //                self.transferCharacteristic = characteristic
-            //                peripheral.setNotifyValue(true, for: characteristic)
-            //            }
-            //            if characteristic.uuid == TransferService.writeCharacteristic {
-            //                print("Found write characteristic")
-            //                // kludge: create a static side-effect for default chunk size
-            //                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withResponse)
-            //                print("MTU set to be", BLEConstants.DEFAULT_CHUNK_SIZE)
-            //                self.writeCharacteristic = characteristic
-            //                // No notify required, right?
-            //            }
-            //            if characteristic.uuid == TransferService.identifyRequestCharacteristic {
-            //                self.identifyRequestCharacteristic = characteristic
-            ////                sendPublicKey()
-            ////                print(characteristic)
         }
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "CREATE_CONNECTION"), object: nil)
+        
+        NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.CREATE_CONNECTION.rawValue), object: nil)
     }
     
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -69,19 +51,23 @@ extension Central: CBPeripheralDelegate {
          
         }
         
-        // use the new data from subscribed publisher
+        if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.HANDLE_TRANSMISSION_REPORT.rawValue), object: nil)
+        }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
             os_log("Unable to write to characteristic: %@", error.localizedDescription)
         }
-        print("TS::: Identify:::", characteristic.uuid)
-        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"deviceName\":\"verifier\"}")
-        // print("Central was able to write value for the characteristic: ", characteristic.uuid.uuidString)
-        if characteristic.uuid.uuidString == "2033" {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil)
-        } else {
+        
+        if characteristic.uuid == NetworkCharNums.identifyRequestCharacteristic {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.EXCHANGE_RECEIVER_INFO.rawValue), object: nil)
+        }
+        if characteristic.uuid == NetworkCharNums.responseSizeCharacteristic {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.RESPONSE_SIZE_WRITE_SUCCESS.rawValue), object: nil)
+        } else if characteristic.uuid == NetworkCharNums.responseCharacteristic {
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.INIT_RESPONSE_CHUNK_TRANSFER.rawValue), object: nil)
         }
     }
     

@@ -68,3 +68,11 @@ struct NetworkCharNums {
     static let semaphoreCharacteristic = CBUUID(string: "2035")
     static let verificationStatusCharacteristic = CBUUID(string: "2036")
 }
+
+enum NotificationEvent: String {
+    case EXCHANGE_RECEIVER_INFO = "EXCHANGE_RECEIVER_INFO"
+    case CREATE_CONNECTION = "CREATE_CONNECTION"
+    case RESPONSE_SIZE_WRITE_SUCCESS = "RESPONSE_SIZE_WRITE_SUCCESS"
+    case HANDLE_TRANSMISSION_REPORT = "HANDLE_TRANSMISSION_REPORT"
+}
+

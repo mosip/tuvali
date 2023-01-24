@@ -67,7 +67,6 @@ class Openid4vpBle: RCTEventEmitter {
         case "exchange-sender-info":
             print("EXCHANGE-SENDER-INFO")
             callback([])
-            //Wallet.shared.registerCallbackForEvent(event: "EXCHANGE-SENDER-INFO", callback: callback)
             Wallet.shared.writeIdentity()
         case "send-vc":
             callback([])
@@ -88,9 +87,9 @@ class Openid4vpBle: RCTEventEmitter {
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
             Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {
-                            notification in
-                            callback([])
-                        }
+                notification in
+                callback([])
+            }
         default:
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break

@@ -7,12 +7,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     
     private var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
-    var transferCharacteristic: CBCharacteristic?
-    var writeCharacteristic: CBCharacteristic?
-    var identityRequestCharacteristic: CBCharacteristic?
-    
     var cbCharacteristics: [String: CBCharacteristic] = [:]
-    
     
     public static var shared = Central()
     
@@ -40,13 +35,6 @@ class Central: NSObject, CBCentralManagerDelegate {
     }
     
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
-//        if chars.contains(where: { key, value in
-//            if key == charUUID.uuidString { return true }
-//            return false
-//        }) {
-//            print("Value in chars... stopping write")
-//            return
-//        }
         
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
@@ -59,15 +47,10 @@ class Central: NSObject, CBCentralManagerDelegate {
                 print("Data count", data.count)
                 let bytesToCopy: size_t = min(mtu, data.count)
                 let messageData = Data(bytes: Array(data), count: bytesToCopy)
-                // TBD: Make it big!!
+                
                 connectedPeripheral.writeValue(messageData, for: characteristic, type: .withResponse)
             }
         }
     }
-/*
-    func stopWritingToCharacteristic(characteristic: CBCharacteristic) {
-        self.chars[characteristic.uuid.uuidString] = characteristic
-    }
- */
 }
 

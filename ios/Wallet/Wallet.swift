@@ -8,10 +8,11 @@ class Wallet: NSObject {
     static let shared = Wallet()
     var central: Central?
     var secretTranslator: SecretTranslator?
-    var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
-    // var viewModel: WalletViewModel = WalletViewModel()
+    var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
+    
+   static let EXCHANGE_RECEIVER_INFO_DATA = "{\"device\":\"wallet\"}"
     
     private override init() {}
     
@@ -75,12 +76,9 @@ class Wallet: NSObject {
                 let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
                 transferHandler.sendMessage(message: imsgBuilder)
             }
-        } else {
-            
         }
     }
     
-    @available(iOS 13.0, *)
     func writeIdentity() {
         print("::: write idendity called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
@@ -92,7 +90,7 @@ class Wallet: NSObject {
         var iv = (self.secretTranslator?.initializationVector())!
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
         registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
-            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: "{\"device\":\"wallet\"}")
+            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         }
     }
 }
