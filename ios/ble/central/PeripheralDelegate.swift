@@ -44,15 +44,11 @@ extension Central: CBPeripheralDelegate {
             os_log("Unable to recieve updates from device: %s", error.localizedDescription)
             return
         }
-        if characteristic.uuid.uuidString == "2035" {
-            let report = characteristic.value
-            print("ts report is :::", report)
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: report)
-         
-        }
-        
         if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.HANDLE_TRANSMISSION_REPORT.rawValue), object: nil)
+            let report = characteristic.value as Data?
+            print("ts report is :::", report)
+            // TODO: figure out why object isn't sent out across
+            NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, userInfo: ["report": report])
         }
     }
     
@@ -74,3 +70,4 @@ extension Central: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
     }
 }
+

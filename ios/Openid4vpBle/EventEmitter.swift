@@ -36,7 +36,9 @@ class EventEmitter {
             "EVENT_NEARBY",
             "EVENT_LOG",
             "exchange-receiver-info",
+            "send-vc:response",
         ]
     }()
 }
+
 

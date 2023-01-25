@@ -36,6 +36,7 @@
 		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
 		FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA18F3E2977B69A00290433 /* CRC16.swift */; };
 		FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */; };
+		FDD941202980FD2500FBBDD4 /* TransferReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -83,6 +84,7 @@
 		F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBle.swift; sourceTree = "<group>"; };
 		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
+		FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferReport.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -242,6 +244,7 @@
 				E25800A32976BF8700968EA0 /* chunker.swift */,
 				E223F0312977BE090042F919 /* TransferHandler.swift */,
 				FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */,
+				FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -329,6 +332,7 @@
 				8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */,
 				8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */,
 				8D31C3FA2956B10E0073B710 /* SenderTransferOwnershipOfData.swift in Sources */,
+				FDD941202980FD2500FBBDD4 /* TransferReport.swift in Sources */,
 				8D31C3FE2956B2650073B710 /* WalletCryptoBoxBuilder.swift in Sources */,
 				8D069F732967BEC200AB61A9 /* PeripheralDelegate.swift in Sources */,
 				8D179C892954871400017EE5 /* CipherBox.swift in Sources */,

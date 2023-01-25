@@ -53,4 +53,3 @@ class Central: NSObject, CBCentralManagerDelegate {
         }
     }
 }
-

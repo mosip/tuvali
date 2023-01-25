@@ -15,6 +15,14 @@ class Chunker {
         assignPreSlicedChunks()
     }
     
+    func getChunkWithIndex(index: Int) -> Data {
+        if index < self.preSlicedChunks.count {
+            return self.preSlicedChunks[index]
+        }
+        // TODO: Figure out how to throw errors!
+        return Data()
+    }
+    
     func getLastChunkByteCount(dataSize: Int) -> Int {
         return dataSize % effectivePayloadSize
     }
@@ -117,3 +125,4 @@ class Chunker {
         return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
     }
 }
+
