@@ -128,7 +128,7 @@ class GattClient(var context: Context) {
       if (serviceUuids != null) {
         onServicesDiscovered(serviceUuids)
       } else {
-        onServicesDiscovered(List<UUID>)
+        onServicesDiscovered(emptyList())
       }
     }
 
