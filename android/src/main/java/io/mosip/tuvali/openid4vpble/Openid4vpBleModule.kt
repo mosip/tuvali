@@ -13,9 +13,18 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var wallet: Wallet? = null
   private val mutex = Object()
 
-  enum class InjiVerificationStates(val value: String) {
+  //Inji contract requires double quotes around the states.
+  enum class VCResponseStates(val value: String) {
+    RECEIVED("\"RECEIVED\""),
     ACCEPTED("\"ACCEPTED\""),
     REJECTED("\"REJECTED\"")
+  }
+
+  enum class NearbyEvents(val value: String) {
+    EXCHANGE_RECEIVER_INFO("exchange-receiver-info"),
+    EXCHANGE_SENDER_INFO("exchange-sender-info"),
+    SEND_VC("send-vc"),
+    SEND_VC_RESPONSE("send-vc:response")
   }
 
   override fun getName(): String {
@@ -25,14 +34,17 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
     Log.d(logTag, "getConnectionParameters new verifier object at ${System.nanoTime()}")
-    synchronized (mutex) {
+    synchronized(mutex) {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
         verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
         verifier?.generateKeyPair()
       }
       val payload = verifier?.getAdvIdentifier("OVPMOSIP")
-      Log.d(logTag, "synchronized getConnectionParameters called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}")
+      Log.d(
+        logTag,
+        "synchronized getConnectionParameters called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}"
+      )
       return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
     }
   }
@@ -45,14 +57,17 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
     Log.d(logTag, "setConnectionParameters at ${System.nanoTime()}")
-    synchronized (mutex) {
+    synchronized(mutex) {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
         wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")
-      Log.d(logTag, "synchronized setConnectionParameters called with $params and $firstPartOfPk at ${System.nanoTime()}")
+      Log.d(
+        logTag,
+        "synchronized setConnectionParameters called with $params and $firstPartOfPk at ${System.nanoTime()}"
+      )
       wallet?.setAdvIdentifier(firstPartOfPk)
     }
   }
@@ -60,7 +75,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
     Log.d(logTag, "createConnection: received request with mode $mode at ${System.nanoTime()}")
-    synchronized (mutex) {
+    synchronized(mutex) {
       Log.d(logTag, "synchronized createConnection: received request with mode $mode at ${System.nanoTime()}")
       when (mode) {
         "advertiser" -> {
@@ -77,38 +92,43 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun destroyConnection() {
+  fun destroyConnection(callback: Callback) {
+    //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
-    synchronized (mutex) {
-      if (wallet != null) {
-        Log.d(logTag, "synchronized destroyConnection called for wallet at ${System.nanoTime()}")
-        stopWallet()
-      }
-      if (verifier != null) {
-        Log.d(logTag, "synchronized destroyConnection called for verifier at ${System.nanoTime()}")
-        stopVerifier()
+
+    synchronized(mutex) {
+      if (wallet == null && verifier == null) {
+        callback()
+      } else {
+        if (wallet != null) {
+          Log.d(logTag, "synchronized destroyConnection called for wallet at ${System.nanoTime()}")
+          stopWallet { callback() }
+        }
+        if (verifier != null) {
+          Log.d(logTag, "synchronized destroyConnection called for verifier at ${System.nanoTime()}")
+          stopVerifier { callback() }
+        }
       }
     }
   }
 
-  private fun stopVerifier() {
+  private fun stopVerifier(onDestroy: Callback) {
     try {
-      verifier?.stop()
+      verifier?.stop(onDestroy)
     } finally {
       Log.d(logTag, "stopVerifier setting to null")
       verifier = null
     }
   }
 
-  private fun stopWallet() {
+  private fun stopWallet(onDestroy: Callback) {
     try {
-      wallet?.stop()
+      wallet?.stop(onDestroy)
     } catch (e: Exception) {
       Log.e(logTag, "stopWallet: exception: ${e.message}")
       Log.e(logTag, "stopWallet: exception: ${e.stackTrace}")
       Log.e(logTag, "stopWallet: exception: $e")
-    }
-    finally {
+    } finally {
       Log.d(logTag, "stopWallet setting to null")
       wallet = null
     }
@@ -118,20 +138,20 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun send(message: String, callback: Callback) {
     Log.d(logTag, "send: message $message at ${System.nanoTime()}")
     val messageSplits = message.split("\n", limit = 2)
-    when(messageSplits[0]) {
-      "exchange-receiver-info" -> {
+    when (messageSplits[0]) {
+      NearbyEvents.EXCHANGE_RECEIVER_INFO.value -> {
         callback()
       }
-      "exchange-sender-info" -> {
+      NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
         callback()
         wallet?.writeIdentity()
       }
-      "send-vc" -> {
+      NearbyEvents.SEND_VC.value -> {
         callback()
         wallet?.sendData(messageSplits[1])
       }
-      "send-vc:response" -> {
-        verifier?.notifyVerificationStatus(messageSplits[1] == InjiVerificationStates.ACCEPTED.value)
+      NearbyEvents.SEND_VC_RESPONSE.value -> {
+        verifier?.notifyVerificationStatus(messageSplits[1] == VCResponseStates.ACCEPTED.value)
       }
     }
   }

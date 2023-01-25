@@ -19,6 +19,7 @@ import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
+import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -49,6 +50,7 @@ class Wallet(
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<CentralCallbacks, Callback>()
@@ -59,7 +61,8 @@ class Wallet(
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
-  fun stop() {
+  fun stop(onDestroy: Callback) {
+    callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroy
     central.stop()
     handlerThread.quitSafely()
   }
@@ -100,8 +103,6 @@ class Wallet(
 
     //TODO: Handle multiple calls while connecting
     if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
-      Log.d(logTag, "Stopping the scan.")
-      central.stopScan()
 
       setVerifierPK(advertisementPayload, scanResponsePayload)
       central.connect(device)
@@ -160,8 +161,12 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
+    Log.d(logTag, "Stopping the scan.")
+    central.stopScan()
+
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
+    central.subscribe(Verifier.SERVICE_UUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -197,14 +202,10 @@ class Wallet(
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
     //TODO: Close and send event to higher layer
   }
-
-  override fun onDeviceDisconnected() {
-    //TODO: Close and send event to higher layer
-    if (!central.isDisconnecting()) {
-      central.stop()
+  override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
+    if(!isManualDisconnect) {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
@@ -226,7 +227,7 @@ class Wallet(
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTITY_CHARACTERISTIC_UUID -> {
-        messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
+        messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_RECEIVER_INFO.value, "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -242,6 +243,7 @@ class Wallet(
   }
 
   override fun onResponseSent() {
+    messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.RECEIVED.value)
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -257,22 +259,35 @@ class Wallet(
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
-        if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          messageResponseListener(
-            "send-vc:response",
-            Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value
-          )
+        if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.ACCEPTED.value)
         } else {
-          messageResponseListener(
-            "send-vc:response",
-            Openid4vpBleModule.InjiVerificationStates.REJECTED.value
-          )
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.REJECTED.value)
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnect()
-        central.close()
+        central.disconnectAndClose()
       }
+      GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID -> {
+        val status = value?.get(0)?.toInt()
+
+        if(status != null && status == DISCONNECT_STATUS) {
+          central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
+          central.disconnectAndClose()
+        }
+      }
+    }
+  }
+
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    central.quitHandler()
+    val onClosedCallback = callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      Log.d(logTag, "calling onDestroy callback")
+      it()
+      callbacks.remove(CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
     }
   }
 

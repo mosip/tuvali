@@ -10,6 +10,7 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
+import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
@@ -18,7 +19,6 @@ import io.mosip.tuvali.verifier.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
-import kotlin.reflect.KFunction2
 
 
 class Verifier(
@@ -42,6 +42,7 @@ class Verifier(
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
     val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+    const val DISCONNECT_STATUS = 1
   }
 
   private enum class PeripheralCallbacks {
@@ -49,7 +50,7 @@ class Verifier(
     ADV_FAILURE_CALLBACK,
     DEVICE_CONNECTED_CALLBACK,
     RESPONSE_RECEIVE_SUCCESS_CALLBACK,
-    RESPONSE_RECEIVED_FAILED_CALLBACK
+    ON_DESTROY_SUCCESS_CALLBACK
   }
 
   private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
@@ -62,8 +63,9 @@ class Verifier(
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
-  fun stop() {
-    peripheral.stop();
+  fun stop(onDestroySuccessCallback: Callback) {
+    callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroySuccessCallback
+    peripheral.stop(SERVICE_UUID)
     handlerThread.quitSafely()
   }
 
@@ -136,8 +138,9 @@ class Verifier(
           )
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPubKey)
           // TODO: Validate pub key, how to handle if not valid?
-          messageResponseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_SENDER_INFO.value, "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
+          peripheral.stopAdvertisement()
         }
       }
       GattService.SEMAPHORE_CHAR_UUID -> {
@@ -189,10 +192,21 @@ class Verifier(
     }
   }
 
+  override fun onClosed() {
+    Log.d(logTag, "onClosed")
+    peripheral.quitHandler()
+    val onClosedCallback = callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
+
+    onClosedCallback?.let {
+      it()
+      callbacks.remove(PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
+    }
+  }
+
+
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
     val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
-    peripheral.stopAdvertisement()
 
     deviceConnectedCallback?.let {
       it()
@@ -200,13 +214,11 @@ class Verifier(
     }
   }
 
-  override fun onDeviceNotConnected() {
-    //TODO: Close and send event to higher layer
-    if(!peripheral.isDisconnecting()) {
-      peripheral.stop()
+  override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
+    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
+    if(!isManualDisconnect && isConnected) {
+      eventResponseListener("onDisconnected")
     }
-
-    eventResponseListener("onDisconnected")
   }
 
   override fun onResponseReceived(data: ByteArray) {
@@ -216,7 +228,7 @@ class Verifier(
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
       val decompressedData = Util.decompress(decryptedData)
       Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-      messageResponseListener("send-vc", String(decompressedData!!))
+      messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
       // TODO: Handle error

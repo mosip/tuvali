@@ -18,6 +18,8 @@ abstract class IMessage(val messageType: PeripheralMessageTypes) {
 
     ADV_STOP,
     DISCONNECT,
+    DISCONNECT_AND_CLOSE_DEVICE,
+    CLOSE_ON_DISCONNECT_TIMEOUT,
     CLOSE_SERVER
   }
 }

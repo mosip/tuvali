@@ -38,16 +38,23 @@ class Openid4vpBle: RCTEventEmitter {
         }
         return dictonary!
     }
+    
     @objc
     func getConnectionParametersDebug() -> String {
         return "GetConnectionParametersDebug"
     }
-    
-    @objc
-    func destroyConnection() -> Any {
+
+    @objc(destroyConnection:)
+    func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
+        // post 10ms call the callback
+        let seconds = 0.01
+        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+            let newMessage = "hello world"
+            callback([newMessage])
+        }
         return "check" as! Any
     }
-    
+
     @objc
     func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let messageComponents = message.components(separatedBy: "\n")
@@ -60,8 +67,11 @@ class Openid4vpBle: RCTEventEmitter {
         case "exchange-sender-info":
             print("EXCHANGE-SENDER-INFO")
             callback([])
-            // Wallet.shared.registerCallbackForEvent(event: "EXCHANGE-SENDER-INFO", callback: callback)
             Wallet.shared.writeIdentity()
+        case "send-vc":
+            callback([])
+            print(">> raw message size", messageComponents[1].count)
+            Wallet.shared.sendData(data: messageComponents[1])
         default:
             print("DEFAULT SEND: MESSAGE:: ", message)
         }
@@ -74,8 +84,12 @@ class Openid4vpBle: RCTEventEmitter {
             print("Advertiser")
         case "discoverer":
             print("Discoverer")
-            Wallet.shared.central = Central()
-            Wallet.shared.registerCallbackForEvent(event: "CREATE_CONNECTION", callback: callback)
+            Central.shared.initialize()
+            Wallet.shared.central = Central.shared
+            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {
+                notification in
+                callback([])
+            }
         default:
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break

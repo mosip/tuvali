@@ -38,14 +38,19 @@ class GattClient(var context: Context) {
         }
       }
       Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
+      Log.i(
+        logTag,
+        "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
+      )
 
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
         peripheral?.let {
-          characteristic?.uuid?.let {
-              uuid -> onWriteFailed(it, uuid, status)
-          } }
+          characteristic?.uuid?.let { uuid ->
+            onWriteFailed(it, uuid, status)
+          }
+        }
 
         return
       }
@@ -81,8 +86,11 @@ class GattClient(var context: Context) {
       gatt: BluetoothGatt?,
       characteristic: BluetoothGattCharacteristic?
     ) {
-      Log.i(logTag, "Got notification from char ${characteristic?.uuid} and value ${
-        characteristic?.value?.get(0)?.toInt()}")
+      Log.i(
+        logTag, "Got notification from char ${characteristic?.uuid} and value ${
+          characteristic?.value?.get(0)?.toInt()
+        }"
+      )
 
       characteristic?.let {
         if (onNotificationReceived != null) {
@@ -132,20 +140,11 @@ class GattClient(var context: Context) {
 
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
         Log.i(logTag, "Disconnected from the peripheral")
-        closeGatt()
+        peripheral?.let{ onDeviceDisconnected() }
 
         peripheral = null;
       }
     }
-  }
-
-  @SuppressLint("MissingPermission")
-  private fun closeGatt() {
-    bluetoothGatt?.close()
-    peripheral?.let { onDeviceDisconnected() };
-
-    bluetoothGatt = null
-
   }
 
   @SuppressLint("MissingPermission", "NewApi")
@@ -155,6 +154,11 @@ class GattClient(var context: Context) {
     onDeviceDisconnected: () -> Unit
   ) {
     Log.i(logTag, "Initiating connect to ble peripheral")
+
+    if(peripheral != null) {
+      Log.i(logTag, "Device is already connected.")
+      return
+    }
 
     this.onDeviceConnected = onDeviceConnected;
     this.onDeviceDisconnected = onDeviceDisconnected;
@@ -167,7 +171,7 @@ class GattClient(var context: Context) {
       BluetoothDevice.TRANSPORT_LE
     )
 
-    gatt.requestConnectionPriority(BluetoothGatt.CONNECTION_PRIORITY_HIGH)
+    gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH)
     gatt.readPhy()
     gatt.setPreferredPhy(2, 2, 0)
     gatt.readPhy()
@@ -260,14 +264,14 @@ class GattClient(var context: Context) {
       val characteristic = service.getCharacteristic(charUUID)
       val notificationsEnabled = bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
 
-      return if(notificationsEnabled) {
+      return if (notificationsEnabled) {
         true
       } else {
         Log.d(logTag, "Failed to subscribe to $charUUID")
         false
       }
 
-    } catch(e: Error) {
+    } catch (e: Error) {
       return false
     }
   }
@@ -298,17 +302,25 @@ class GattClient(var context: Context) {
   }
 
   @SuppressLint("MissingPermission")
-  fun disconnect() {
-    if (bluetoothGatt != null) {
+  fun disconnect(): Boolean {
+    return if (bluetoothGatt != null && peripheral != null) {
+      Log.i(logTag, "Disconnecting connection")
       bluetoothGatt!!.disconnect()
+      true
+    } else {
+      Log.i(logTag, "Ignoring disconnect request")
+      false
     }
   }
 
   @SuppressLint("MissingPermission")
   fun close() {
     if (bluetoothGatt != null) {
+      Log.i(logTag, "Closing Bluetooth client")
       bluetoothGatt!!.close()
       bluetoothGatt = null
+    } else {
+      Log.i(logTag, "Ignoring close Bluetooth client request")
     }
   }
 

@@ -1,6 +1,7 @@
 import Foundation
 import CoreBluetooth
 
+@available(iOS 13.0, *)
 class Peripheral: NSObject {
     private var peripheralManager: CBPeripheralManager!
     
