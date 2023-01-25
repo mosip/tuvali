@@ -15,6 +15,7 @@ class CipherBoxImpl: CipherBox {
     
     func encrypt(message: Data) -> Data {
         let encryptedSealedBox = try! AES.GCM.seal(message, using: secretKey, nonce: AES.GCM.Nonce(data: initializationVector))
+        print("using secret key \(Utils.symKeyToString(key: secretKey))")
         let cipherWithAuthTag = encryptedSealedBox.ciphertext + encryptedSealedBox.tag
         return cipherWithAuthTag
     }
@@ -60,6 +61,7 @@ extension String {
         return String(data: data, encoding: .init(rawValue: 0))
     }
 }
+
 
 
 

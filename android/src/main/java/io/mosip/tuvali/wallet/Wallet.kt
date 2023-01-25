@@ -103,8 +103,6 @@ class Wallet(
 
     //TODO: Handle multiple calls while connecting
     if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
-      Log.d(logTag, "Stopping the scan.")
-      central.stopScan()
 
       setVerifierPK(advertisementPayload, scanResponsePayload)
       central.connect(device)
@@ -148,6 +146,9 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
+    Log.d(logTag, "Stopping the scan.")
+    central.stopScan()
+
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
@@ -212,7 +213,7 @@ class Wallet(
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        messageResponseListener("exchange-receiver-info", "{\"deviceName\": \"Verifier\"}")
+        messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_RECEIVER_INFO.value, "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -228,6 +229,7 @@ class Wallet(
   }
 
   override fun onResponseSent() {
+    messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.RECEIVED.value)
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -244,9 +246,9 @@ class Wallet(
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.ACCEPTED.value)
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.ACCEPTED.value)
         } else {
-          messageResponseListener("send-vc:response", Openid4vpBleModule.InjiVerificationStates.REJECTED.value)
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.REJECTED.value)
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)

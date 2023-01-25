@@ -10,6 +10,8 @@ class WalletCryptoBoxImpl: WalletCryptoBox {
     }
     
     func buildSecretsTranslator(verifierPublicKey: Data) -> SecretTranslator {
+        // WalletInfo -> senderInfo -> Sendkey -> myselfPackage
+        // VerifierInfo -> receiverInfo -> receiverKey -> OtherPackage -> encrypt (*)
         let secureRandom = secureRandomData(count: CryptoConstants.INITIALIZATION_VECTOR_LENGTH)
         let selfCipherPackage = selfCryptoBox.createCipherPackage(otherPublicKey: verifierPublicKey, senderInfo: CryptoConstants.WALLET_INFO, recieverInfo: CryptoConstants.VERIFIER_INFO, ivBytes: secureRandom)
         return SenderTransferOwnershipOfData(CipherPackage: selfCipherPackage, initVector: secureRandom)

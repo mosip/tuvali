@@ -2,6 +2,7 @@ import Foundation
 import CoreBluetooth
 import os
 
+@available(iOS 13.0, *)
 extension Peripheral: CBPeripheralManagerDelegate {
     func peripheralManagerDidUpdateState(_ peripheral: CBPeripheralManager) {
         switch peripheral.state {

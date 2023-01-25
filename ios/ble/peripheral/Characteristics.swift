@@ -20,6 +20,8 @@ struct CBcharatcteristic {
     let VERIFICATION_STATUS_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.properties, value: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.value, permissions: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.permissions)
 }
 
+// TODO: Add conn status change everywhere
+
 enum CharacteristicIds: String, CaseIterable {
     case IDENTITY_CHARACTERISTIC_UUID = "00002030-0000-1000-8000-00805f9b34fb"
     case REQUEST_SIZE_CHAR_UUID = "00002031-0000-1000-8000-00805f9b34fb"
@@ -58,3 +60,25 @@ struct TransferService {
     static let characteristicUUID = CBUUID(string: "00002032-0000-1000-8000-00805f9b34fb") //read characteristics
     static let writeCharacteristic = CBUUID(string: "00002031-0000-1000-8000-00805f9b34fb")
 }
+
+struct NetworkCharNums {
+    static let identifyRequestCharacteristic = CBUUID(string: "2030")
+    static let requestSizeCharacteristic = CBUUID(string: "2031")
+    static let requestCharacteristic = CBUUID(string: "2032")
+    static let responseSizeCharacteristic = CBUUID(string: "2033")
+    static let responseCharacteristic = CBUUID(string: "2034")
+    static let semaphoreCharacteristic = CBUUID(string: "2035")
+    static let verificationStatusCharacteristic = CBUUID(string: "2036")
+}
+
+enum NotificationEvent: String {
+    case EXCHANGE_RECEIVER_INFO = "EXCHANGE_RECEIVER_INFO"
+    case CREATE_CONNECTION = "CREATE_CONNECTION"
+    case RESPONSE_SIZE_WRITE_SUCCESS = "RESPONSE_SIZE_WRITE_SUCCESS"
+    case HANDLE_TRANSMISSION_REPORT = "HANDLE_TRANSMISSION_REPORT"
+    case INIT_RESPONSE_CHUNK_TRANSFER = "INIT_RESPONSE_CHUNK_TRANSFER"
+    case VERIFICATION_STATUS_RESPONSE = "VERIFICATION_STATUS_RESPONSE"
+}
+
+
+
