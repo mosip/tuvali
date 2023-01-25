@@ -3,8 +3,8 @@ package io.mosip.tuvali.retrymechanism.lib
 import kotlin.math.pow
 
 class BackOffStrategy(
-  private var maxElapsedTime: Long = DEFAULT_MAX_ELAPSE_TIME,
   private var maxRetryLimit: Int = DEFAULT_MAX_RETRY_LIMIT,
+  private var maxElapsedTime: Long = DEFAULT_MAX_ELAPSE_TIME,
   private var initialWaitTime: Long = DEFAULT_INITIAL_WAIT_TIME,
   private var multiplier: Int = DEFAULT_MULTIPLIER,
 ) {
