@@ -109,8 +109,21 @@ class TransferHandler {
         
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
-            EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "RECEIVED")
+            EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
             print("Emitting send-vc:response RECEIVED message")
+            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.VERIFICATION_STATUS_RESPONSE) {
+                notification in
+                // TODO -- Add all React native events under an Enum
+                let value = notification.userInfo?["status"] as? Data
+                if let value =  value {
+                    let status = Int(value[0])
+                    if status == 0 {
+                        EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"ACCEPTED\"")
+                    } else if status == 1 {
+                        EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
+                    }
+                }
+            }
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
             sendRetryRespChunk(missingChunks: r.missingSequences!)
@@ -201,5 +214,6 @@ enum SemaphoreMarker: Int {
     case RequestReport = 1
     case Error = 2
 }
+
 
 

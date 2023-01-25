@@ -20,6 +20,8 @@ struct CBcharatcteristic {
     let VERIFICATION_STATUS_CHAR = CBMutableCharacteristic(type: CBUUID(string: CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue), properties: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.properties, value: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.value, permissions: characteristicsMap[CharacteristicIds.VERIFICATION_STATUS_CHAR_UUID.rawValue]!.permissions)
 }
 
+// TODO: Add conn status change everywhere
+
 enum CharacteristicIds: String, CaseIterable {
     case IDENTITY_CHARACTERISTIC_UUID = "00002030-0000-1000-8000-00805f9b34fb"
     case REQUEST_SIZE_CHAR_UUID = "00002031-0000-1000-8000-00805f9b34fb"
@@ -75,6 +77,8 @@ enum NotificationEvent: String {
     case RESPONSE_SIZE_WRITE_SUCCESS = "RESPONSE_SIZE_WRITE_SUCCESS"
     case HANDLE_TRANSMISSION_REPORT = "HANDLE_TRANSMISSION_REPORT"
     case INIT_RESPONSE_CHUNK_TRANSFER = "INIT_RESPONSE_CHUNK_TRANSFER"
+    case VERIFICATION_STATUS_RESPONSE = "VERIFICATION_STATUS_RESPONSE"
 }
+
 
 

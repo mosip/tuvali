@@ -28,4 +28,3 @@ struct Utils {
         return (Int(num[0]) * 256 + Int(num[1]) )
     }
 }
-

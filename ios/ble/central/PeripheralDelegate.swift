@@ -50,6 +50,11 @@ extension Central: CBPeripheralDelegate {
             // TODO: figure out why object isn't sent out across
             NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, userInfo: ["report": report])
         }
+        
+        if characteristic.uuid == NetworkCharNums.verificationStatusCharacteristic {
+            let verificationStatus = characteristic.value as Data?
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.VERIFICATION_STATUS_RESPONSE.rawValue), object: nil, userInfo: ["status": verificationStatus])
+        }
     }
     
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
@@ -70,4 +75,3 @@ extension Central: CBPeripheralDelegate {
     func peripheral(_ peripheral: CBPeripheral, didModifyServices invalidatedServices: [CBService]) {
     }
 }
-

@@ -41,5 +41,3 @@ public extension String {
         return ""
     }
 }
-
-
