@@ -43,7 +43,7 @@ class GattClient(var context: Context) {
         "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
       )
 
-      if(status != GATT_SUCCESS) {
+      if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
         peripheral?.let {
@@ -124,9 +124,11 @@ class GattClient(var context: Context) {
       }
 
       Log.i(logTag, "discovered services: ${gatt?.services?.map { it.uuid }}")
-      val services = gatt?.services?.map { it.uuid }
-      if (services != null) {
-        onServicesDiscovered(services)
+      val serviceUuids = gatt?.services?.map { it.uuid }
+      if (serviceUuids != null) {
+        onServicesDiscovered(serviceUuids)
+      } else {
+        onServicesDiscovered(List<UUID>)
       }
     }
 
@@ -260,8 +262,7 @@ class GattClient(var context: Context) {
     try {
       val service = bluetoothGatt!!.getService(serviceUUID)
       val characteristic = service.getCharacteristic(charUUID)
-      val notificationsEnabled =
-        bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
+      val notificationsEnabled = bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
 
       return if (notificationsEnabled) {
         true
@@ -285,8 +286,7 @@ class GattClient(var context: Context) {
     try {
       val service = bluetoothGatt!!.getService(serviceUUID)
       val characteristic = service.getCharacteristic(charUUID)
-      val notificationsEnabled =
-        bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
+      val notificationsEnabled = bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
       onNotificationReceived = null
 
       return if (notificationsEnabled) {

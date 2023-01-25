@@ -31,8 +31,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit
-) :
-  ICentralListener, ITransferListener {
+) : ICentralListener, ITransferListener {
   private val logTag = "Wallet"
 
   private val secureRandom: SecureRandom = SecureRandom()
@@ -42,14 +41,12 @@ class Wallet(
 
   private var advIdentifier: String? = null
   private var transferHandler: TransferHandler
-  private val handlerThread =
-    HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
+  private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   private var central: Central
   private val maxMTU = 517
 
-  private val retryDiscoverServices =
-    BackOffStrategy(100, 10, 2, 2)
+  private val retryDiscoverServices = BackOffStrategy(10)
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
@@ -61,8 +58,7 @@ class Wallet(
   init {
     central = Central(context, this@Wallet)
     handlerThread.start()
-    transferHandler =
-      TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
+    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
   fun stop(onDestroy: Callback) {
@@ -102,8 +98,7 @@ class Wallet(
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    val scanResponsePayload =
-      scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
     val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
     //TODO: Handle multiple calls while connecting
@@ -113,8 +108,7 @@ class Wallet(
       central.connect(device)
     } else {
       Log.d(
-        logTag,
-        "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
+        logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
       )
     }
   }
@@ -139,16 +133,15 @@ class Wallet(
     central.discoverServices()
   }
 
-  override fun onServicesDiscovered(services : List<UUID>) {
+  override fun onServicesDiscovered(serviceUuids: List<UUID>) {
 
-    if(services.contains(Verifier.SERVICE_UUID)){
+    if (serviceUuids.contains(Verifier.SERVICE_UUID)) {
       retryDiscoverServices.reset()
-      Log.d(logTag, "onServicesDiscovered with specific service")
+      Log.d(logTag, "onServicesDiscovered with services - $serviceUuids")
       central.requestMTU(maxMTU)
-    }
-      else{
+    } else {
       retryServiceDiscovery()
-      }
+    }
   }
 
   override fun onServicesDiscoveryFailed(errorCode: Int) {
@@ -159,8 +152,8 @@ class Wallet(
   private fun retryServiceDiscovery() {
     if (retryDiscoverServices.shouldRetry()) {
       central.discoverServicesDelayed(retryDiscoverServices.getWaitTime())
-    }
-    else{
+    } else {
+      //TODO: Send service discovery failure to inji layer
       Log.d(logTag, "Retrying to find the services failed after multiple attempts")
       retryDiscoverServices.reset()
     }
@@ -219,7 +212,7 @@ class Wallet(
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
 
-    when(charUUID) {
+    when (charUUID) {
       GattService.RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
@@ -313,14 +306,12 @@ class Wallet(
       //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
 
       Log.d(
-        logTag,
-        "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}"
+        logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}"
       )
       transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
     } else {
       Log.e(
-        logTag,
-        "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
+        logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
       )
     }
   }
