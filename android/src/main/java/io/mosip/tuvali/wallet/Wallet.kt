@@ -303,10 +303,6 @@ class Wallet(
     val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
     if (encryptedData != null) {
       //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
-
-      Log.d(
-        logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}"
-      )
       transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
     } else {
       Log.e(
