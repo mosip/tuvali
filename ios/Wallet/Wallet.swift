@@ -11,9 +11,7 @@ class Wallet: NSObject {
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
-    
-    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"device\":\"wallet\"}"
-    
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
     private override init() {}
     
     @objc(getModuleName:withRejecter:)
