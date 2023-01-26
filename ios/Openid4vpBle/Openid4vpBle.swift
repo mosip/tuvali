@@ -48,10 +48,12 @@ class Openid4vpBle: RCTEventEmitter {
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
         // post 10ms call the callback
         let seconds = 0.01
-        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
-            let newMessage = "hello world"
-            callback([newMessage])
-        }
+//        DispatchQueue.main.asyncAfter(deadline: .now() + seconds) {
+//            let newMessage = "hello world"
+//            callback([newMessage])
+//        }
+        // Wallet.initialize()
+        Wallet.shared.destroyConnection()
         return "check" as! Any
     }
 

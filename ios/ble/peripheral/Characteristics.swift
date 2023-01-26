@@ -30,6 +30,7 @@ enum CharacteristicIds: String, CaseIterable {
     case RESPONSE_CHAR_UUID = "00002034-0000-1000-8000-00805f9b34fb"
     case SEMAPHORE_CHAR_UUID = "00002035-0000-1000-8000-00805f9b34fb"
     case VERIFICATION_STATUS_CHAR_UUID = "00002036-0000-1000-8000-00805f9b34fb"
+    case CONNECTION_STATUS_CHANGE_CHAR_UUID = "00002037-0000-1000-8000-00805f9b34fb"
 }
 
 let characteristicsMap: [String: CharacteristicTuple] = [
@@ -50,7 +51,7 @@ struct TransferService {
     static let responseCharacteristic = CBUUID(string: "00002034-0000-1000-8000-00805f9b34fb")
     static let semaphoreCharacteristic = CBUUID(string: "00002035-0000-1000-8000-00805f9b34fb")
     static let verificationStatusCharacteristic = CBUUID(string: "00002036-0000-1000-8000-00805f9b34fb")
-
+    static let connectionStatusChangeCharacteristic = CBUUID(string: "00002037-0000-1000-8000-00805f9b34fb")
 
     static let serviceUUID = CBUUID(string: "0000AB29-0000-1000-8000-00805f9b34fb") // same
     static let scanResponseServiceUUID = CBUUID(string: "0000AB2A-0000-1000-8000-00805f9b34fb")
@@ -69,6 +70,7 @@ struct NetworkCharNums {
     static let responseCharacteristic = CBUUID(string: "2034")
     static let semaphoreCharacteristic = CBUUID(string: "2035")
     static let verificationStatusCharacteristic = CBUUID(string: "2036")
+    static let connectionStatusChangeCharacteristic = CBUUID(string: "2037")
 }
 
 enum NotificationEvent: String {
@@ -78,6 +80,8 @@ enum NotificationEvent: String {
     case HANDLE_TRANSMISSION_REPORT = "HANDLE_TRANSMISSION_REPORT"
     case INIT_RESPONSE_CHUNK_TRANSFER = "INIT_RESPONSE_CHUNK_TRANSFER"
     case VERIFICATION_STATUS_RESPONSE = "VERIFICATION_STATUS_RESPONSE"
+    case CONNECTION_STATUS_CHANGE = "CONNECTION_STATUS_CHANGE"
+    
 }
 
 

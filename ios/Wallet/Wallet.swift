@@ -12,7 +12,11 @@ class Wallet: NSObject {
     var advIdentifier: String?
     var verifierPublicKey: Data?
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
-    private override init() {}
+    
+    private override init() {
+        super.init()
+        lookForDestroyConnection()
+    }
     
     @objc(getModuleName:withRejecter:)
     func getModuleName(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -33,6 +37,26 @@ class Wallet: NSObject {
     func buildSecretTranslator(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
+    }
+    
+    func lookForDestroyConnection(){
+        registerCallbackForEvent(event: NotificationEvent.CONNECTION_STATUS_CHANGE) { notification in
+            print("Handling notification for \(notification.name.rawValue)")
+            if let notifyObj = notification.userInfo?["connectionStatus"] as? Data {
+                let connStatusID = Int(notifyObj[0])
+                    if connStatusID == 1 {
+                        print("con statusid:", connStatusID)
+                        self.destroyConnection()
+                    }
+                } else {
+                    print("weird reason!!")
+                }
+            }
+        }
+    
+    func destroyConnection(){
+        NotificationCenter.default.removeObserver(self)
+        print("destroyed")
     }
     
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
