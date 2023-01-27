@@ -46,7 +46,7 @@ class Wallet(
   private var central: Central
   private val maxMTU = 517
 
-  private val retryDiscoverServices = BackOffStrategy(10)
+  private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
 
   private enum class CentralCallbacks {
     CONNECTION_ESTABLISHED,
