@@ -202,7 +202,6 @@ class Wallet(
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
     //TODO: Close and send event to higher layer
   }
-
   override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
     if(!isManualDisconnect) {
       eventResponseListener("onDisconnected")
