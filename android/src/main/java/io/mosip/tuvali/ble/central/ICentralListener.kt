@@ -11,7 +11,7 @@ interface ICentralListener {
   fun onDeviceDisconnected(isManualDisconnect: Boolean)
   fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int)
   fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID)
-  fun onServicesDiscovered()
+  fun onServicesDiscovered(serviceUuids: List<UUID>)
   fun onServicesDiscoveryFailed(errorCode: Int)
   fun onRequestMTUSuccess(mtu: Int)
   fun onRequestMTUFailure(errorCode: Int)

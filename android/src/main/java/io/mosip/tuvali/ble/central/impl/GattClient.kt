@@ -14,13 +14,13 @@ class GattClient(var context: Context) {
   private lateinit var onRequestMTUSuccess: (mtu: Int) -> Unit
   private lateinit var onRequestMTUFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscoveryFailure: (err: Int) -> Unit
-  private lateinit var onServicesDiscovered: () -> Unit
+  private lateinit var onServicesDiscovered: (List<UUID>) -> Unit
   private lateinit var onWriteFailed: (BluetoothDevice, UUID, Int) -> Unit
   private lateinit var onWriteSuccess: (BluetoothDevice, UUID) -> Unit
   private lateinit var onDeviceDisconnected: () -> Unit
-  private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit;
-  private var peripheral: BluetoothDevice? = null;
-  private var bluetoothGatt: BluetoothGatt? = null;
+  private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit
+  private var peripheral: BluetoothDevice? = null
+  private var bluetoothGatt: BluetoothGatt? = null
   private val logTag = "BLECentral"
   private var tempCounterMap = mutableMapOf<UUID, Int>()
 
@@ -43,7 +43,7 @@ class GattClient(var context: Context) {
         "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
       )
 
-      if(status != GATT_SUCCESS) {
+      if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
         peripheral?.let {
@@ -124,7 +124,12 @@ class GattClient(var context: Context) {
       }
 
       Log.i(logTag, "discovered services: ${gatt?.services?.map { it.uuid }}")
-      onServicesDiscovered()
+      val serviceUuids = gatt?.services?.map { it.uuid }
+      if (serviceUuids != null) {
+        onServicesDiscovered(serviceUuids)
+      } else {
+        onServicesDiscovered(emptyList())
+      }
     }
 
     @SuppressLint("MissingPermission")
@@ -202,7 +207,7 @@ class GattClient(var context: Context) {
   }
 
   @SuppressLint("MissingPermission")
-  fun discoverServices(onSuccess: () -> Unit, onFailure: (err: Int) -> Unit) {
+  fun discoverServices(onSuccess: (List<UUID>) -> Unit, onFailure: (err: Int) -> Unit) {
     this.onServicesDiscovered = onSuccess
     this.onServicesDiscoveryFailure = onFailure
     bluetoothGatt?.discoverServices()
@@ -257,8 +262,7 @@ class GattClient(var context: Context) {
     try {
       val service = bluetoothGatt!!.getService(serviceUUID)
       val characteristic = service.getCharacteristic(charUUID)
-      val notificationsEnabled =
-        bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
+      val notificationsEnabled = bluetoothGatt!!.setCharacteristicNotification(characteristic, true)
 
       return if (notificationsEnabled) {
         true
@@ -282,8 +286,7 @@ class GattClient(var context: Context) {
     try {
       val service = bluetoothGatt!!.getService(serviceUUID)
       val characteristic = service.getCharacteristic(charUUID)
-      val notificationsEnabled =
-        bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
+      val notificationsEnabled = bluetoothGatt!!.setCharacteristicNotification(characteristic, false)
       onNotificationReceived = null
 
       return if (notificationsEnabled) {

@@ -14,22 +14,15 @@ extension Central {
             print("adv data::", advertisementData, "scan resuly:::", scanResponseData)
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             print("veri pub key::", publicKeyData)
-            if #available(iOS 13.0, *) {
-                let cryptoBox = WalletCryptoBoxBuilder().build()
-                let secretsTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
-                Wallet.shared.setSecretTranslator(ss: secretsTranslator, publicKeyData: publicKeyData)
-                if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
-                    peripheral.delegate = self
-                    central.connect(peripheral)
-                    connectedPeripheral = peripheral
-                }
-            } else {
-                print ("deployment target is less")
+            Wallet.shared.buildSecretTranslator(publicKeyData: publicKeyData)
+            if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
+                peripheral.delegate = self
+                central.connect(peripheral)
+                connectedPeripheral = peripheral
             }
         }
     }
 
-    
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
         os_log("Connected to peripheral: %@", String(describing: peripheral.name))
         central.stopScan()
@@ -44,4 +37,3 @@ extension Central {
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
     }
 }
-

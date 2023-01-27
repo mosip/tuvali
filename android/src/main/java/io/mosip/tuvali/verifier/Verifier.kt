@@ -10,6 +10,7 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
+import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
@@ -137,7 +138,7 @@ class Verifier(
           )
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPubKey)
           // TODO: Validate pub key, how to handle if not valid?
-          messageResponseListener("exchange-sender-info", "{\"deviceName\": \"Wallet\"}")
+          messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_SENDER_INFO.value, "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
           peripheral.stopAdvertisement()
         }
@@ -227,7 +228,7 @@ class Verifier(
       Log.d(logTag, "decryptedData size: ${decryptedData.size}")
       val decompressedData = Util.decompress(decryptedData)
       Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-      messageResponseListener("send-vc", String(decompressedData!!))
+      messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
     } else {
       Log.e(logTag, "failed to decrypt data with size: ${data.size}")
       // TODO: Handle error

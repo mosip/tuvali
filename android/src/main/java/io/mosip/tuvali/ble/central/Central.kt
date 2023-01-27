@@ -74,6 +74,10 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(DiscoverServicesMessage())
   }
 
+  fun discoverServicesDelayed(waitTime: Long) {
+    messageSender.sendMessageDelayed(DiscoverServicesMessage(), waitTime)
+  }
+
   fun requestMTU(mtu: Int) {
     messageSender.sendMessage(RequestMTUMessage(mtu))
   }

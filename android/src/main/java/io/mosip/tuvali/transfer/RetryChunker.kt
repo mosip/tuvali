@@ -4,7 +4,7 @@ import android.util.Log
 
 class RetryChunker(private val chunker: Chunker, private val missedSequences: IntArray) {
   private val logTag = "RetryChunker"
-  private var seqCounter = 0;
+  private var seqCounter = 0
 
   init {
     Log.d(logTag, "Total number of missedChunks: ${missedSequences.size}")
@@ -12,12 +12,12 @@ class RetryChunker(private val chunker: Chunker, private val missedSequences: In
 
   fun next(): ByteArray {
     val missedSeqNo = missedSequences[seqCounter]
-    seqCounter++;
+    seqCounter++
 
     return chunker.chunkBySequenceNumber(missedSeqNo)
   }
 
   fun isComplete(): Boolean {
-    return seqCounter == missedSequences.size - 1
+    return seqCounter == missedSequences.size
   }
 }

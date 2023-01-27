@@ -13,9 +13,18 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var wallet: Wallet? = null
   private val mutex = Object()
 
-  enum class InjiVerificationStates(val value: String) {
+  //Inji contract requires double quotes around the states.
+  enum class VCResponseStates(val value: String) {
+    RECEIVED("\"RECEIVED\""),
     ACCEPTED("\"ACCEPTED\""),
     REJECTED("\"REJECTED\"")
+  }
+
+  enum class NearbyEvents(val value: String) {
+    EXCHANGE_RECEIVER_INFO("exchange-receiver-info"),
+    EXCHANGE_SENDER_INFO("exchange-sender-info"),
+    SEND_VC("send-vc"),
+    SEND_VC_RESPONSE("send-vc:response")
   }
 
   override fun getName(): String {
@@ -130,19 +139,19 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "send: message $message at ${System.nanoTime()}")
     val messageSplits = message.split("\n", limit = 2)
     when (messageSplits[0]) {
-      "exchange-receiver-info" -> {
+      NearbyEvents.EXCHANGE_RECEIVER_INFO.value -> {
         callback()
       }
-      "exchange-sender-info" -> {
+      NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
         callback()
         wallet?.writeIdentity()
       }
-      "send-vc" -> {
+      NearbyEvents.SEND_VC.value -> {
         callback()
         wallet?.sendData(messageSplits[1])
       }
-      "send-vc:response" -> {
-        verifier?.notifyVerificationStatus(messageSplits[1] == InjiVerificationStates.ACCEPTED.value)
+      NearbyEvents.SEND_VC_RESPONSE.value -> {
+        verifier?.notifyVerificationStatus(messageSplits[1] == VCResponseStates.ACCEPTED.value)
       }
     }
   }

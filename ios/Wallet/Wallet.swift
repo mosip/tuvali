@@ -1,4 +1,5 @@
 import Foundation
+import Gzip
 
 @objc(Wallet)
 @available(iOS 13.0, *)
@@ -7,11 +8,15 @@ class Wallet: NSObject {
     static let shared = Wallet()
     var central: Central?
     var secretTranslator: SecretTranslator?
-    // var viewModel: WalletViewModel = WalletViewModel()
+    var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
     
-    private override init() {}
+    private override init() {
+        super.init()
+        lookForDestroyConnection()
+    }
     
     @objc(getModuleName:withRejecter:)
     func getModuleName(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
@@ -22,17 +27,36 @@ class Wallet: NSObject {
         self.advIdentifier = identifier
     }
     
-    func registerCallbackForEvent(event: String, callback: @escaping RCTResponseSenderBlock) {
-        
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event), object: nil, queue: nil) { [unowned self] notification in
+    func registerCallbackForEvent(event: NotificationEvent, callback: @escaping (_ notification: Notification) -> Void) {
+        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event.rawValue), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
-            callback([])
+            callback(notification)
         }
     }
     
-    func setSecretTranslator(ss: SecretTranslator, publicKeyData: Data) {
-        secretTranslator = ss
+    func buildSecretTranslator(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
+        secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
+    }
+    
+    func lookForDestroyConnection(){
+        registerCallbackForEvent(event: NotificationEvent.CONNECTION_STATUS_CHANGE) { notification in
+            print("Handling notification for \(notification.name.rawValue)")
+            if let notifyObj = notification.userInfo?["connectionStatus"] as? Data {
+                let connStatusID = Int(notifyObj[0])
+                    if connStatusID == 1 {
+                        print("con statusid:", connStatusID)
+                        self.destroyConnection()
+                    }
+                } else {
+                    print("weird reason!!")
+                }
+            }
+        }
+    
+    func destroyConnection(){
+        NotificationCenter.default.removeObserver(self)
+        print("destroyed")
     }
     
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -61,21 +85,34 @@ class Wallet: NSObject {
         }
         return data
     }
+
+    func sendData(data: String) {
+        var dataInBytes = Data(data.utf8)
+        var compressedBytes = try! dataInBytes.gzipped()
+        var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
+        if (encryptedData != nil) {
+            DispatchQueue.main.async {
+                let transferHandler = TransferHandler.shared
+                // DOUBT: why is encrypted data written twice ?
+                transferHandler.initialize(initdData: encryptedData!)
+                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
+                transferHandler.sendMessage(message: imsgBuilder)
+            }
+        }
+    }
     
-    @available(iOS 13.0, *)
     func writeIdentity() {
         print("::: write idendity called ::: ")
-        let publicKey = WalletCryptoBoxImpl().getPublicKey()
+        let publicKey = self.cryptoBox.getPublicKey()
         print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
             print("Write Identity - Found NO KEY")
             return
         }
-        self.secretTranslator = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: verifierPublicKey)
         var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: TransferService.identifyRequestCharacteristic, data: iv + publicKey)
-        NotificationCenter.default.post(name: Notification.Name(rawValue: "EXCHANGE-SENDER-INFO"), object: nil)
-     }
-
+        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
+        registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
+            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        }
+    }
 }
-    
