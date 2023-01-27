@@ -6,9 +6,8 @@ import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.transfer.Assembler
-import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
-import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.transfer.message.*
@@ -48,15 +47,15 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
         currentState = States.ResponseReadPending
       }
-      // On verifier side, we can wait on response char, instead of semaphore to know when chunk arrived
+      // On verifier side, we can wait on response char, instead of transfer report request to know when chunk arrived
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_RECEIVED.ordinal -> {
         val responseChunkReceivedMessage = msg.obj as ResponseChunkReceivedMessage
         assembleChunk(responseChunkReceivedMessage.chunkData)
       }
       IMessage.TransferMessageTypes.REMOTE_REQUESTED_TRANSFER_REPORT.ordinal -> {
         val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
-        when(remoteRequestedTransferReportMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.RequestReport.ordinal -> {
+        when(remoteRequestedTransferReportMessage.transferReportRequestCharValue) {
+          TransferReportRequest.ReportType.RequestReport.ordinal -> {
             var transferReport: TransferReport
             if (assembler?.isComplete() == true) {
               Log.d(logTag, "success frame: transfer completed")
@@ -72,13 +71,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
                 TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until defaultTransferReportPageSize))
               }
             }
-            transferListener.sendDataOverNotification(GattService.SEMAPHORE_CHAR_UUID, transferReport.toByteArray())
+            transferListener.sendDataOverNotification(GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID, transferReport.toByteArray())
           }
-          Semaphore.SemaphoreMarker.Error.ordinal -> {
-            transferListener.onResponseReceivedFailed("received error on semaphore from remote")
+          TransferReportRequest.ReportType.Error.ordinal -> {
+            transferListener.onResponseReceivedFailed("received error on transfer Report request from remote")
           }
           else -> {
-            transferListener.onResponseReceivedFailed("unknown value received on semaphore from remote")
+            transferListener.onResponseReceivedFailed("unknown value received on transfer Report request from remote")
           }
         }
       }

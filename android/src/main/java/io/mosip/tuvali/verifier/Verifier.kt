@@ -10,8 +10,8 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
+import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
@@ -120,7 +120,7 @@ class Verifier(
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
-      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         value?.let {
           // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
           if (value.size < 12 + 32) {
@@ -143,18 +143,18 @@ class Verifier(
           peripheral.stopAdvertisement()
         }
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
         value?.let {
           if (value.isEmpty()) {
             return
           }
-          val semaphoreValue = value[0].toInt()
-          if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
+          val receivedReportType = value[0].toInt()
+          if (receivedReportType == TransferReportRequest.ReportType.RequestReport.ordinal) {
             val remoteRequestedTransferReportMessage =
-              RemoteRequestedTransferReportMessage(semaphoreValue)
+              RemoteRequestedTransferReportMessage(receivedReportType)
             transferHandler.sendMessage(remoteRequestedTransferReportMessage)
-          } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
-            onResponseReceivedFailed("received error on semaphore from remote")
+          } else if (receivedReportType == TransferReportRequest.ReportType.Error.ordinal) {
+            onResponseReceivedFailed("received error on transfer Report request from remote")
           }
         }
       }
@@ -167,7 +167,7 @@ class Verifier(
           transferHandler.sendMessage(responseSizeReadSuccessMessage)
         }
       }
-      GattService.RESPONSE_CHAR_UUID -> {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         if (value != null) {
           Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
           transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
@@ -178,7 +178,7 @@ class Verifier(
 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
         //TODO: Can re-send report if failed to send notification with exponential backoff
         Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
       }
