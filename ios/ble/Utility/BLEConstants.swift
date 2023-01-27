@@ -1,4 +1,3 @@
-
 import Foundation
 import CoreBluetooth
 
@@ -11,3 +10,4 @@ struct BLEConstants {
     static var seqNumberReservedByteSize = 2
     static var mtuReservedByteSize = 2
 }
+

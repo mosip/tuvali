@@ -4,7 +4,7 @@ import CommonCrypto
 extension Data {
     public func sha256() -> String {
         return hexStringFromData(input: digest(input: self as NSData))
-    }    
+    }
     private func digest(input : NSData) -> NSData {
         let digestLength = Int(CC_SHA256_DIGEST_LENGTH)
         var hash = [UInt8](repeating: 0, count: digestLength)
@@ -23,6 +23,14 @@ extension Data {
         
         return hexString
     }
+    public func toInt() -> Int {
+        let x = self.withUnsafeBytes({
+            (rawPtr: UnsafeRawBufferPointer) in
+        return rawPtr.load(as: UInt8.self)
+            })
+            // failed to convert bytes to Int
+            return 0
+    }
 }
 
 public extension String {
@@ -33,4 +41,3 @@ public extension String {
         return ""
     }
 }
-

@@ -103,6 +103,8 @@ class Wallet(
 
     //TODO: Handle multiple calls while connecting
     if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+      Log.d(logTag, "Stopping the scan.")
+      central.stopScan()
 
       setVerifierPK(advertisementPayload, scanResponsePayload)
       central.connect(device)
@@ -161,8 +163,6 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
-    Log.d(logTag, "Stopping the scan.")
-    central.stopScan()
 
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]

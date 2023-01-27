@@ -23,4 +23,8 @@ struct Utils {
         }
         return hexKey
     }
+    
+    static func twoBytesToIntBigEndian(num: Data) -> Int {
+        return (Int(num[0]) * 256 + Int(num[1]) )
+    }
 }
