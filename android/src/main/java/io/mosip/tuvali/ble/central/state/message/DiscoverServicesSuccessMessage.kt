@@ -1,5 +1,7 @@
 package io.mosip.tuvali.ble.central.state.message
 
-class DiscoverServicesSuccessMessage(): IMessage(
+import java.util.UUID
+
+class DiscoverServicesSuccessMessage(val serviceUuids : List<UUID>): IMessage(
   CentralStates.DISCOVER_SERVICES_SUCCESS
 )

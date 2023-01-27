@@ -127,7 +127,8 @@ class StateHandler(
       }
       IMessage.CentralStates.DISCOVER_SERVICES_SUCCESS.ordinal -> {
         Log.d(logTag, "discovered services.")
-        listener.onServicesDiscovered()
+        val discoverServicesSuccessMessage = msg.obj as DiscoverServicesSuccessMessage
+        listener.onServicesDiscovered(discoverServicesSuccessMessage.serviceUuids)
         currentState = States.Connected
       }
       IMessage.CentralStates.DISCOVER_SERVICES_FAILURE.ordinal -> {
@@ -250,7 +251,7 @@ class StateHandler(
     }
   }
 
-  override fun getCurrentState() : States {
+  override fun getCurrentState(): States {
     return currentState
   }
 
@@ -270,7 +271,7 @@ class StateHandler(
     message.obj = msg
     val isSent = this.sendMessageDelayed(message, delay)
     if (!isSent) {
-      Log.e(logTag, "sendMessage to state handler for ${msg.commandType} failed")
+      Log.e(logTag, "sendMessageDelayed to state handler for ${msg.commandType} failed")
     }
   }
 }

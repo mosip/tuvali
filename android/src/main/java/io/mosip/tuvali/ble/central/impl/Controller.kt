@@ -13,6 +13,7 @@ class Controller(val context: Context) {
   private lateinit var scanner: Scanner
   private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender
+
   //TODO: Move it to gatt client instance
   private var peripheralDevice: BluetoothDevice? = null;
 
@@ -43,7 +44,14 @@ class Controller(val context: Context) {
   fun write(writeMessage: WriteMessage) {
     //TODO: handle no device case
     peripheralDevice?.let {
-      gattClient?.write(it, writeMessage.serviceUUID, writeMessage.charUUID, writeMessage.data, this::onWriteSuccess, this::onWriteFailed)
+      gattClient?.write(
+        it,
+        writeMessage.serviceUUID,
+        writeMessage.charUUID,
+        writeMessage.data,
+        this::onWriteSuccess,
+        this::onWriteFailed
+      )
     }
   }
 
@@ -58,7 +66,7 @@ class Controller(val context: Context) {
       this::onNotificationReceived
     )
 
-    if(subscribed == true) {
+    if (subscribed == true) {
       messageSender.sendMessage(SubscribeSuccessMessage(subscribeMessage.charUUID))
     } else {
       messageSender.sendMessage(SubscribeFailureMessage(subscribeMessage.charUUID,
@@ -73,7 +81,7 @@ class Controller(val context: Context) {
       unsubscribeMessage.charUUID,
     )
 
-    if(unsubscribe == true) {
+    if (unsubscribe == true) {
       messageSender.sendMessage(UnsubscribeSuccessMessage(unsubscribeMessage.charUUID))
     } else {
       messageSender.sendMessage(UnsubscribeFailureMessage(unsubscribeMessage.charUUID, BluetoothGatt.GATT_FAILURE))
@@ -158,11 +166,11 @@ class Controller(val context: Context) {
     messageSender.sendMessage(scanStartFailureMessage)
   }
 
-  private fun onServicesDiscovered(){
-    messageSender.sendMessage(DiscoverServicesSuccessMessage())
+  private fun onServicesDiscovered(serviceUuids: List<UUID>) {
+    messageSender.sendMessage(DiscoverServicesSuccessMessage(serviceUuids))
   }
 
-  private fun onServiceDiscoveryFailure(errorCode: Int){
+  private fun onServiceDiscoveryFailure(errorCode: Int) {
     messageSender.sendMessage(DiscoverServicesFailureMessage(errorCode))
   }
 }
