@@ -26,6 +26,9 @@ extension Central: CBPeripheralDelegate {
         for characteristic in serviceCharacteristics {
             // store a reference to the discovered characteristic in the Central for write.
             print("Characteristic UUID:: ", characteristic.uuid.uuidString)
+            if characteristic.uuid == NetworkCharNums.responseCharacteristic {
+                BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withResponse)
+            }
             self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
             // subscribe to the characteristics for (2035, 2036, 2037)
             if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic ||

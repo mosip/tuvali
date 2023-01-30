@@ -35,7 +35,6 @@ class Central: NSObject, CBCentralManagerDelegate {
     }
     
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
-        
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
                 guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
