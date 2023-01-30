@@ -83,7 +83,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
-        Log.d(logTag, "response transfer complete in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
+        Log.i(logTag, "response transfer complete in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         val responseTransferCompleteMessage = msg.obj as ResponseTransferCompleteMessage
         transferListener.onResponseReceived(responseTransferCompleteMessage.data)
         currentState = States.TransferComplete
