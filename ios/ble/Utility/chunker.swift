@@ -8,13 +8,13 @@ class Chunker {
     private var chunkData: Data?
     private var mtuSize: Int = BLEConstants.DEFAULT_CHUNK_SIZE
     private var chunkMetaSize = BLEConstants.seqNumberReservedByteSize + BLEConstants.mtuReservedByteSize
-    
+
     init(chunkData: Data, mtuSize: Int?) {
         self.chunkData = chunkData
         self.mtuSize = mtuSize!
         assignPreSlicedChunks()
     }
-    
+
     func getChunkWithIndex(index: Int) -> Data {
         if index < self.preSlicedChunks.count {
             return self.preSlicedChunks[index]
@@ -22,11 +22,11 @@ class Chunker {
         // TODO: Figure out how to throw errors!
         return Data()
     }
-    
+
     func getLastChunkByteCount(dataSize: Int) -> Int {
         return dataSize % effectivePayloadSize
     }
-    
+
     func assignPreSlicedChunks(){
         print("preSlicedChunks called ::: ")
         print("expected total data size: \(chunkData?.count) and totalChunkCount: \(totalChunkCount)")
@@ -37,24 +37,24 @@ class Chunker {
             print(preSlicedChunks ?? [])
         }
     }
-    
+
     func getTotalChunkCount(dataSize: Int) -> Double {
         var resulydouble = Double(dataSize)/Double(effectivePayloadSize)
         return Double(ceill(resulydouble))
     }
-    
+
     var lastChunkByteCount: Int {
         return getLastChunkByteCount(dataSize: chunkData!.count)
     }
-    
+
     var totalChunkCount: Int {
         return Int(getTotalChunkCount(dataSize: chunkData!.count))
     }
-    
+
     var effectivePayloadSize: Int {
        return mtuSize - chunkMetaSize
     }
-    
+
     func next() -> Data {
         var seqNumber = chunksReadCounter
         chunksReadCounter += 1
@@ -66,11 +66,11 @@ class Chunker {
            return Data()
        }
     }
-    
+
     func chunkBySequenceNumber(num: Int) -> Data {
         return (preSlicedChunks[num])
     }
-    
+
     private func chunk(seqNumber: Int) -> Data {
         let fromIndex = seqNumber * effectivePayloadSize
         if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
@@ -82,7 +82,7 @@ class Chunker {
             return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
     }
-    
+
     /*
      <------------------------------------------------------- MTU ------------------------------------------------------------------->
      +-----------------------+-----------------------------+-------------------------------------------------------------------------+
@@ -92,7 +92,7 @@ class Chunker {
      |                       |                             |                                                                         |
      +-----------------------+-----------------------------+-------------------------------------------------------------------------+
      */
-    
+
     private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
         print("fetching chunk size:",toIndex,"-", fromIndex,"}, chunkSequenceNumber(0-indexed):", seqNumber)
 //        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
@@ -103,15 +103,15 @@ class Chunker {
         }
         return Data() //
     }
-    
+
     func isComplete() -> Bool {
         let isComplete = chunksReadCounter > (totalChunkCount - 1)
         if isComplete {
-                print("isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadCounter")
+            print("isComplete: true, totalChunks: \(totalChunkCount) , chunkReadCounter(1-indexed): \(chunksReadCounter)")
         }
        return isComplete
     }
-    
+
 //    func intToTwoBytesBigEndian(num: Int) -> [UInt8] {
 //        if num < 256 {
 //            let minValue: UInt8 = 0
@@ -119,7 +119,7 @@ class Chunker {
 //        }
 //        return [UInt8(num/256), UInt8(num%256)]
 //    }
-    
+
     func intToBytes(_ value: UInt16) -> Data {
         var value = value.bigEndian
         return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
