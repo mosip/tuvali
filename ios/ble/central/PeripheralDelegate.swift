@@ -10,12 +10,14 @@ extension Central: CBPeripheralDelegate {
             return
         }
 
+
         guard let peripheralServices = peripheral.services else { return }
         for service in peripheralServices where Peripheral.SERVICE_UUID == service.uuid {
             peripheral.discoverCharacteristics(CharacteristicIds.allCases.map{CBUUID(string: $0.rawValue)}, for: service)
         }
         print("found \(String(describing: peripheral.services?.count)) services for peripheral \(String(describing: peripheral.name))")
     }
+
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
         if let error = error {
