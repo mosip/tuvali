@@ -97,21 +97,36 @@ class Wallet(
     //TODO: Handle error
   }
 
+  private val connectionMutex = Object()
+  @Volatile private var connectionState = VerifierConnectionState.NOT_CONNECTED
+
+  private enum class VerifierConnectionState {
+    NOT_CONNECTED,
+    CONNECTING,
+    CONNECTED
+  }
+
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
-    val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
+    synchronized(connectionMutex) {
+      if (connectionState != VerifierConnectionState.NOT_CONNECTED) {
+        Log.d(
+          logTag, "Device found is ignored $device"
+        )
+        return
+      }
+      val scanResponsePayload =
+        scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+      val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
-    //TODO: Handle multiple calls while connecting
-    if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
-      Log.d(logTag, "Stopping the scan.")
-      central.stopScan()
-
-      setVerifierPK(advertisementPayload, scanResponsePayload)
-      central.connect(device)
-    } else {
-      Log.d(
-        logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
-      )
+      if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+        setVerifierPK(advertisementPayload, scanResponsePayload)
+        central.connect(device)
+        connectionState = VerifierConnectionState.CONNECTING
+      } else {
+        Log.d(
+          logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
+        )
+      }
     }
   }
 
@@ -130,9 +145,16 @@ class Wallet(
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
-    Log.d(logTag, "onDeviceConnected")
-    walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
-    central.discoverServices()
+    synchronized(connectionMutex) {
+      Log.d(logTag, "on Verifier device connected")
+      connectionState = VerifierConnectionState.CONNECTED
+
+      Log.d(logTag, "stopping scan for verifiers")
+      central.stopScan()
+
+      walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
+      central.discoverServices()
+    }
   }
 
   override fun onServicesDiscovered(serviceUuids: List<UUID>) {
@@ -202,9 +224,13 @@ class Wallet(
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
     //TODO: Close and send event to higher layer
   }
+
   override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
-    if(!isManualDisconnect) {
-      eventResponseListener("onDisconnected")
+    synchronized(connectionMutex) {
+      connectionState = VerifierConnectionState.NOT_CONNECTED
+      if (!isManualDisconnect) {
+        eventResponseListener("onDisconnected")
+      }
     }
   }
 
