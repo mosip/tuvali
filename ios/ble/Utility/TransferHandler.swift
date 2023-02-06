@@ -71,14 +71,14 @@ class TransferHandler {
     private func sendRetryRespChunk(missingChunks: [Int]) {
         for chunkIndex in missingChunks {
             let chunk = chunker?.getChunkWithIndex(index: chunkIndex)
-            Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.responseCharacteristic, data: chunk!)
+            Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk!)
             // checks if no more missing chunks exist on verifier
         }
         sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT, data: nil))
     }
     private func requestTransmissionReport() {
         var notifyObj: Data
-        Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.semaphoreCharacteristic, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
+        Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
         print("transmission report requested")
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
@@ -126,7 +126,7 @@ class TransferHandler {
         let decimalString = String(size)
         let d = decimalString.data(using: .utf8)
         print(d!)
-        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.responseSizeCharacteristic, data: d!)
+        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: d!)
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS, data: data))
@@ -142,7 +142,7 @@ class TransferHandler {
         if let chunker = chunker {
             while !chunker.isComplete() {
                 let chunk = chunker.next()
-                Central.shared.writeWithoutResp(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.responseCharacteristic, data: chunk)
+                Central.shared.writeWithoutResp(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk)
                 Thread.sleep(forTimeInterval: 0.020)
             }
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
