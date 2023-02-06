@@ -6,8 +6,6 @@ class TransferHandler {
     private var currentState: States = States.UnInitialised
     private var responseStartTimeInMillis: UInt64 = 0
     private var chunker: Chunker?
-    private var chunkCounter = 0
-    private var isRetryFrame = false
 
     public static var shared = TransferHandler()
 
@@ -21,6 +19,7 @@ class TransferHandler {
     deinit{
         print("deinit happend in transferh")
     }
+
     private func handleMessage(msg: imessage) {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data!
@@ -54,28 +53,17 @@ class TransferHandler {
             var handleTransmissionReportMessage = msg.data
             handleTransmissionReport(report: handleTransmissionReportMessage!)
         } else if msg.msgType == .RESPONSE_CHUNK_WRITE_SUCCESS {
-            // send retry resp chunk or resp chunk
-            if (isRetryFrame) {
-                // sendRetryRespChunk()
-            } else {
-                sendResponseChunk()
-                chunkCounter+=1
-            }
+            // NoOp: iOS lacks support for writeWithoutResponse callbacks unlike Android
         } else if msg.msgType == .RESPONSE_CHUNK_WRITE_FAILURE {
-            sendMessage(message: imessage(msgType: .RESPONSE_CHUNK_WRITE_FAILURE, data: msg.data))
+            // NoOp: might need to use this later when sent with resp
+            print("response chunk write failed")
         } else if msg.msgType == .RESPONSE_TRANSFER_COMPLETE {
             currentState = States.TransferComplete
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
         } else if msg.msgType == .RESPONSE_TRANSFER_FAILED {
-            // handle failures?
             currentState = States.ResponseWriteFailed
-            handleTransmissionReport(report: msg.data!)
-        } else if msg.msgType == .INIT_RETRY_TRANSFER {
-            isRetryFrame = true
-            // create a RetryChunker object
-            // sendRetryRespChunk()
-        }
-        else {
+            // TODO: should response transfer be retried
+        } else {
             print("out of scope")
         }
     }
@@ -97,10 +85,9 @@ class TransferHandler {
             if let notifyObj = notification.userInfo?["report"] as? Data {
                 sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: notifyObj))
             } else {
-                print("weird reason!!")
+                print("invalid report")
             }
         }
-
     }
 
     private func handleTransmissionReport(report: Data) {
@@ -128,6 +115,9 @@ class TransferHandler {
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
             sendRetryRespChunk(missingChunks: r.missingSequences!)
+        } else {
+            print("handle transfer report parsing, report-type=\(r.type)")
+            sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: nil, dataSize: 0))
         }
     }
 
