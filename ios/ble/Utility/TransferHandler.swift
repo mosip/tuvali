@@ -95,7 +95,7 @@ class TransferHandler {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             if let notifyObj = notification.userInfo?["report"] as? Data {
-                sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: notifyObj))
+                sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: notifyObj))
             } else {
                 print("weird reason!!")
             }
