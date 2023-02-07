@@ -14,6 +14,7 @@ import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
 import kotlin.math.ceil
+import kotlin.math.min
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = "TransferHandler"
@@ -57,28 +58,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
         when(remoteRequestedTransferReportMessage.semaphoreCharValue) {
           Semaphore.SemaphoreMarker.RequestReport.ordinal -> {
-            var transferReport: TransferReport
-            if (assembler?.isComplete() == true) {
-              Log.d(logTag, "success frame: transfer completed")
-              transferReport = TransferReport(TransferReport.ReportType.SUCCESS, 0, null)
-            } else {
-              val missedSequenceNumbers = assembler?.getMissedSequenceNumbers()
-              val missedCount = missedSequenceNumbers?.size
-              val totalPages:Double = ceil(missedCount!!.toDouble()/defaultTransferReportPageSize)
-              Log.d(logTag, "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages")
-              transferReport = if (missedCount < defaultTransferReportPageSize) {
-                TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until missedCount))
-              } else {
-                TransferReport(TransferReport.ReportType.MISSING_CHUNKS, totalPages.toInt(), missedSequenceNumbers.sliceArray(0 until defaultTransferReportPageSize))
-              }
-            }
-            transferListener.sendDataOverNotification(GattService.SEMAPHORE_CHAR_UUID, transferReport.toByteArray())
+            handleTransferReportRequest()
           }
           Semaphore.SemaphoreMarker.Error.ordinal -> {
-            transferListener.onResponseReceivedFailed("received error on semaphore from remote")
+            transferListener.onResponseReceivedFailed("received error on transfer summary request char from remote")
           }
           else -> {
-            transferListener.onResponseReceivedFailed("unknown value received on semaphore from remote")
+            transferListener.onResponseReceivedFailed("unknown value received on transfer summary request char from remote: ${remoteRequestedTransferReportMessage.semaphoreCharValue}")
           }
         }
       }
@@ -90,11 +76,44 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
         val responseTransferFailedMessage = msg.obj as ResponseTransferFailedMessage
-        Log.d(logTag, "handleMessage: response transfer failed")
+        Log.d(logTag, "handleMessage: response transfer failed with errMsg: ${responseTransferFailedMessage.errorMsg}")
         transferListener.onResponseReceivedFailed(responseTransferFailedMessage.errorMsg)
         currentState = States.ResponseReadFailed
       }
     }
+  }
+
+  private fun handleTransferReportRequest() {
+    if (assembler?.isComplete() == true) {
+      Log.d(logTag, "success frame: transfer completed")
+      val transferReport = TransferReport(TransferReport.ReportType.SUCCESS, 0, null)
+      transferListener.sendDataOverNotification(
+        GattService.SEMAPHORE_CHAR_UUID,
+        transferReport.toByteArray()
+      )
+      this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
+      return
+    }
+
+    val missedSequenceNumbers = assembler?.getMissedSequenceNumbers()
+    val missedCount = missedSequenceNumbers?.size
+    val totalPages: Double = ceil(missedCount!!.toDouble() / defaultTransferReportPageSize)
+
+    Log.d(
+      logTag,
+      "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages"
+    )
+
+    val transferReport =TransferReport(
+      TransferReport.ReportType.MISSING_CHUNKS,
+      totalPages.toInt(),
+      missedSequenceNumbers.sliceArray(0 until min(defaultTransferReportPageSize, missedCount))
+    )
+
+    transferListener.sendDataOverNotification(
+      GattService.SEMAPHORE_CHAR_UUID,
+      transferReport.toByteArray()
+    )
   }
 
   private fun assembleChunk(chunkData: ByteArray) {
@@ -103,13 +122,6 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
 //    Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
-
-    if (assembler?.isComplete() == true) {
-      if (assembler?.data() == null){
-        return this.sendMessage(ResponseTransferFailedMessage("assembler is complete data is null"))
-      }
-      this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
-    }
   }
 
   fun sendMessage(msg: IMessage) {

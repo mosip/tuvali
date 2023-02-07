@@ -181,7 +181,7 @@ class Verifier(
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         //TODO: Can re-send report if failed to send notification with exponential backoff
-        Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
+        Log.d(logTag, "transfer summary report notification sent status $isSent on uuid: $uuid")
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
