@@ -1,5 +1,7 @@
 package io.mosip.tuvali.cryptography;
 
+import org.bouncycastle.crypto.InvalidCipherTextException;
+
 /*
 vk: verifier key
 wk: wallet key
@@ -25,13 +27,13 @@ class SenderTransfersOwnershipOfData implements SecretsTranslator {
     }
 
     @Override
-    public byte[] encryptToSend(byte[] plainText) {
+    public byte[] encryptToSend(byte[] plainText) throws InvalidCipherTextException {
         byte[] encrypt = receiverCipherBox.encrypt(plainText);
         return encrypt;
     }
 
     @Override
-    public byte[] decryptUponReceive(byte[] cipherText) {
+    public byte[] decryptUponReceive(byte[] cipherText) throws InvalidCipherTextException {
         byte[] plainText = senderCipherBox.decrypt(cipherText);
         return plainText;
     }

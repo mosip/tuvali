@@ -16,6 +16,7 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.*
+import org.bouncycastle.crypto.InvalidCipherTextException
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
@@ -180,7 +181,7 @@ class Verifier(
     when (uuid) {
       GattService.SEMAPHORE_CHAR_UUID -> {
         //TODO: Can re-send report if failed to send notification with exponential backoff
-        Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
+        Log.d(logTag, "transfer summary report notification sent status $isSent on uuid: $uuid")
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
@@ -223,15 +224,19 @@ class Verifier(
 
   override fun onResponseReceived(data: ByteArray) {
 //    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
-    val decryptedData = secretsTranslator?.decryptUponReceive(data)
-    if (decryptedData != null) {
-      Log.d(logTag, "decryptedData size: ${decryptedData.size}")
-      val decompressedData = Util.decompress(decryptedData)
-      Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-      messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
-    } else {
-      Log.e(logTag, "failed to decrypt data with size: ${data.size}")
-      // TODO: Handle error
+    try {
+      val decryptedData = secretsTranslator?.decryptUponReceive(data)
+      if (decryptedData != null) {
+        Log.d(logTag, "decryptedData size: ${decryptedData.size}")
+        val decompressedData = Util.decompress(decryptedData)
+        Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
+        messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
+      } else {
+        Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
+        // TODO: Handle error
+      }
+    } catch (e: Exception) {
+        Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
 

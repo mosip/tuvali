@@ -86,7 +86,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_WRITE_FAILURE.ordinal -> {
         val responseChunkWriteFailureMessage = msg.obj as ResponseChunkWriteFailureMessage
-        this.sendMessage(ResponseTransferFailureMessage("chunk write failed with err: ${responseChunkWriteFailureMessage.err}"))
+        Log.e(logTag, "chunk write failed with err: ${responseChunkWriteFailureMessage.err}")
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         // TODO: Let higher level know

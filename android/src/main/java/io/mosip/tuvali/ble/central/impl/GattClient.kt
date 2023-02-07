@@ -170,6 +170,7 @@ class GattClient(var context: Context) {
       bluetoothGattCallback,
       BluetoothDevice.TRANSPORT_LE
     )
+    // TODO: In case device is never connected, how do we know?
 
     gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH)
     gatt.readPhy()
