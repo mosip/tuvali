@@ -326,14 +326,18 @@ class Wallet(
     Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
     val compressedBytes = Util.compress(dataInBytes)
     Log.i(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
-    val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
-    if (encryptedData != null) {
-      //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
-      transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
-    } else {
-      Log.e(
-        logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
-      )
+    try {
+      val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
+      if (encryptedData != null) {
+        //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
+        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
+      } else {
+        Log.e(
+          logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
+        )
+      }
+    } catch (e: Exception) {
+        Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
 }

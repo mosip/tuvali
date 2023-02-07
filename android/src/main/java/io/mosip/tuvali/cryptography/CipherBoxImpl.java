@@ -19,30 +19,22 @@ class CipherBoxImpl implements CipherBox {
     }
 
     @Override
-    public byte[] encrypt(byte[] plainText) {
-
+    public byte[] encrypt(byte[] plainText) throws InvalidCipherTextException {
         return process(plainText, true, macSizeInBits);
     }
 
     @Override
-    public byte[] decrypt(byte[] cipherText) {
+    public byte[] decrypt(byte[] cipherText) throws InvalidCipherTextException {
         return process(cipherText, false, macSizeInBits);
     }
 
-    private byte[] process(byte[] payload, boolean forEncryption, int macSize) {
+    private byte[] process(byte[] payload, boolean forEncryption, int macSize) throws InvalidCipherTextException {
         GCMBlockCipher gcmBlockCipher = initialiseAESEngineWithGCM(forEncryption, macSize);
         byte[] output = new byte[gcmBlockCipher.getOutputSize(payload.length)];
         int length = gcmBlockCipher.processBytes(payload, 0, payload.length, output, 0);
-
-        try {
-            length += gcmBlockCipher.doFinal(output, length);
-
-            if (output.length != length)
-                throw new RuntimeException("encryption/decryption reported incorrect length");
-
-        } catch (InvalidCipherTextException e) {
-            e.printStackTrace();
-        }
+        length += gcmBlockCipher.doFinal(output, length);
+        if (output.length != length)
+            throw new RuntimeException("encryption/decryption reported incorrect length");
         return output;
     }
 
