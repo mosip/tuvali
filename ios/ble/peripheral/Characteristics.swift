@@ -42,9 +42,9 @@ let characteristicsMap: [String: CharacteristicTuple] = [
     "00002032-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
     "00002033-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
     "00002034-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
-    "00002035-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write, .read]), permissions: CBAttributePermissions([.writeable, .readable]), value: nil),
+    "00002035-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse]), permissions: CBAttributePermissions([.writeable]), value: nil),
     "00002036-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
-    "00002037-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.indicate, .read]), permissions: CBAttributePermissions([.readable]), value: nil),
+    "00002037-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
 ]
 
 struct NetworkCharNums {

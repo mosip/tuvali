@@ -75,7 +75,7 @@ class Wallet(
     )
   }
 
-  fun writeIdentity() {
+  fun writeToIdentifyRequest() {
     val publicKey = walletCryptoBox.publicKey()
     secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
     val iv = secretsTranslator?.initializationVector()

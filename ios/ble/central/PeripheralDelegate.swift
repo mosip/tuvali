@@ -103,8 +103,8 @@ extension Central: CBPeripheralDelegate {
             let verificationStatus = characteristic.value as Data?
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.VERIFICATION_STATUS_RESPONSE.rawValue), object: nil, userInfo: ["status": verificationStatus])
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
-            let connectionStatus = characteristic.value as Data?
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["connectionStatus": connectionStatus])
+            let disconnectStatus = characteristic.value as Data?
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
         }
     }
 
