@@ -11,16 +11,15 @@ import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.Semaphore
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.*
-import org.bouncycastle.crypto.InvalidCipherTextException
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
-
 
 class Verifier(
   context: Context,
@@ -38,6 +37,7 @@ class Verifier(
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
+  private var negotiatedMTUSize = DEFAULT_CHUNK_SIZE
 
   //TODO: Update UUIDs as per specification
   companion object {
@@ -164,7 +164,7 @@ class Verifier(
           Log.d(logTag, "received response size on characteristic value: ${String(value)}")
           val responseSize: Int = String(value).toInt()
           Log.d(logTag, "received response size on characteristic: $responseSize")
-          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
+          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, negotiatedMTUSize)
           transferHandler.sendMessage(responseSizeReadSuccessMessage)
         }
       }
@@ -213,6 +213,11 @@ class Verifier(
       it()
       callbacks.remove(PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK)
     }
+  }
+
+  override fun onMTUChanged(mtu: Int) {
+    Log.d(logTag, "onMTUChanged: $mtu bytes")
+    negotiatedMTUSize = mtu
   }
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {

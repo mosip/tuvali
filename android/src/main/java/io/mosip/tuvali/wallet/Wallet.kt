@@ -44,7 +44,8 @@ class Wallet(
   private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   private var central: Central
-  private val maxMTU = 517
+  //Reduced 2 from 517 to be on safer side
+  private val maxMTU = 515
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
 

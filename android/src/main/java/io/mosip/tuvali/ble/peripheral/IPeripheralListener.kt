@@ -10,4 +10,5 @@ interface IPeripheralListener {
   fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean)
   fun onSendDataNotified(uuid: UUID, isSent: Boolean)
   fun onClosed()
+  fun onMTUChanged(mtu: Int)
 }
