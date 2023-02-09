@@ -144,7 +144,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
       }
       NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
         callback()
-        wallet?.writeIdentity()
+        wallet?.writeToIdentifyRequest()
       }
       NearbyEvents.SEND_VC.value -> {
         callback()

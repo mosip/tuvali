@@ -6,7 +6,7 @@ import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.transfer.Assembler
-import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -49,22 +49,22 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         }
         currentState = States.ResponseReadPending
       }
-      // On verifier side, we can wait on response char, instead of semaphore to know when chunk arrived
+      // On verifier side, we can wait on response char, instead of transfer report request to know when chunk arrived
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_RECEIVED.ordinal -> {
         val responseChunkReceivedMessage = msg.obj as ResponseChunkReceivedMessage
         assembleChunk(responseChunkReceivedMessage.chunkData)
       }
       IMessage.TransferMessageTypes.REMOTE_REQUESTED_TRANSFER_REPORT.ordinal -> {
         val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
-        when(remoteRequestedTransferReportMessage.semaphoreCharValue) {
-          Semaphore.SemaphoreMarker.RequestReport.ordinal -> {
+        when(remoteRequestedTransferReportMessage.transferReportRequestCharValue) {
+          TransferReportRequest.ReportType.RequestReport.ordinal -> {
             handleTransferReportRequest()
           }
-          Semaphore.SemaphoreMarker.Error.ordinal -> {
+          TransferReportRequest.ReportType.Error.ordinal -> {
             transferListener.onResponseReceivedFailed("received error on transfer summary request char from remote")
           }
           else -> {
-            transferListener.onResponseReceivedFailed("unknown value received on transfer summary request char from remote: ${remoteRequestedTransferReportMessage.semaphoreCharValue}")
+            transferListener.onResponseReceivedFailed("unknown value received on transfer summary request char from remote: ${remoteRequestedTransferReportMessage.transferReportRequestCharValue}")
           }
         }
       }
@@ -88,7 +88,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       Log.d(logTag, "success frame: transfer completed")
       val transferReport = TransferReport(TransferReport.ReportType.SUCCESS, 0, null)
       transferListener.sendDataOverNotification(
-        GattService.SEMAPHORE_CHAR_UUID,
+        GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID,
         transferReport.toByteArray()
       )
       this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
@@ -111,7 +111,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     )
 
     transferListener.sendDataOverNotification(
-      GattService.SEMAPHORE_CHAR_UUID,
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID,
       transferReport.toByteArray()
     )
   }

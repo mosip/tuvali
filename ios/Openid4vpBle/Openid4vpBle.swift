@@ -69,7 +69,7 @@ class Openid4vpBle: RCTEventEmitter {
         case "exchange-sender-info":
             print("EXCHANGE-SENDER-INFO")
             callback([])
-            Wallet.shared.writeIdentity()
+            Wallet.shared.writeToIdentifyRequest()
         case "send-vc":
             callback([])
             print(">> raw message size", messageComponents[1].count)
