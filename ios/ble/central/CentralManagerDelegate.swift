@@ -32,6 +32,7 @@ extension Central {
     func centralManager(_ central: CBCentralManager, didDisconnectPeripheral peripheral: CBPeripheral, error: Error?) {
         os_log("Peripheral disconnected")
         self.connectedPeripheral = nil
+        Wallet.shared.onDeviceDisconnected(isManualDisconnect: false)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {

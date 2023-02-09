@@ -48,7 +48,7 @@ extension Central: CBPeripheralDelegate {
             self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
             // subscribe to the characteristics for (2036, 2037)
             if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID ||
-                characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID
+                characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID || characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID
             {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
