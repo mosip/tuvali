@@ -20,6 +20,7 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
+import io.mosip.tuvali.wallet.exception.WalletExceptionHandler
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -30,7 +31,8 @@ import java.util.*
 class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val errorEventListener: (String) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = "Wallet"
 
@@ -59,6 +61,16 @@ class Wallet(
     central = Central(context, this@Wallet)
     handlerThread.start()
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
+
+    val walletExceptionHandler = WalletExceptionHandler(this::sendError)
+
+    Thread.setDefaultUncaughtExceptionHandler { _, exception ->
+      walletExceptionHandler.handleWalletException(exception)
+    }
+  }
+
+  private fun sendError(message: String) {
+    errorEventListener(message)
   }
 
   fun stop(onDestroy: Callback) {

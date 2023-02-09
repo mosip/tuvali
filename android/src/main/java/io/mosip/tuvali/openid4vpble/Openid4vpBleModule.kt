@@ -60,7 +60,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     synchronized(mutex) {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
+        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::emitNearbyErrorEvent )
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")
@@ -166,6 +166,13 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     val writableMap = Arguments.createMap()
     writableMap.putString("data", "$eventType\n${data}")
     writableMap.putString("type", "msg")
+    emitEvent("EVENT_NEARBY", writableMap)
+  }
+
+  private fun emitNearbyErrorEvent(message: String) {
+    val writableMap = Arguments.createMap()
+    writableMap.putString("message", message)
+    writableMap.putString("type", "onError")
     emitEvent("EVENT_NEARBY", writableMap)
   }
 
