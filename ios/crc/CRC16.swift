@@ -10,7 +10,7 @@ class CRC {
         let crc = CrcSwift.computeCrc16(
             d,
             initialCrc: 0x0000,
-            polynomial: 0x1021,
+            polynom: 0x1021,
             xor: 0x0000,
             refIn: true,
             refOut: true
