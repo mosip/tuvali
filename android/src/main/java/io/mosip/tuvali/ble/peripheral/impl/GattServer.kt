@@ -89,7 +89,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     Log.d(logTag, "onCharacteristicWriteRequest: requestId: ${requestId}, preparedWrite: ${preparedWrite}, responseNeeded: ${responseNeeded}, offset: ${offset}, dataSize: ${value?.size}")
     onReceivedWriteCallback(characteristic, value)
     if (responseNeeded) {
-      gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+      val response = gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+      Log.d(logTag, "onCharacteristicWriteRequest: didResponseSent: ${response}")
     }
   }
 
