@@ -4,6 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
+const val HEADERS_SIZE_IN_MTU = 3
 
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
@@ -16,7 +17,7 @@ class Controller(val context: Context) {
 
   fun setupGattService(gattServiceMessage: SetupGattServiceMessage) {
     gattServer = GattServer(context)
-    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite)
+    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onMTUChanged)
     gattServer.addService(gattServiceMessage.service, this::onServiceAdded)
   }
 
@@ -71,6 +72,11 @@ class Controller(val context: Context) {
   private fun onReceivedWrite(characteristic: BluetoothGattCharacteristic?, value: ByteArray?) {
     val receivedWriteMessage = ReceivedWriteMessage(characteristic, value)
     messageSender.sendMessage(receivedWriteMessage)
+  }
+
+  private fun onMTUChanged(mtu: Int) {
+    val mtuChangedMessage = MtuChangedMessage(mtu - HEADERS_SIZE_IN_MTU)
+    messageSender.sendMessage(mtuChangedMessage)
   }
 
   fun closeServer() {

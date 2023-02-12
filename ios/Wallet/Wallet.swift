@@ -95,7 +95,11 @@ class Wallet: NSObject {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
                 transferHandler.initialize(initdData: encryptedData!)
-                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
+                var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
+                if currentMTUSize == nil || currentMTUSize! < 0 {
+                   currentMTUSize = BLEConstants.DEFAULT_CHUNK_SIZE
+                }
+                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!, mtuSize: currentMTUSize)
                 transferHandler.sendMessage(message: imsgBuilder)
             }
         }
