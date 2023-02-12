@@ -40,9 +40,9 @@ class Wallet: NSObject {
     }
 
     func lookForDestroyConnection(){
-        registerCallbackForEvent(event: NotificationEvent.CONNECTION_STATUS_CHANGE) { notification in
+        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
             print("Handling notification for \(notification.name.rawValue)")
-            if let notifyObj = notification.userInfo?["connectionStatus"] as? Data {
+            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
                 let connStatusID = Int(notifyObj[0])
                     if connStatusID == 1 {
                         print("con statusid:", connStatusID)
@@ -105,16 +105,16 @@ class Wallet: NSObject {
         }
     }
 
-    func writeIdentity() {
-        print("::: write idendity called ::: ")
+    func writeToIdentifyRequest() {
+        print("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
         print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            print("Write Identity - Found NO KEY")
+            print("Write Identify - Found NO KEY")
             return
         }
         var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
+        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
         registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
             EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         }

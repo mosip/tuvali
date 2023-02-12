@@ -8,21 +8,21 @@ extension Central: CBPeripheralDelegate {
             retryServicesDiscovery(peripheral)
             return
         }
-        
+
         guard let peripheralServices = peripheral.services else {
             retryServicesDiscovery(peripheral)
             return
         }
-        
+
         let serviceUUIDS = peripheralServices.map({ service in
             return service.uuid
         })
-        
+
         if !serviceUUIDS.contains(Peripheral.SERVICE_UUID) {
             retryServicesDiscovery(peripheral)
             return
         }
-        
+
         for service in peripheralServices where Peripheral.SERVICE_UUID == service.uuid {
             peripheral.discoverCharacteristics(CharacteristicIds.allCases.map{CBUUID(string: $0.rawValue)}, for: service)
         }
@@ -42,13 +42,13 @@ extension Central: CBPeripheralDelegate {
         for characteristic in serviceCharacteristics {
             // store a reference to the discovered characteristic in the Central for write.
             print("Characteristic UUID:: ", characteristic.uuid.uuidString)
-            if characteristic.uuid == NetworkCharNums.responseCharacteristic {
+            if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
                 // BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withoutResponse)
             }
             self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
-            // subscribe to the characteristics for (2035, 2036, 2037)
-            if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic ||
-                characteristic.uuid == NetworkCharNums.verificationStatusCharacteristic
+            // subscribe to the characteristics for (2036, 2037)
+            if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID ||
+                characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID
             {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
@@ -56,8 +56,8 @@ extension Central: CBPeripheralDelegate {
 
         NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.CREATE_CONNECTION.rawValue), object: nil)
     }
-    
-    
+
+
     func retryServicesDiscovery(_ peripheral : CBPeripheral){
         if retryStrategy.shouldRetry() {
             let waitTime = retryStrategy.getWaitTime()
@@ -72,7 +72,7 @@ extension Central: CBPeripheralDelegate {
             return
         }
     }
-    
+
     func retryCharacteristicsDiscovery(_ peripheral : CBPeripheral, _ service : CBService){
         if retryStrategy.shouldRetry() {
             let waitTime = retryStrategy.getWaitTime()
@@ -94,21 +94,17 @@ extension Central: CBPeripheralDelegate {
             os_log("Unable to recieve updates from device: %s", error.localizedDescription)
             return
         }
-        if characteristic.uuid == NetworkCharNums.semaphoreCharacteristic {
+        if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID {
             let report = characteristic.value as Data?
             print("ts report is :::", report)
             // TODO: figure out why object isn't sent out across
             NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, userInfo: ["report": report])
-        }
-
-        if characteristic.uuid == NetworkCharNums.verificationStatusCharacteristic {
+        } else if characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID {
             let verificationStatus = characteristic.value as Data?
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.VERIFICATION_STATUS_RESPONSE.rawValue), object: nil, userInfo: ["status": verificationStatus])
-        }
-
-        if characteristic.uuid == NetworkCharNums.connectionStatusChangeCharacteristic {
-            let connectionStatus = characteristic.value as Data?
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.CONNECTION_STATUS_CHANGE.rawValue), object: nil, userInfo: ["connectionStatus": connectionStatus])
+        } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
+            let disconnectStatus = characteristic.value as Data?
+            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
         }
     }
 
@@ -117,12 +113,11 @@ extension Central: CBPeripheralDelegate {
             os_log("Unable to write to characteristic: %@", error.localizedDescription)
         }
 
-        if characteristic.uuid == NetworkCharNums.identifyRequestCharacteristic {
+        if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.EXCHANGE_RECEIVER_INFO.rawValue), object: nil)
-        }
-        if characteristic.uuid == NetworkCharNums.responseSizeCharacteristic {
+        } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.RESPONSE_SIZE_WRITE_SUCCESS.rawValue), object: nil)
-        } else if characteristic.uuid == NetworkCharNums.responseCharacteristic {
+        } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
             NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.INIT_RESPONSE_CHUNK_TRANSFER.rawValue), object: nil)
         }
     }
