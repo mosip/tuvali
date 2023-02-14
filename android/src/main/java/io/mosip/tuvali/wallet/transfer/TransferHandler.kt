@@ -5,6 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
+import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -158,6 +159,15 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     Log.d(logTag, "initResponseChunkSend")
     val initResponseChunkTransferMessage = InitResponseChunkTransferMessage()
     this.sendMessage(initResponseChunkTransferMessage)
+  }
+
+  override fun dispatchMessage(msg: Message) {
+    try {
+      super.dispatchMessage(msg)
+    } catch (e: Throwable) {
+      transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
+      Log.d(logTag, "dispatchMessage " + e.message)
+    }
   }
 
   fun sendMessage(msg: IMessage) {

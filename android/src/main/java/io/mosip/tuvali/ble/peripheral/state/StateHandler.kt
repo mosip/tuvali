@@ -8,9 +8,8 @@ import android.util.Log
 import com.facebook.common.util.Hex
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
-import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
+import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 
 
 class StateHandler(
@@ -33,15 +32,6 @@ class StateHandler(
   }
 
   private var currentState: States = States.Init
-
-  override fun dispatchMessage(msg: Message) {
-    try {
-      super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
-    }
-  }
 
   override fun handleMessage(msg: Message) {
     // TODO: Figure out how to enforce exhaustive checks here
@@ -160,6 +150,15 @@ class StateHandler(
         currentState = States.Closed
         peripheralListener.onClosed()
       }
+    }
+  }
+
+  override fun dispatchMessage(msg: Message) {
+    try {
+      super.dispatchMessage(msg)
+    } catch (e: Throwable) {
+      peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e))
+      Log.d(logTag, "dispatchMessage " + e.message)
     }
   }
 

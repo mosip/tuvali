@@ -8,7 +8,7 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
-import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
+import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
 
 class StateHandler(
   looper: Looper,

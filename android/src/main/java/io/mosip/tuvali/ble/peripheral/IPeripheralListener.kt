@@ -1,6 +1,5 @@
 package io.mosip.tuvali.ble.peripheral
 
-import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
 import java.util.UUID
 
 interface IPeripheralListener {
@@ -12,5 +11,5 @@ interface IPeripheralListener {
   fun onSendDataNotified(uuid: UUID, isSent: Boolean)
   fun onClosed()
   fun onMTUChanged(mtu: Int)
-  fun onException(e: StateHandlerException)
+  fun onException(exception: Throwable)
 }
