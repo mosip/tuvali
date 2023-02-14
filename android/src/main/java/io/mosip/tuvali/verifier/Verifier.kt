@@ -170,7 +170,7 @@ class Verifier(
       }
       GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         if (value != null) {
-          Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
+          //Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
           transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
         }
       }
@@ -228,7 +228,7 @@ class Verifier(
   }
 
   override fun onResponseReceived(data: ByteArray) {
-//    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
+    Log.d(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
     try {
       val decryptedData = secretsTranslator?.decryptUponReceive(data)
       if (decryptedData != null) {

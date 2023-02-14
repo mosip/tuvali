@@ -142,6 +142,7 @@ class TransferHandler {
         if let chunker = chunker {
             while !chunker.isComplete() {
                 let chunk = chunker.next()
+                print("SequenceNumber: \(Array(chunk.prefix(2))) , Sha256: \(chunk.sha256())")
                 Central.shared.writeWithoutResp(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk)
                 Thread.sleep(forTimeInterval: 0.020)
             }

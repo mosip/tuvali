@@ -141,7 +141,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
     val chunkArray = chunker?.next()
     if (chunkArray != null) {
-      Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkArray)}")
+      Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, Sha256: ${Util.getSha256(chunkArray)}")
       writeResponseChunk(chunkArray)
     }
   }

@@ -6,7 +6,7 @@ import os
 class Central: NSObject, CBCentralManagerDelegate {
 
     var retryStrategy : BackOffStrategy = BackOffStrategy(MAX_RETRY_LIMIT: 10)
-    
+
     private var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
@@ -63,7 +63,7 @@ class Central: NSObject, CBCentralManagerDelegate {
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
-            print("wrote some data without resp")
+            //print("wrote some data without resp")
         }
     }
 }
