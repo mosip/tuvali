@@ -251,6 +251,8 @@ class Verifier(
       }
     } catch (e: Exception) {
         Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+        //Re-Throwing for the exception handler to handle this again and let Higher layer know.
+        throw e;
     }
   }
 
