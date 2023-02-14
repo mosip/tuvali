@@ -130,7 +130,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   }
 
   private fun requestTransmissionReport() {
-    central.write(serviceUUID, GattService.SEMAPHORE_CHAR_UUID, byteArrayOf(Semaphore.SemaphoreMarker.RequestReport.ordinal.toByte()))
+    central.write(serviceUUID, GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID, byteArrayOf(TransferReportRequest.ReportType.RequestReport.ordinal.toByte()))
   }
 
   private fun sendResponseChunk() {
@@ -141,7 +141,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
     val chunkArray = chunker?.next()
     if (chunkArray != null) {
-      Log.d(logTag, "sequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, chunk sha256: ${Util.getSha256(chunkArray)}")
+      Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, Sha256: ${Util.getSha256(chunkArray)}")
       writeResponseChunk(chunkArray)
     }
   }
@@ -149,7 +149,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   private fun writeResponseChunk(chunkArray: ByteArray) {
     central.write(
       serviceUUID,
-      GattService.RESPONSE_CHAR_UUID,
+      GattService.SUBMIT_RESPONSE_CHAR_UUID,
       chunkArray
     )
   }

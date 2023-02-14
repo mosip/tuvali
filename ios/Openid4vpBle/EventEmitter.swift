@@ -18,9 +18,9 @@ class EventEmitter {
     }
     
     func emitNearbyEvent(event: String) {
-        var eventData : [String: String] = [:]
-        eventData["type"] = event
-        dispatch(name: "EVENT_NEARBY", body: eventData)
+        let writableMap = NSMutableDictionary()
+        writableMap["type"] = event
+        dispatch(name: "EVENT_NEARBY", body: writableMap)
     }
     
     func emitNearbyMessage(event: String, data: String) {
@@ -37,6 +37,7 @@ class EventEmitter {
             "EVENT_LOG",
             "exchange-receiver-info",
             "send-vc:response",
+            "onDisconnected",
         ]
     }()
 }
