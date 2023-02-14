@@ -38,7 +38,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String) -> Unit, private
   }
 
   private fun handleUnknownException(e: Throwable) {
-    Log.e(logcat, "Wallet got an unknown exception: $e")
+    Log.e(logcat, "Got an unknown exception: $e")
     sendError(e.message ?: "Something went wrong in BLE: ${e.cause}")
   }
 }
