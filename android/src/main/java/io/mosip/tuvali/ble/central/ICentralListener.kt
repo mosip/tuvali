@@ -2,6 +2,7 @@ package io.mosip.tuvali.ble.central
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanRecord
+import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
 import java.util.*
 
 interface ICentralListener {
@@ -21,4 +22,5 @@ interface ICentralListener {
   fun onSubscriptionFailure(charUUID: UUID, err: Int)
   fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
   fun onClosed()
+  fun onException(stateHandlerException: StateHandlerException)
 }

@@ -5,10 +5,13 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.Log
+import com.facebook.common.util.Hex
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
+import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
-import com.facebook.common.util.Hex
+import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
+
 
 class StateHandler(
   looper: Looper,
@@ -30,6 +33,15 @@ class StateHandler(
   }
 
   private var currentState: States = States.Init
+
+  override fun dispatchMessage(msg: Message) {
+    try {
+      super.dispatchMessage(msg)
+    } catch (e: Throwable) {
+      peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e))
+      Log.d(logTag, "dispatchMessage " + e.message)
+    }
+  }
 
   override fun handleMessage(msg: Message) {
     // TODO: Figure out how to enforce exhaustive checks here
@@ -75,12 +87,12 @@ class StateHandler(
       }
       IMessage.PeripheralMessageTypes.DEVICE_NOT_CONNECTED.ordinal -> {
         val deviceNotConnectedMessage = msg.obj as DeviceNotConnectedMessage
-        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState} $currentState")
+        Log.d(logTag, "on device not connected: status: ${deviceNotConnectedMessage.status}, newState: ${deviceNotConnectedMessage.newState}")
 
         if(currentState == States.Closing) {
           this.sendMessage(CloseServerMessage())
         } else {
-          peripheralListener.onDeviceNotConnected(currentState >= States.Disconnecting, currentState == States.CommunicationReady)
+          peripheralListener.onDeviceNotConnected(currentState >= States.Disconnecting, currentState == States.ConnectedToDevice || currentState == States.CommunicationReady)
         }
         currentState = States.NotConnectedToDevice
       }

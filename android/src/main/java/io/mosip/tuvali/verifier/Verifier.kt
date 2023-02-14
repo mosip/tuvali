@@ -10,8 +10,9 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
-import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
 import io.mosip.tuvali.transfer.TransferReportRequest
+import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
@@ -24,7 +25,8 @@ import java.util.*
 class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val onBLEException: (Throwable) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -193,6 +195,10 @@ class Verifier(
     }
   }
 
+  override fun onException(e: StateHandlerException) {
+    onBLEException(e)
+  }
+
   override fun onClosed() {
     Log.d(logTag, "onClosed")
     peripheral.quitHandler()
@@ -221,7 +227,7 @@ class Verifier(
   }
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
-    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
+    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if(!isManualDisconnect && isConnected) {
       eventResponseListener("onDisconnected")
     }
