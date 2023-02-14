@@ -59,6 +59,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
   private fun onException(exception: Throwable){
     if(exception.cause != null){
+      Log.e(logTag, "Exception: ${exception.message}");
       walletExceptionHandler.handleException(exception.cause!!)
     } else {
       walletExceptionHandler.handleException(exception)

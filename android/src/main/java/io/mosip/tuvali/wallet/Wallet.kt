@@ -13,7 +13,6 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
-import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.retrymechanism.lib.BackOffStrategy
 import io.mosip.tuvali.transfer.TransferReport
@@ -21,7 +20,6 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
-import io.mosip.tuvali.wallet.exception.WalletException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -297,8 +295,8 @@ class Wallet(
     }
   }
 
-  override fun onException(stateHandlerException: StateHandlerException) {
-    onBLEException(stateHandlerException)
+  override fun onException(exception: Throwable) {
+    onBLEException(exception)
   }
 
   override fun onClosed() {

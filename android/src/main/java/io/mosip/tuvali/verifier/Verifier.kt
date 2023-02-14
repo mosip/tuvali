@@ -4,20 +4,22 @@ import android.content.Context
 import android.os.HandlerThread
 import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
+import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
-import com.facebook.react.bridge.Callback
-import io.mosip.tuvali.ble.peripheral.state.exception.StateHandlerException
-import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
+import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
-import io.mosip.tuvali.verifier.transfer.message.*
+import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage
+import io.mosip.tuvali.verifier.transfer.message.RemoteRequestedTransferReportMessage
+import io.mosip.tuvali.verifier.transfer.message.ResponseChunkReceivedMessage
+import io.mosip.tuvali.verifier.transfer.message.ResponseSizeReadSuccessMessage
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
@@ -195,7 +197,7 @@ class Verifier(
     }
   }
 
-  override fun onException(e: StateHandlerException) {
+  override fun onException(e: Throwable) {
     onBLEException(e)
   }
 
