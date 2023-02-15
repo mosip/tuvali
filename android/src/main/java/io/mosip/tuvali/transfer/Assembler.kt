@@ -8,7 +8,7 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   private val logTag = "Assembler"
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
-  private val totalChunkCount = getTotalChunkCount(totalSize)
+  val totalChunkCount = getTotalChunkCount(totalSize)
   private var chunkReceivedMarker = ByteArray(totalChunkCount.toInt())
   private val chunkReceivedMarkerByte: Byte = 1
 
