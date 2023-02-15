@@ -11,6 +11,7 @@ import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
+import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
 import kotlin.math.ceil
@@ -106,6 +107,10 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       logTag,
       "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages"
     )
+
+    if(assembler != null && missedCount > (0.7 * assembler!!.totalChunkCount)) {
+      throw TooManyFailureChunksException("Failing VC transfer as failure chunks are more than 70% of total chunks")
+    }
 
     val transferReport =TransferReport(
       TransferReport.ReportType.MISSING_CHUNKS,
