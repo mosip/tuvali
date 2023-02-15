@@ -14,6 +14,7 @@ import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
+import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage
@@ -23,6 +24,8 @@ import io.mosip.tuvali.verifier.transfer.message.ResponseSizeReadSuccessMessage
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
+
+private const val MIN_MTU_REQUIRED = 64
 
 class Verifier(
   context: Context,
@@ -225,6 +228,11 @@ class Verifier(
 
   override fun onMTUChanged(mtu: Int) {
     Log.d(logTag, "onMTUChanged: $mtu bytes")
+
+    if(mtu < MIN_MTU_REQUIRED){
+      throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")
+    }
+    
     negotiatedMTUSize = mtu
   }
 
