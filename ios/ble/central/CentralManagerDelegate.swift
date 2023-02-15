@@ -14,8 +14,8 @@ extension Central {
             print("adv data::", advertisementData, "scan resuly:::", scanResponseData)
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             print("veri pub key::", publicKeyData)
-            Wallet.shared.buildSecretTranslator(publicKeyData: publicKeyData)
             if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
+                Wallet.shared.buildSecretTranslator(publicKeyData: publicKeyData)
                 peripheral.delegate = self
                 central.connect(peripheral)
                 connectedPeripheral = peripheral
