@@ -38,10 +38,6 @@ class GattClient(var context: Context) {
         }
       }
       Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
-      Log.i(
-        logTag,
-        "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
-      )
 
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")

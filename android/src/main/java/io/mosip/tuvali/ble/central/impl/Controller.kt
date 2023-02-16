@@ -9,6 +9,8 @@ import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
 import java.util.UUID
 
+const val HEADERS_SIZE_IN_MTU = 3
+
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
   private var gattClient: GattClient? = null
@@ -111,7 +113,7 @@ class Controller(val context: Context) {
   }
 
   private fun onRequestMTUSuccess(mtu: Int) {
-    messageSender.sendMessage(RequestMTUSuccessMessage(mtu))
+    messageSender.sendMessage(RequestMTUSuccessMessage(mtu - HEADERS_SIZE_IN_MTU))
   }
 
   private fun onRequestMTUFailure(errorCode: Int) {
