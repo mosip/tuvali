@@ -36,7 +36,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   }
 
   private fun notifyDisconnect(serviceUUID: UUID) {
-    sendData(serviceUUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID, byteArrayOf(Verifier.DISCONNECT_STATUS.toByte()))
+    sendData(serviceUUID, GattService.DISCONNECT_CHAR_UUID, byteArrayOf(Verifier.DISCONNECT_STATUS.toByte()))
   }
 
   fun setupService(service: BluetoothGattService) {

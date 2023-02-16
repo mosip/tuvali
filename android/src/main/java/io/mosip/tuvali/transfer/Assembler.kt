@@ -27,7 +27,7 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
     val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
     val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
 
-    Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
+    //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
 
     if (chunkSizeGreaterThanMtuSize(chunkData)) {
       Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
@@ -52,7 +52,11 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   private fun chunkSizeGreaterThanMtuSize(chunkData: ByteArray) = chunkData.size > mtuSize
 
   fun isComplete(): Boolean {
-    return chunkReceivedMarker.none { it != chunkReceivedMarkerByte }
+    if(chunkReceivedMarker.none { it != chunkReceivedMarkerByte }) {
+      Log.d(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
+      return true
+    }
+    return false
   }
 
   fun getMissedSequenceNumbers(): IntArray {

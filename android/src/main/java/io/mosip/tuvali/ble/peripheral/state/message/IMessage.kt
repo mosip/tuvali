@@ -11,6 +11,8 @@ abstract class IMessage(val messageType: PeripheralMessageTypes) {
     DEVICE_CONNECTED,
     DEVICE_NOT_CONNECTED,
 
+    MTU_CHANGED,
+
     RECEIVED_WRITE,
     ENABLE_COMMUNICATION,
     SEND_DATA,

@@ -44,7 +44,7 @@ class Wallet(
   private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   private var central: Central
-  private val maxMTU = 517
+  private val maxMTU = 185
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
 
@@ -75,13 +75,13 @@ class Wallet(
     )
   }
 
-  fun writeIdentity() {
+  fun writeToIdentifyRequest() {
     val publicKey = walletCryptoBox.publicKey()
     secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
     val iv = secretsTranslator?.initializationVector()
     central.write(
       Verifier.SERVICE_UUID,
-      GattService.IDENTITY_CHARACTERISTIC_UUID,
+      GattService.IDENTIFY_REQUEST_CHAR_UUID,
       iv!! + publicKey!!
     )
     Log.d(
@@ -97,21 +97,36 @@ class Wallet(
     //TODO: Handle error
   }
 
+  private val connectionMutex = Object()
+  @Volatile private var connectionState = VerifierConnectionState.NOT_CONNECTED
+
+  private enum class VerifierConnectionState {
+    NOT_CONNECTED,
+    CONNECTING,
+    CONNECTED
+  }
+
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
-    val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
+    synchronized(connectionMutex) {
+      if (connectionState != VerifierConnectionState.NOT_CONNECTED) {
+        Log.d(
+          logTag, "Device found is ignored $device"
+        )
+        return
+      }
+      val scanResponsePayload =
+        scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+      val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
-    //TODO: Handle multiple calls while connecting
-    if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
-      Log.d(logTag, "Stopping the scan.")
-      central.stopScan()
-
-      setVerifierPK(advertisementPayload, scanResponsePayload)
-      central.connect(device)
-    } else {
-      Log.d(
-        logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
-      )
+      if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+        setVerifierPK(advertisementPayload, scanResponsePayload)
+        central.connect(device)
+        connectionState = VerifierConnectionState.CONNECTING
+      } else {
+        Log.d(
+          logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
+        )
+      }
     }
   }
 
@@ -130,9 +145,16 @@ class Wallet(
   }
 
   override fun onDeviceConnected(device: BluetoothDevice) {
-    Log.d(logTag, "onDeviceConnected")
-    walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
-    central.discoverServices()
+    synchronized(connectionMutex) {
+      Log.d(logTag, "on Verifier device connected")
+      connectionState = VerifierConnectionState.CONNECTED
+
+      Log.d(logTag, "stopping scan for verifiers")
+      central.stopScan()
+
+      walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
+      central.discoverServices()
+    }
   }
 
   override fun onServicesDiscovered(serviceUuids: List<UUID>) {
@@ -163,10 +185,9 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
-
     //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
-    central.subscribe(Verifier.SERVICE_UUID, GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID)
+    central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
 
     connectionEstablishedCallBack?.let {
       it()
@@ -181,19 +202,9 @@ class Wallet(
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
     Log.d(logTag, "Read from $charUUID successfully and value is $value")
-
-    when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
-      }
-    }
   }
 
-  override fun onReadFailure(charUUID: UUID?, err: Int) {
-    when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
-      }
-    }
-  }
+  override fun onReadFailure(charUUID: UUID?, err: Int) {}
 
   override fun onSubscriptionSuccess(charUUID: UUID) {
     // Do nothing
@@ -202,21 +213,25 @@ class Wallet(
   override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
     //TODO: Close and send event to higher layer
   }
+
   override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
-    if(!isManualDisconnect) {
-      eventResponseListener("onDisconnected")
+    synchronized(connectionMutex) {
+      connectionState = VerifierConnectionState.NOT_CONNECTED
+      if (!isManualDisconnect) {
+        eventResponseListener("onDisconnected")
+      }
     }
   }
 
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
 
-    when (charUUID) {
-      GattService.RESPONSE_CHAR_UUID -> {
+    when(charUUID) {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
-        transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+      transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
   }
@@ -226,17 +241,17 @@ class Wallet(
   override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
-      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_RECEIVER_INFO.value, "{\"deviceName\": \"Verifier\"}")
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
       }
-      GattService.RESPONSE_CHAR_UUID -> {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
-        central.subscribe(Verifier.SERVICE_UUID, GattService.SEMAPHORE_CHAR_UUID)
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+        central.subscribe(Verifier.SERVICE_UUID, GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID)
         central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
       }
     }
@@ -252,7 +267,7 @@ class Wallet(
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
     when (charUUID) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
         value?.let {
           transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
         }
@@ -268,7 +283,7 @@ class Wallet(
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
         central.disconnectAndClose()
       }
-      GattService.CONNECTION_STATUS_CHANGE_CHAR_UUID -> {
+      GattService.DISCONNECT_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
 
         if(status != null && status == DISCONNECT_STATUS) {
@@ -300,14 +315,19 @@ class Wallet(
     Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
     val compressedBytes = Util.compress(dataInBytes)
     Log.i(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
-    val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
-    if (encryptedData != null) {
-      //Log.d(logTag, "encryptedData size: ${encryptedData.size}, sha256: ${Util.getSha256(encryptedData)}")
-      transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
-    } else {
-      Log.e(
-        logTag, "failed to encrypt data with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
-      )
+    try {
+      val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
+      if (encryptedData != null) {
+        Log.d(logTag, "Complete Encrypted Data: ${Hex.toHexString(encryptedData)}")
+        Log.d(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
+        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
+      } else {
+        Log.e(
+          logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
+        )
+      }
+    } catch (e: Exception) {
+        Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
 }

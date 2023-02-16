@@ -13,20 +13,22 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var gattServer: BluetoothGattServer
   private var bluetoothDevice: BluetoothDevice? = null
 
+  private lateinit var onMTUChangedCallback: (Int) -> Unit
   private lateinit var onServiceAddedCallback: (Int) -> Unit
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
 
-
   fun start(
     onDeviceConnected: (Int, Int) -> Unit,
     onDeviceNotConnected: (Int, Int) -> Unit,
-    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
+    onReceivedWrite: (BluetoothGattCharacteristic?, ByteArray?) -> Unit,
+    onMTUChanged: (Int)  -> Unit
   ) {
     onDeviceConnectedCallback = onDeviceConnected
     onDeviceNotConnectedCallback = onDeviceNotConnected
     onReceivedWriteCallback = onReceivedWrite
+    onMTUChangedCallback = onMTUChanged
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
   }
@@ -69,6 +71,11 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     }
   }
 
+  override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
+    Log.d(logTag, "onMtuChanged: mtu: $mtu, device: $device")
+    onMTUChangedCallback(mtu)
+  }
+
   private fun setPhy(bluetoothDevice: BluetoothDevice) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       gattServer.readPhy(bluetoothDevice)
@@ -86,10 +93,11 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     offset: Int,
     value: ByteArray?
   ) {
-    Log.d(logTag, "onCharacteristicWriteRequest: requestId: ${requestId}, preparedWrite: ${preparedWrite}, responseNeeded: ${responseNeeded}, offset: ${offset}, dataSize: ${value?.size}")
+    // Log.d(logTag, "onCharacteristicWriteRequest: requestId: ${requestId}, preparedWrite: ${preparedWrite}, responseNeeded: ${responseNeeded}, offset: ${offset}, dataSize: ${value?.size}")
     onReceivedWriteCallback(characteristic, value)
     if (responseNeeded) {
-      gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+      val response = gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
+      Log.d(logTag, "onCharacteristicWriteRequest: didResponseSent: ${response}")
     }
   }
 

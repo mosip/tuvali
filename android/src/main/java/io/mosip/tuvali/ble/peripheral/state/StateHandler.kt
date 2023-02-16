@@ -85,6 +85,12 @@ class StateHandler(
         currentState = States.NotConnectedToDevice
       }
 
+      IMessage.PeripheralMessageTypes.MTU_CHANGED.ordinal -> {
+        val mtuChangedMessage = msg.obj as MtuChangedMessage
+        val mtuSize = mtuChangedMessage.mtuChanged
+        peripheralListener.onMTUChanged(mtuSize)
+      }
+
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
         val receivedWriteMessage = msg.obj as ReceivedWriteMessage
         Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")

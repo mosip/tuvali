@@ -40,23 +40,23 @@ class Wallet: NSObject {
     }
     
     func lookForDestroyConnection(){
-        registerCallbackForEvent(event: NotificationEvent.CONNECTION_STATUS_CHANGE) { notification in
+        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
             print("Handling notification for \(notification.name.rawValue)")
-            if let notifyObj = notification.userInfo?["connectionStatus"] as? Data {
+            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
                 let connStatusID = Int(notifyObj[0])
-                    if connStatusID == 1 {
-                        print("con statusid:", connStatusID)
-                        self.destroyConnection()
-                    }
-                } else {
-                    print("weird reason!!")
+                if connStatusID == 1 {
+                    print("con statusid:", connStatusID)
+                    self.destroyConnection()
                 }
+            } else {
+                print("weird reason!!")
             }
         }
+    }
     
     func destroyConnection(){
         NotificationCenter.default.removeObserver(self)
-        print("destroyed")
+        onDeviceDisconnected(isManualDisconnect: false)
     }
     
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -70,18 +70,18 @@ class Wallet: NSObject {
         }
         return false
     }
-
+    
     func hexStringToData(string: String) -> Data {
         let stringArray = Array(string)
         var data: Data = Data()
         for i in stride(from: 0, to: string.count, by: 2) {
             let pair: String = String(stringArray[i]) + String(stringArray[i+1])
-                if let byteNum = UInt8(pair, radix: 16) {
-                    let byte = Data([byteNum])
-                    data.append(byte)
-                } else {
-                    fatalError()
-                }
+            if let byteNum = UInt8(pair, radix: 16) {
+                let byte = Data([byteNum])
+                data.append(byte)
+            } else {
+                fatalError()
+            }
         }
         return data
     }
@@ -91,28 +91,41 @@ class Wallet: NSObject {
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
         if (encryptedData != nil) {
+            print("Complete Encrypted Data: \(encryptedData!.toHex())")
+            print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
                 transferHandler.initialize(initdData: encryptedData!)
-                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!)
+                var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
+                if currentMTUSize == nil || currentMTUSize! < 0 {
+                   currentMTUSize = BLEConstants.DEFAULT_CHUNK_SIZE
+                }
+                let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!, mtuSize: currentMTUSize)
                 transferHandler.sendMessage(message: imsgBuilder)
             }
         }
     }
-    
-    func writeIdentity() {
-        print("::: write idendity called ::: ")
+
+    func writeToIdentifyRequest() {
+        print("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
         print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            print("Write Identity - Found NO KEY")
+            print("Write Identify - Found NO KEY")
             return
         }
         var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.identifyRequestCharacteristic, data: iv + publicKey)
+        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
         registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
             EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        }
+    }
+    
+    func onDeviceDisconnected(isManualDisconnect: Bool) {
+        if(!isManualDisconnect) {
+            central?.connectedPeripheral = nil
+            EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }
 }

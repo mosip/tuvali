@@ -11,7 +11,8 @@ import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.Semaphore
+import io.mosip.tuvali.transfer.TransferReportRequest
+import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
@@ -19,7 +20,6 @@ import io.mosip.tuvali.verifier.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
-
 
 class Verifier(
   context: Context,
@@ -37,6 +37,7 @@ class Verifier(
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
+  private var negotiatedMTUSize = DEFAULT_CHUNK_SIZE
 
   //TODO: Update UUIDs as per specification
   companion object {
@@ -120,7 +121,7 @@ class Verifier(
 
   override fun onReceivedWrite(uuid: UUID, value: ByteArray?) {
     when (uuid) {
-      GattService.IDENTITY_CHARACTERISTIC_UUID -> {
+      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         value?.let {
           // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
           if (value.size < 12 + 32) {
@@ -143,18 +144,18 @@ class Verifier(
           peripheral.stopAdvertisement()
         }
       }
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
         value?.let {
           if (value.isEmpty()) {
             return
           }
-          val semaphoreValue = value[0].toInt()
-          if (semaphoreValue == Semaphore.SemaphoreMarker.RequestReport.ordinal) {
+          val receivedReportType = value[0].toInt()
+          if (receivedReportType == TransferReportRequest.ReportType.RequestReport.ordinal) {
             val remoteRequestedTransferReportMessage =
-              RemoteRequestedTransferReportMessage(semaphoreValue)
+              RemoteRequestedTransferReportMessage(receivedReportType)
             transferHandler.sendMessage(remoteRequestedTransferReportMessage)
-          } else if (semaphoreValue == Semaphore.SemaphoreMarker.Error.ordinal) {
-            onResponseReceivedFailed("received error on semaphore from remote")
+          } else if (receivedReportType == TransferReportRequest.ReportType.Error.ordinal) {
+            onResponseReceivedFailed("received error on transfer Report request from remote")
           }
         }
       }
@@ -163,13 +164,13 @@ class Verifier(
           Log.d(logTag, "received response size on characteristic value: ${String(value)}")
           val responseSize: Int = String(value).toInt()
           Log.d(logTag, "received response size on characteristic: $responseSize")
-          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize)
+          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, negotiatedMTUSize)
           transferHandler.sendMessage(responseSizeReadSuccessMessage)
         }
       }
-      GattService.RESPONSE_CHAR_UUID -> {
+      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         if (value != null) {
-          Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
+          //Log.d(logTag, "received response chunk on characteristic of size: ${value.size}")
           transferHandler.sendMessage(ResponseChunkReceivedMessage(value))
         }
       }
@@ -178,9 +179,9 @@ class Verifier(
 
   override fun onSendDataNotified(uuid: UUID, isSent: Boolean) {
     when (uuid) {
-      GattService.SEMAPHORE_CHAR_UUID -> {
+      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
         //TODO: Can re-send report if failed to send notification with exponential backoff
-        Log.d(logTag, "notification sent status $isSent for uuid: $uuid")
+        Log.d(logTag, "transfer summary report notification sent status $isSent on uuid: $uuid")
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
@@ -214,6 +215,11 @@ class Verifier(
     }
   }
 
+  override fun onMTUChanged(mtu: Int) {
+    Log.d(logTag, "onMTUChanged: $mtu bytes")
+    negotiatedMTUSize = mtu
+  }
+
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
     if(!isManualDisconnect && isConnected) {
@@ -222,16 +228,21 @@ class Verifier(
   }
 
   override fun onResponseReceived(data: ByteArray) {
-//    Log.d(logTag, "dataInBytes size: ${data.size}, sha256: ${Util.getSha256(data)}")
-    val decryptedData = secretsTranslator?.decryptUponReceive(data)
-    if (decryptedData != null) {
-      Log.d(logTag, "decryptedData size: ${decryptedData.size}")
-      val decompressedData = Util.decompress(decryptedData)
-      Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-      messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
-    } else {
-      Log.e(logTag, "failed to decrypt data with size: ${data.size}")
-      // TODO: Handle error
+    Log.d(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
+    Log.d(logTag, "Complete encrypted data received: ${Hex.toHexString(data)}")
+    try {
+      val decryptedData = secretsTranslator?.decryptUponReceive(data)
+      if (decryptedData != null) {
+        Log.d(logTag, "decryptedData size: ${decryptedData.size}")
+        val decompressedData = Util.decompress(decryptedData)
+        Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
+        messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
+      } else {
+        Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
+        // TODO: Handle error
+      }
+    } catch (e: Exception) {
+        Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
 

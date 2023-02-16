@@ -1,5 +1,7 @@
 package io.mosip.tuvali.cryptography;
 
+import android.util.Log;
+
 import org.bouncycastle.crypto.AsymmetricCipherKeyPair;
 import org.bouncycastle.crypto.AsymmetricCipherKeyPairGenerator;
 import org.bouncycastle.crypto.agreement.X25519Agreement;
@@ -7,6 +9,7 @@ import org.bouncycastle.crypto.generators.X25519KeyPairGenerator;
 import org.bouncycastle.crypto.params.AsymmetricKeyParameter;
 import org.bouncycastle.crypto.params.X25519KeyGenerationParameters;
 import org.bouncycastle.crypto.params.X25519PublicKeyParameters;
+import org.bouncycastle.util.encoders.Hex;
 
 import java.security.SecureRandom;
 
@@ -41,6 +44,12 @@ class CryptoBoxImpl implements CryptoBox {
 
         CipherBox self = new CipherBoxImpl(senderKey, ivBytes, NUMBER_OF_MAC_BYTES);
         CipherBox other = new CipherBoxImpl(receiverKey, ivBytes, NUMBER_OF_MAC_BYTES);
+
+        //Print the ephemeral keys
+      Log.d("CryptoBox", "self public key: "      + Hex.toHexString(getPublicKey()));
+      Log.d("CryptoBox", "iv bytes: "             + Hex.toHexString(ivBytes));
+      Log.d("CryptoBox", senderInfo + " key: "    + Hex.toHexString(senderKey));
+      Log.d("CryptoBox", receiverInfo + " key: "  + Hex.toHexString(receiverKey));
 
         return new CipherPackage(self, other);
     }
