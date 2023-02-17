@@ -6,8 +6,7 @@ import os
 class Central: NSObject, CBCentralManagerDelegate {
 
     var retryStrategy : BackOffStrategy = BackOffStrategy(MAX_RETRY_LIMIT: 10)
-
-    private var centralManager: CBCentralManager!
+    var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
 

@@ -124,7 +124,9 @@ class Wallet: NSObject {
     
     func onDeviceDisconnected(isManualDisconnect: Bool) {
         if(!isManualDisconnect) {
-            central?.connectedPeripheral = nil
+            if let connectedPeripheral = central?.connectedPeripheral {
+                central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
+            }
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }
