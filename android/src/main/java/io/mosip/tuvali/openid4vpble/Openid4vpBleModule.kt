@@ -5,6 +5,7 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
+import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 import org.json.JSONObject
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
@@ -12,6 +13,13 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var verifier: Verifier? = null
   private var wallet: Wallet? = null
   private val mutex = Object()
+  private var walletExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
+
+  init {
+    Thread.setDefaultUncaughtExceptionHandler { _, exception ->
+      walletExceptionHandler.handleException(exception)
+    }
+  }
 
   //Inji contract requires double quotes around the states.
   enum class VCResponseStates(val value: String) {
@@ -37,7 +45,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     synchronized(mutex) {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
-        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
+        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
         verifier?.generateKeyPair()
       }
       val payload = verifier?.getAdvIdentifier("OVPMOSIP")
@@ -46,6 +54,15 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
         "synchronized getConnectionParameters called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}"
       )
       return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
+    }
+  }
+
+  private fun onException(exception: Throwable){
+    if(exception.cause != null){
+      Log.e(logTag, "Exception: ${exception.message}");
+      walletExceptionHandler.handleException(exception.cause!!)
+    } else {
+      walletExceptionHandler.handleException(exception)
     }
   }
 
@@ -60,7 +77,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     synchronized(mutex) {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
+        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")
@@ -96,6 +113,10 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
 
+    stopBLE(callback)
+  }
+
+  private fun stopBLE(callback: Callback) {
     synchronized(mutex) {
       if (wallet == null && verifier == null) {
         callback()
@@ -166,6 +187,13 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     val writableMap = Arguments.createMap()
     writableMap.putString("data", "$eventType\n${data}")
     writableMap.putString("type", "msg")
+    emitEvent("EVENT_NEARBY", writableMap)
+  }
+
+  private fun emitNearbyErrorEvent(message: String) {
+    val writableMap = Arguments.createMap()
+    writableMap.putString("message", message)
+    writableMap.putString("type", "onError")
     emitEvent("EVENT_NEARBY", writableMap)
   }
 

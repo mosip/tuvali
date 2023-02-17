@@ -5,12 +5,13 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
+import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
-import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
+import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
 import kotlin.math.ceil
@@ -107,6 +108,10 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages"
     )
 
+    if(assembler != null && missedCount > (0.7 * assembler!!.totalChunkCount)) {
+      throw TooManyFailureChunksException("Failing VC transfer as failure chunks are more than 70% of total chunks")
+    }
+
     val transferReport =TransferReport(
       TransferReport.ReportType.MISSING_CHUNKS,
       totalPages.toInt(),
@@ -125,6 +130,15 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
     Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))},  Sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
+  }
+
+  override fun dispatchMessage(msg: Message) {
+    try {
+      super.dispatchMessage(msg)
+    } catch (e: Throwable) {
+      transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
+      Log.d(logTag, "dispatchMessage " + e.message)
+    }
   }
 
   fun sendMessage(msg: IMessage) {

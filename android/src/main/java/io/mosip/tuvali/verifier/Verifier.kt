@@ -4,27 +4,34 @@ import android.content.Context
 import android.os.HandlerThread
 import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
+import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
-import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
+import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
+import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
-import io.mosip.tuvali.verifier.transfer.message.*
+import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage
+import io.mosip.tuvali.verifier.transfer.message.RemoteRequestedTransferReportMessage
+import io.mosip.tuvali.verifier.transfer.message.ResponseChunkReceivedMessage
+import io.mosip.tuvali.verifier.transfer.message.ResponseSizeReadSuccessMessage
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 
+private const val MIN_MTU_REQUIRED = 64
+
 class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val onBLEException: (Throwable) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -193,6 +200,10 @@ class Verifier(
     }
   }
 
+  override fun onException(e: Throwable) {
+    onBLEException(e)
+  }
+
   override fun onClosed() {
     Log.d(logTag, "onClosed")
     peripheral.quitHandler()
@@ -217,11 +228,16 @@ class Verifier(
 
   override fun onMTUChanged(mtu: Int) {
     Log.d(logTag, "onMTUChanged: $mtu bytes")
+
+    if(mtu < MIN_MTU_REQUIRED){
+      throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")
+    }
+    
     negotiatedMTUSize = mtu
   }
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
-    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect")
+    Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if(!isManualDisconnect && isConnected) {
       eventResponseListener("onDisconnected")
     }
@@ -243,6 +259,8 @@ class Verifier(
       }
     } catch (e: Exception) {
         Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+        //Re-Throwing for the exception handler to handle this again and let Higher layer know.
+        throw e;
     }
   }
 

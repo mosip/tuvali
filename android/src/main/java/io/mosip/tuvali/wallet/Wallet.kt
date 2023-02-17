@@ -30,7 +30,8 @@ import java.util.*
 class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val onBLEException: (Throwable) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = "Wallet"
 
@@ -292,6 +293,10 @@ class Wallet(
         }
       }
     }
+  }
+
+  override fun onException(exception: Throwable) {
+    onBLEException(exception)
   }
 
   override fun onClosed() {
