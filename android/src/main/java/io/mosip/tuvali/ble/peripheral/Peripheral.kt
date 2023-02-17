@@ -60,7 +60,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
 
   fun sendData(serviceUUID: UUID, charUUID: UUID, data: ByteArray) {
     val currentState = messageSender.getCurrentState()
-    if (currentState == StateHandler.States.CommunicationReady || (serviceUUID === GattService.DISCONNECT_CHAR_UUID)) {
+    if (currentState == StateHandler.States.CommunicationReady || (charUUID === GattService.DISCONNECT_CHAR_UUID)) {
       val sendDataMessage = SendDataMessage(serviceUUID, charUUID, data)
       messageSender.sendMessage(sendDataMessage)
     } else {
