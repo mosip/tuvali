@@ -34,9 +34,8 @@ class Wallet: NSObject {
         }
     }
     
-    func buildSecretTranslator(publicKeyData: Data) {
+    func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
-        secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: publicKeyData))
     }
     
     func lookForDestroyConnection(){
@@ -115,6 +114,7 @@ class Wallet: NSObject {
             print("Write Identify - Found NO KEY")
             return
         }
+        secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: self.verifierPublicKey))
         var iv = (self.secretTranslator?.initializationVector())!
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
         registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in

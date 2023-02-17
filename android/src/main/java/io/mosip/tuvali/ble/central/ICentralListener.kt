@@ -22,4 +22,5 @@ interface ICentralListener {
   fun onSubscriptionFailure(charUUID: UUID, err: Int)
   fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
   fun onClosed()
+  fun onException(exception: Throwable)
 }
