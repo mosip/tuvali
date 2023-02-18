@@ -67,10 +67,6 @@ class Openid4vpBle: RCTEventEmitter {
             callback([])
             print(">> raw message size", messageComponents[1].count)
             Wallet.shared.sendData(data: messageComponents[1])
-        case "onDisconnected":
-            callback([])
-            print("onDisconnected")
-            Wallet.shared.lookForDestroyConnection()
         default:
             print("DEFAULT SEND: MESSAGE:: ", message)
         }

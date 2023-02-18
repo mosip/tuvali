@@ -34,7 +34,7 @@ extension Central {
         if let connectedPeripheral = connectedPeripheral {
             central.cancelPeripheralConnection(connectedPeripheral)
         }
-        Wallet.shared.onDeviceDisconnected(isManualDisconnect: false)
+        Wallet.shared.destroyConnection()
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
