@@ -9,6 +9,7 @@ import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
+import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
