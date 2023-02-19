@@ -20,6 +20,7 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
+import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -49,7 +50,6 @@ class Wallet(
   private var central: Central
 
   private var negotiatedMTU = 100
-  private var requestMtuCounter : Int = 0
   private val mtuValues = arrayOf(512, 185, 100)
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
@@ -168,7 +168,7 @@ class Wallet(
     if (serviceUuids.contains(Verifier.SERVICE_UUID)) {
       retryDiscoverServices.reset()
       Log.d(logTag, "onServicesDiscovered with services - $serviceUuids")
-      central.requestMTU(mtuValues[requestMtuCounter++])
+      central.requestMTU(mtuValues, MTU_REQUEST_RETRY_DELAY_TIME)
     } else {
       retryServiceDiscovery()
     }
@@ -188,19 +188,9 @@ class Wallet(
     }
   }
 
-  override fun onRequestMTURetry() {
-    if(requestMtuCounter < mtuValues.size) {
-      central.retryRequestMTU(mtuValues[requestMtuCounter++], MTU_REQUEST_RETRY_DELAY_TIME)
-    }
-    else {
-      central.requestMTUFailure(MTU_REQUEST_RETRY_DELAY_TIME)
-    }
-  }
-
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
     negotiatedMTU = mtu
-    //TODO: Can we pass this MTU value to chunker, would this callback always come?
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
 
@@ -213,7 +203,7 @@ class Wallet(
 
   override fun onRequestMTUFailure(errorCode: Int) {
     //TODO: Handle onRequest MTU failure
-    central.disconnectAndClose()
+    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries.")
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {

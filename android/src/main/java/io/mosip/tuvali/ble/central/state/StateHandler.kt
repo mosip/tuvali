@@ -140,19 +140,9 @@ class StateHandler(
       }
       IMessage.CentralStates.REQUEST_MTU.ordinal -> {
         val requestMTUMessage = msg.obj as RequestMTUMessage
-        Log.d(logTag, "Requesting mtu change to ${requestMTUMessage.mtu}")
+        Log.d(logTag, "Requesting mtu change")
         currentState = States.RequestingMTU
-        controller.requestMTU(requestMTUMessage.mtu)
-        listener.onRequestMTURetry()
-      }
-      IMessage.CentralStates.NEGOTIATE_AND_REQUEST_MTU.ordinal -> {
-        if(currentState == States.Connected){
-          Log.i(logTag, "Successfully negotiated MTU")
-        }
-        if(currentState == States.RequestingMTU){
-          val negotiateAndRequestMTU = msg.obj as NegotiateAndRequestMTU
-          this.sendMessage(RequestMTUMessage(negotiateAndRequestMTU.mtuSize))
-        }
+        controller.requestMTU(requestMTUMessage.mtu, requestMTUMessage.delayTime)
       }
       IMessage.CentralStates.REQUEST_MTU_SUCCESS.ordinal -> {
         val requestMTUSuccessMessage = msg.obj as RequestMTUSuccessMessage

@@ -78,16 +78,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessageDelayed(DiscoverServicesMessage(), waitTime)
   }
 
-  fun requestMTU(mtu: Int) {
-    messageSender.sendMessage(RequestMTUMessage(mtu))
-  }
-
-  fun retryRequestMTU(mtu: Int, waitTime: Long){
-    messageSender.sendMessageDelayed(NegotiateAndRequestMTU(mtu),waitTime)
-  }
-
-  fun requestMTUFailure(waitTime: Long){
-    messageSender.sendMessageDelayed(RequestMTUFailureMessage(0),waitTime) //TODO: confirm the error code
+  fun requestMTU(mtu: Array<Int>, delayTime: Long) {
+    messageSender.sendMessage(RequestMTUMessage(mtu, delayTime))
   }
 
   fun stopScan() {

@@ -13,7 +13,6 @@ interface ICentralListener {
   fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID)
   fun onServicesDiscovered(serviceUuids: List<UUID>)
   fun onServicesDiscoveryFailed(errorCode: Int)
-  fun onRequestMTURetry()
   fun onRequestMTUSuccess(mtu: Int)
   fun onRequestMTUFailure(errorCode: Int)
   fun onReadSuccess(charUUID: UUID, value: ByteArray?)
