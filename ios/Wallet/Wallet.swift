@@ -4,7 +4,7 @@ import Gzip
 @objc(Wallet)
 @available(iOS 13.0, *)
 class Wallet: NSObject {
-    
+
     static let shared = Wallet()
     var central: Central?
     var secretTranslator: SecretTranslator?
@@ -12,32 +12,32 @@ class Wallet: NSObject {
     var advIdentifier: String?
     var verifierPublicKey: Data?
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
-    
+
     private override init() {
         super.init()
         lookForDestroyConnection()
     }
-    
+
     @objc(getModuleName:withRejecter:)
     func getModuleName(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
         resolve(["iOS Wallet"])
     }
-    
+
     func setAdvIdentifier(identifier: String) {
         self.advIdentifier = identifier
     }
-    
+
     func registerCallbackForEvent(event: NotificationEvent, callback: @escaping (_ notification: Notification) -> Void) {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event.rawValue), object: nil, queue: nil) { [unowned self] notification in
             print("Handling notification for \(notification.name.rawValue)")
             callback(notification)
         }
     }
-    
+
     func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
     }
-    
+
     func lookForDestroyConnection(){
         registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
             print("Handling notification for \(notification.name.rawValue)")
@@ -52,12 +52,12 @@ class Wallet: NSObject {
             }
         }
     }
-    
+
     func destroyConnection(){
         NotificationCenter.default.removeObserver(self)
         onDeviceDisconnected(isManualDisconnect: false)
     }
-    
+
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
             print("Found NO ADV Identifier")
@@ -69,7 +69,7 @@ class Wallet: NSObject {
         }
         return false
     }
-    
+
     func hexStringToData(string: String) -> Data {
         let stringArray = Array(string)
         var data: Data = Data()
@@ -114,14 +114,14 @@ class Wallet: NSObject {
             print("Write Identify - Found NO KEY")
             return
         }
-        secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: self.verifierPublicKey))
+        secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
         var iv = (self.secretTranslator?.initializationVector())!
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
         registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
             EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         }
     }
-    
+
     func onDeviceDisconnected(isManualDisconnect: Bool) {
         if(!isManualDisconnect) {
             if let connectedPeripheral = central?.connectedPeripheral {
