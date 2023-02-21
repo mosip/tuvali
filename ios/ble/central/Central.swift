@@ -9,6 +9,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
+    var delegate: PeripheralCommunicatorDelegate?
 
     public static var shared = Central()
 
@@ -62,7 +63,6 @@ class Central: NSObject, CBCentralManagerDelegate {
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
-            //print("wrote some data without resp")
         }
     }
 }

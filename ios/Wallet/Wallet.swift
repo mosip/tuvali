@@ -95,6 +95,7 @@ class Wallet: NSObject {
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
+                self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
                 var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
                 if currentMTUSize == nil || currentMTUSize! < 0 {
