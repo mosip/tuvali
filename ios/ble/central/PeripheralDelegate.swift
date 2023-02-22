@@ -104,7 +104,8 @@ extension Central: CBPeripheralDelegate {
             delegate?.verificationStatusChange(data: verificationStatus)
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
             let disconnectStatus = characteristic.value as Data?
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
+//            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
+            walletDelegate?.disconnectHandler(data: disconnectStatus)
             peripheral.setNotifyValue(false, for: characteristic)
         }
     }

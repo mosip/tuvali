@@ -15,7 +15,7 @@ class Wallet: NSObject {
     
     private override init() {
         super.init()
-        lookForDestroyConnection()
+//        lookForDestroyConnection()
     }
     
     @objc(getModuleName:withRejecter:)
@@ -38,23 +38,23 @@ class Wallet: NSObject {
         verifierPublicKey = publicKeyData
     }
     
-    func lookForDestroyConnection(){
-        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
-                let connStatusID = Int(notifyObj[0])
-                if connStatusID == 1 {
-                    print("con statusid:", connStatusID)
-                    self.destroyConnection()
-                }
-            } else {
-                print("weird reason!!")
-            }
-        }
-    }
+//    func lookForDestroyConnection(){
+//        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
+//            print("Handling notification for \(notification.name.rawValue)")
+//            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
+//                let connStatusID = Int(notifyObj[0])
+//                if connStatusID == 1 {
+//                    print("con statusid:", connStatusID)
+//                    self.destroyConnection()
+//                }
+//            } else {
+//                print("weird reason!!")
+//            }
+//        }
+//    }
     
     func destroyConnection(){
-        NotificationCenter.default.removeObserver(self)
+        //NotificationCenter.default.removeObserver(self)
         onDeviceDisconnected(isManualDisconnect: false)
     }
     
@@ -133,5 +133,18 @@ extension Wallet: WalletProtocol {
     func exchangeReceiverInfoHandler() {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         print("wallet delegate called")
+    }
+    
+    func disconnectHandler(data: Data?){
+        print("Handling notification for disconnect handle")
+        if let data {
+            let connStatusID = Int(data[0])
+            if connStatusID == 1 {
+                print("con statusid:", connStatusID)
+                destroyConnection()
+            }
+        } else {
+            print("weird reason!!")
+        }
     }
 }

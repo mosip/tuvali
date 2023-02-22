@@ -10,10 +10,12 @@ class Central: NSObject, CBCentralManagerDelegate {
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
     var delegate: PeripheralCommunicatorDelegate?
-
+    var walletDelegate: WalletProtocol?
+    
     public static var shared = Central()
 
     func initialize() {
+        walletDelegate = Wallet.shared
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
