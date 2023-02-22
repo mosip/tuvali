@@ -14,18 +14,21 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.retrymechanism.lib.BackOffStrategy
+import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
+import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
+
+private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 250L
 
 class Wallet(
   context: Context,
@@ -45,7 +48,9 @@ class Wallet(
   private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
   private var central: Central
-  private val maxMTU = 185
+
+  private var maxDataBytes = 100
+  private val mtuValues = arrayOf(512, 185, 100)
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
 
@@ -163,12 +168,11 @@ class Wallet(
     if (serviceUuids.contains(Verifier.SERVICE_UUID)) {
       retryDiscoverServices.reset()
       Log.d(logTag, "onServicesDiscovered with services - $serviceUuids")
-      central.requestMTU(maxMTU)
+      central.requestMTU(mtuValues, MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS)
     } else {
       retryServiceDiscovery()
     }
   }
-
   override fun onServicesDiscoveryFailed(errorCode: Int) {
     Log.d(logTag, "onServicesDiscoveryFailed retrying to find the services")
     retryServiceDiscovery()
@@ -186,7 +190,7 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
-    //TODO: Can we pass this MTU value to chunker, would this callback always come?
+    maxDataBytes = mtu
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
 
@@ -199,6 +203,7 @@ class Wallet(
 
   override fun onRequestMTUFailure(errorCode: Int) {
     //TODO: Handle onRequest MTU failure
+    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries.")
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
@@ -325,7 +330,7 @@ class Wallet(
       if (encryptedData != null) {
         Log.d(logTag, "Complete Encrypted Data: ${Hex.toHexString(encryptedData)}")
         Log.d(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
-        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData))
+        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
       } else {
         Log.e(
           logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"

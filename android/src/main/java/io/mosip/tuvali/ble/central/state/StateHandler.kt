@@ -140,19 +140,18 @@ class StateHandler(
       }
       IMessage.CentralStates.REQUEST_MTU.ordinal -> {
         val requestMTUMessage = msg.obj as RequestMTUMessage
-        Log.d(logTag, "request mtu change to ${requestMTUMessage.mtu}")
-        controller.requestMTU(requestMTUMessage.mtu)
+        Log.d(logTag, "Requesting mtu change")
         currentState = States.RequestingMTU
+        controller.requestMTU(requestMTUMessage.mtuValues, requestMTUMessage.delayTime)
       }
       IMessage.CentralStates.REQUEST_MTU_SUCCESS.ordinal -> {
         val requestMTUSuccessMessage = msg.obj as RequestMTUSuccessMessage
-
         Log.d(logTag, "MTU changed to ${requestMTUSuccessMessage.mtu}.")
         listener.onRequestMTUSuccess(requestMTUSuccessMessage.mtu)
         currentState = States.Connected
       }
       IMessage.CentralStates.REQUEST_MTU_FAILURE.ordinal -> {
-        Log.d(logTag, "failed to request MTU Change.")
+        Log.d(logTag, "Failed to request MTU Change.")
         val requestMTUFailureMessage = msg.obj as RequestMTUFailureMessage
         listener.onRequestMTUFailure(requestMTUFailureMessage.errorCode)
         currentState = States.Connected
