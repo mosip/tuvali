@@ -7,3 +7,7 @@ protocol PeripheralCommunicatorDelegate: AnyObject {
     func verificationStatusChange(data: Data?)
     func exchangeReceiverInfoHandler()
 }
+
+protocol WalletProtocol: AnyObject {
+    func exchangeReceiverInfoHandler()
+}

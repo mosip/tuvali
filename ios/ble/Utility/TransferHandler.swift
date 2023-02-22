@@ -220,8 +220,4 @@ extension TransferHandler: PeripheralCommunicatorDelegate {
             }
         }
     }
-    
-    func exchangeReceiverInfoHandler() {
-        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: BLEConstants.EXCHANGE_RECEIVER_INFO_DATA)
-    }
 }

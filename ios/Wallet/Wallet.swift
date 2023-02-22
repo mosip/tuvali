@@ -118,9 +118,6 @@ class Wallet: NSObject {
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: self.verifierPublicKey))
         var iv = (self.secretTranslator?.initializationVector())!
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
-        registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
-            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
-        }
     }
     
     func onDeviceDisconnected(isManualDisconnect: Bool) {
@@ -130,5 +127,11 @@ class Wallet: NSObject {
             }
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
+    }
+}
+extension Wallet: WalletProtocol {
+    func exchangeReceiverInfoHandler() {
+        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        print("wallet delegate called")
     }
 }
