@@ -10,7 +10,7 @@ import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
 import java.util.UUID
 
-const val HEADERS_SIZE_IN_MTU = 3
+const val MTU_HEADERS_SIZE = 3
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
@@ -137,7 +137,7 @@ class Controller(val context: Context) {
   private fun onRequestMTUSuccess(negotiatedMtu: Int) {
     if(requestedMTUValue == negotiatedMtu) {
       isMTURequestCallbackReceived = true
-      messageSender.sendMessage(RequestMTUSuccessMessage(negotiatedMtu - HEADERS_SIZE_IN_MTU))
+      messageSender.sendMessage(RequestMTUSuccessMessage(negotiatedMtu - MTU_HEADERS_SIZE))
     }
   }
 

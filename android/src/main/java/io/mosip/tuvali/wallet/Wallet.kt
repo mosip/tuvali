@@ -28,7 +28,7 @@ import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 
-private const val MTU_REQUEST_RETRY_DELAY_TIME = 250L
+private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 250L
 
 class Wallet(
   context: Context,
@@ -49,7 +49,7 @@ class Wallet(
 
   private var central: Central
 
-  private var negotiatedMTU = 100
+  private var maxDataBytes = 100
   private val mtuValues = arrayOf(512, 185, 100)
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
@@ -168,7 +168,7 @@ class Wallet(
     if (serviceUuids.contains(Verifier.SERVICE_UUID)) {
       retryDiscoverServices.reset()
       Log.d(logTag, "onServicesDiscovered with services - $serviceUuids")
-      central.requestMTU(mtuValues, MTU_REQUEST_RETRY_DELAY_TIME)
+      central.requestMTU(mtuValues, MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS)
     } else {
       retryServiceDiscovery()
     }
@@ -190,7 +190,7 @@ class Wallet(
 
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
-    negotiatedMTU = mtu
+    maxDataBytes = mtu
     val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
 
@@ -330,7 +330,7 @@ class Wallet(
       if (encryptedData != null) {
         Log.d(logTag, "Complete Encrypted Data: ${Hex.toHexString(encryptedData)}")
         Log.d(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
-        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, negotiatedMTU))
+        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
       } else {
         Log.e(
           logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
