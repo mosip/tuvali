@@ -78,8 +78,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessageDelayed(DiscoverServicesMessage(), waitTime)
   }
 
-  fun requestMTU(mtu: Array<Int>, delayTimeInMillis: Long) {
-    messageSender.sendMessage(RequestMTUMessage(mtu, delayTimeInMillis))
+  fun requestMTU(mtuValues: Array<Int>, delayTimeInMillis: Long) {
+    messageSender.sendMessage(RequestMTUMessage(mtuValues, delayTimeInMillis))
   }
 
   fun stopScan() {

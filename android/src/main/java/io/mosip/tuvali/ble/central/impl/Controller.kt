@@ -5,9 +5,9 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.le.ScanResult
 import android.content.Context
-import kotlinx.coroutines.*
 import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
+import io.mosip.tuvali.transfer.Util
 import java.util.UUID
 
 const val MTU_HEADERS_SIZE = 3
@@ -107,18 +107,13 @@ class Controller(val context: Context) {
       }
       requestedMTUValue = mtuValues[requestMtuCounter++]
       gattClient?.requestMtu(requestedMTUValue, this::onRequestMTUSuccess, this::onRequestMTUFailure)
-      sleepInRealTime(delayTime)
+      Util.sleepInRealTime(delayTime)
     }
     if(!isMTURequestCallbackReceived) {
       onRequestMTUFailure(0)
     }
   }
 
-  private fun sleepInRealTime(delayTime: Long) {
-    runBlocking {
-      delay(delayTime)
-    }
-  }
 
   fun disconnect(): Boolean {
     return if(gattClient != null) {

@@ -142,7 +142,7 @@ class StateHandler(
         val requestMTUMessage = msg.obj as RequestMTUMessage
         Log.d(logTag, "Requesting mtu change")
         currentState = States.RequestingMTU
-        controller.requestMTU(requestMTUMessage.mtu, requestMTUMessage.delayTime)
+        controller.requestMTU(requestMTUMessage.mtuValues, requestMTUMessage.delayTime)
       }
       IMessage.CentralStates.REQUEST_MTU_SUCCESS.ordinal -> {
         val requestMTUSuccessMessage = msg.obj as RequestMTUSuccessMessage

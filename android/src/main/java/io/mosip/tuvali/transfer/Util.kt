@@ -1,5 +1,7 @@
 package io.mosip.tuvali.transfer
 
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.runBlocking
 import org.bouncycastle.util.encoders.Hex
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
@@ -65,6 +67,12 @@ class Util {
         GZIPInputStream(ByteArrayInputStream(bytes)).use { gzipInputStream -> return gzipInputStream.readBytes() }
       } catch (e: Exception) {
         throw RuntimeException("Error while decompression!", e)
+      }
+    }
+
+    fun sleepInRealTime(delayTime: Long) {
+      runBlocking {
+        delay(delayTime)
       }
     }
   }
