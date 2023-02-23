@@ -11,9 +11,14 @@ class Central: NSObject, CBCentralManagerDelegate {
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
     var tuvaliVersion: String?
+    var delegate: PeripheralCommunicatorProtocol?
+    var walletDelegate: WalletProtocol?
+    var createConnection:(()->Void)?
+
     public static var shared = Central()
 
     func initialize() {
+        walletDelegate = Wallet.shared
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
@@ -63,7 +68,6 @@ class Central: NSObject, CBCentralManagerDelegate {
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
-
         }
     }
 }
