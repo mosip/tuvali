@@ -8,6 +8,7 @@ import java.io.ByteArrayOutputStream
 import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
+import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 
 
 class Util {
@@ -74,6 +75,10 @@ class Util {
       runBlocking {
         delay(delayTime)
       }
+    }
+
+    fun getLogTag(moduleName: String): String{
+      return moduleName+": v"+Openid4vpBleModule.tuvaliVersion
     }
   }
 }

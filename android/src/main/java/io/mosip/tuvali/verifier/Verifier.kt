@@ -14,6 +14,7 @@ import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
@@ -35,7 +36,7 @@ class Verifier(
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
-  private val logTag = "Verifier"
+  private val logTag = getLogTag("Verifier")
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var iv: ByteArray
@@ -232,7 +233,7 @@ class Verifier(
     if(mtu < MIN_MTU_REQUIRED){
       throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")
     }
-    
+
     negotiatedMTUSize = mtu
   }
 

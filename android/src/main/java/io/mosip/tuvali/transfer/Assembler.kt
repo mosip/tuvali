@@ -3,9 +3,10 @@ package io.mosip.tuvali.transfer
 import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(maxDataBytes) {
-  private val logTag = "Assembler"
+  private val logTag = getLogTag("Assembler")
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
   val totalChunkCount = getTotalChunkCount(totalSize)
