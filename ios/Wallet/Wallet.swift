@@ -15,7 +15,6 @@ class Wallet: NSObject {
     
     private override init() {
         super.init()
-//        lookForDestroyConnection()
     }
     
     @objc(getModuleName:withRejecter:)
@@ -27,34 +26,12 @@ class Wallet: NSObject {
         self.advIdentifier = identifier
     }
     
-    func registerCallbackForEvent(event: NotificationEvent, callback: @escaping (_ notification: Notification) -> Void) {
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event.rawValue), object: nil, queue: nil) { [unowned self] notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            callback(notification)
-        }
-    }
-    
     func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
     }
-    
-//    func lookForDestroyConnection(){
-//        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
-//            print("Handling notification for \(notification.name.rawValue)")
-//            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
-//                let connStatusID = Int(notifyObj[0])
-//                if connStatusID == 1 {
-//                    print("con statusid:", connStatusID)
-//                    self.destroyConnection()
-//                }
-//            } else {
-//                print("weird reason!!")
-//            }
-//        }
-//    }
+
     
     func destroyConnection(){
-        //NotificationCenter.default.removeObserver(self)
         onDeviceDisconnected(isManualDisconnect: false)
     }
     
