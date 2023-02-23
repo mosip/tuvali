@@ -16,6 +16,8 @@ RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(getConnectionParametersDebug)
  */
 RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(setConnectionParameters:(NSString *)params)
 
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(setTuvaliVersion:(NSString *)version)
+
 RCT_EXTERN_METHOD(send:(NSString *)message withCallback:(RCTResponseSenderBlock)callback)
 
 RCT_EXTERN_METHOD(createConnection:(NSString *)mode withCallback:(RCTResponseSenderBlock)callback)

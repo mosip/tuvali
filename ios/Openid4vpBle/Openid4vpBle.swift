@@ -3,20 +3,20 @@ import Foundation
 @available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-    
+    var tuvaliVersion: String = " "
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
     }
-    
+
     @objc
     func noop() -> Void {}
-    
+
     @objc
     func getConnectionParameters() -> String {
         return "GetConnectionParameters"
     }
-    
+
     @objc(setConnectionParameters:)
     func setConnectionParameters(params: String) -> Any {
         print("SetConnectionParameters->Params::\(params)")
@@ -26,7 +26,7 @@ class Openid4vpBle: RCTEventEmitter {
         Wallet.shared.setAdvIdentifier(identifier: firstPartOfPk as! String)
         return "data" as Any
     }
-    
+
     func stringToJson(jsonText: String) -> NSDictionary {
         var dictonary: NSDictionary?
         if let data = jsonText.data(using: String.Encoding.utf8) {
@@ -38,11 +38,19 @@ class Openid4vpBle: RCTEventEmitter {
         }
         return dictonary!
     }
-    
+
     @objc
     func getConnectionParametersDebug() -> String {
         return "GetConnectionParametersDebug"
     }
+
+    @objc(setTuvaliVersion:)
+    func setTuvaliVersion(version: String) -> String{
+        tuvaliVersion = version
+        os_log("Tuvali version - %{public}@",tuvaliVersion);
+        Central.shared.tuvaliVersion = tuvaliVersion
+        return tuvaliVersion
+      }
 
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
@@ -54,7 +62,7 @@ class Openid4vpBle: RCTEventEmitter {
     func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let messageComponents = message.components(separatedBy: "\n")
         print("new message is :::: ", messageComponents)
-        
+
         switch messageComponents[0] {
         case "exchange-receiver-info":
             print("EXCHANGE-RECEIVER-INFO")
@@ -71,7 +79,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("DEFAULT SEND: MESSAGE:: ", message)
         }
     }
-    
+
     @objc(createConnection:withCallback:)
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         switch mode {
@@ -95,7 +103,7 @@ class Openid4vpBle: RCTEventEmitter {
      override func supportedEvents() -> [String]! {
         return EventEmitter.sharedInstance.allEvents
     }
-    
+
     @objc
     override static func requiresMainQueueSetup() -> Bool {
         return false
