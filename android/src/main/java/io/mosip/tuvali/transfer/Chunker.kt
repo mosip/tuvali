@@ -3,8 +3,8 @@ package io.mosip.tuvali.transfer
 import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.intToTwoBytesBigEndian
 
-class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CHUNK_SIZE) :
-  ChunkerBase(mtuSize) {
+class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE) :
+  ChunkerBase(maxDataBytes) {
   private val logTag = "Chunker"
   private var chunksReadCounter: Int = 0
   private val lastChunkByteCount = getLastChunkByteCount(data.size)
@@ -43,11 +43,11 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
   }
 
   /*
-  <------------------------------------------------------- MTU ------------------------------------------------------------------->
+  <--------------------------------------------------Max Data Bytes -------------------------------------------------------------->
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
   |                       |                             |                                                                         |
   |  chunk sequence no    |   checksum value of data    |         chunk payload                                                   |
-  |      (2 bytes)        |         (2 bytes)           |       (upto MTU-4 bytes)                                                |
+  |      (2 bytes)        |         (2 bytes)           |       (upto MaxDataBytes -4 bytes)                                      |
   |                       |                             |                                                                         |
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */

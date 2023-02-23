@@ -38,10 +38,6 @@ class GattClient(var context: Context) {
         }
       }
       Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
-      Log.i(
-        logTag,
-        "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}"
-      )
 
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
@@ -103,7 +99,6 @@ class GattClient(var context: Context) {
 
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
-
       if (status == GATT_SUCCESS) {
         onRequestMTUSuccess(mtu)
         Log.i(logTag, "Successfully changed mtu size: $mtu")
@@ -216,6 +211,7 @@ class GattClient(var context: Context) {
 
   @SuppressLint("MissingPermission")
   fun requestMtu(mtu: Int, onSuccess: (mtu: Int) -> Unit, onFailure: (err: Int) -> Unit) {
+    Log.d(logTag, "Request mtu change to $mtu")
     val success = bluetoothGatt?.requestMtu(mtu)
     this.onRequestMTUSuccess = onSuccess
     this.onRequestMTUFailure = onFailure

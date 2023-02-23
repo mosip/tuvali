@@ -7,12 +7,19 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
+import io.mosip.tuvali.transfer.Util
 import java.util.UUID
+
+const val MTU_HEADER_SIZE = 3
+const val REQUEST_MTU_TIME_OUT = -1
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
   private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender
+  private var requestedMTUValue = -1
+  private lateinit var mtuValues : Array<Int>
+  private var isMTURequestCallbackReceived: Boolean = false
 
   //TODO: Move it to gatt client instance
   private var peripheralDevice: BluetoothDevice? = null;
@@ -92,9 +99,22 @@ class Controller(val context: Context) {
     gattClient?.discoverServices(this::onServicesDiscovered, this::onServiceDiscoveryFailure)
   }
 
-  fun requestMTU(mtu: Int) {
-    gattClient?.requestMtu(mtu, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+  fun requestMTU(mtuValues: Array<Int>, delayTime: Long) {
+    this.mtuValues = mtuValues
+    for (mtu in mtuValues) {
+      requestedMTUValue = mtu
+      gattClient?.requestMtu(requestedMTUValue, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+      Util.sleepInRealTime(delayTime)
+      if (isMTURequestCallbackReceived) {
+        break
+      }
+    }
+    if (!isMTURequestCallbackReceived) {
+      requestedMTUValue = -1
+      onRequestMTUFailure(REQUEST_MTU_TIME_OUT)
+    }
   }
+
 
   fun disconnect(): Boolean {
     return if(gattClient != null) {
@@ -110,8 +130,11 @@ class Controller(val context: Context) {
     messageSender.sendMessage(NotificationReceivedMessage(charUUID, data))
   }
 
-  private fun onRequestMTUSuccess(mtu: Int) {
-    messageSender.sendMessage(RequestMTUSuccessMessage(mtu))
+  private fun onRequestMTUSuccess(negotiatedMtu: Int) {
+    if(requestedMTUValue == negotiatedMtu) {
+      isMTURequestCallbackReceived = true
+      messageSender.sendMessage(RequestMTUSuccessMessage(negotiatedMtu - MTU_HEADER_SIZE))
+    }
   }
 
   private fun onRequestMTUFailure(errorCode: Int) {

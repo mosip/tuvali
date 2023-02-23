@@ -4,7 +4,7 @@ import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
-const val HEADERS_SIZE_IN_MTU = 3
+const val MTU_HEADER_SIZE = 3
 
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
@@ -39,6 +39,7 @@ class Controller(val context: Context) {
       sendDataMessage.charUUID,
       sendDataMessage.data
     )
+    println("isNotificationTriggered : $isNotificationTriggered")
     val sendDataNotifiedMessage =
       SendDataTriggeredMessage(sendDataMessage.charUUID, isNotificationTriggered)
     messageSender.sendMessage(sendDataNotifiedMessage)
@@ -75,7 +76,7 @@ class Controller(val context: Context) {
   }
 
   private fun onMTUChanged(mtu: Int) {
-    val mtuChangedMessage = MtuChangedMessage(mtu - HEADERS_SIZE_IN_MTU)
+    val mtuChangedMessage = MtuChangedMessage(mtu - MTU_HEADER_SIZE)
     messageSender.sendMessage(mtuChangedMessage)
   }
 
