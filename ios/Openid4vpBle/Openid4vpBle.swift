@@ -81,8 +81,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
-            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {
-                notification in
+            Central.shared.createConnection = {
                 callback([])
             }
         default:
