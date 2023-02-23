@@ -8,7 +8,7 @@ class RetryChunker(private val chunker: Chunker, private val missedSequences: In
   private var seqCounter = 0
 
   init {
-    Log.d(logTag, "Total number of missedChunks: ${missedSequences.size}")
+    Log.i(logTag, "Total number of missedChunks: ${missedSequences.size}")
   }
 
   fun next(): ByteArray {

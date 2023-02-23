@@ -84,9 +84,9 @@ class Openid4vpBle: RCTEventEmitter {
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         switch mode {
         case "advertiser":
-            print("Advertiser")
+            os_log("Advertiser")
         case "discoverer":
-            print("Discoverer")
+            os_log("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
             Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {

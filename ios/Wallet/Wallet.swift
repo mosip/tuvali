@@ -29,7 +29,7 @@ class Wallet: NSObject {
 
     func registerCallbackForEvent(event: NotificationEvent, callback: @escaping (_ notification: Notification) -> Void) {
         NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event.rawValue), object: nil, queue: nil) { [unowned self] notification in
-            print("Handling notification for \(notification.name.rawValue)")
+            os_log("Handling notification for \(notification.name.rawValue)")
             callback(notification)
         }
     }
@@ -40,7 +40,7 @@ class Wallet: NSObject {
 
     func lookForDestroyConnection(){
         registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
-            print("Handling notification for \(notification.name.rawValue)")
+            os_log("Handling notification for \(notification.name.rawValue)")
             if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
                 let connStatusID = Int(notifyObj[0])
                 if connStatusID == 1 {
@@ -60,7 +60,7 @@ class Wallet: NSObject {
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
-            print("Found NO ADV Identifier")
+            os_log("Found NO ADV Identifier")
             return false
         }
         let advIdentifierData = hexStringToData(string: advIdentifier)
@@ -90,8 +90,8 @@ class Wallet: NSObject {
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
         if (encryptedData != nil) {
-            print("Complete Encrypted Data: \(encryptedData!.toHex())")
-            print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
+            os_log("Complete Encrypted Data: \(encryptedData!.toHex())")
+            os_log("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
@@ -109,9 +109,9 @@ class Wallet: NSObject {
     func writeToIdentifyRequest() {
         print("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
-        print("verifier pub key:::", self.verifierPublicKey)
+        os_log("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            print("Write Identify - Found NO KEY")
+            os_log("Write Identify - Found NO KEY")
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
