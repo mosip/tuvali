@@ -115,7 +115,7 @@ extension Central: CBPeripheralDelegate {
         }
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
-             delegate?.exchangeReceiverInfoHandler()
+            walletDelegate?.exchangeReceiverInfoHandler()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
             delegate?.writeSuccessHandler()
         } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
