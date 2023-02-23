@@ -1,13 +1,13 @@
 
 import Foundation
 
-protocol PeripheralCommunicatorDelegate: AnyObject {
-    func transmissionReportHandler(data: Data?)
-    func writeSuccessHandler()
-    func verificationStatusChange(data: Data?)
+protocol PeripheralCommunicatorProtocol: AnyObject {
+    func onTransmissionReportRequest(data: Data?)
+    func onResponseSizeWriteSuccess()
+    func onVerificationStatusChange(data: Data?)
 }
 
 protocol WalletProtocol: AnyObject {
-    func exchangeReceiverInfoHandler()
-    func disconnectHandler(data: Data?)
+    func onIdentifyWriteSuccess()
+    func onDisconnectStatusChange(data: Data?)
 }

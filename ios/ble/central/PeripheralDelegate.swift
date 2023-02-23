@@ -98,13 +98,13 @@ extension Central: CBPeripheralDelegate {
             let report = characteristic.value as Data?
             print("ts report is :::", report)
             // TODO: figure out why object isn't sent out across
-            delegate?.transmissionReportHandler(data: report)
+            delegate?.onTransmissionReportRequest(data: report)
         } else if characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID {
             let verificationStatus = characteristic.value as Data?
-            delegate?.verificationStatusChange(data: verificationStatus)
+            delegate?.onVerificationStatusChange(data: verificationStatus)
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
             let disconnectStatus = characteristic.value as Data?
-            walletDelegate?.disconnectHandler(data: disconnectStatus)
+            walletDelegate?.onDisconnectStatusChange(data: disconnectStatus)
             peripheral.setNotifyValue(false, for: characteristic)
         }
     }
@@ -115,9 +115,9 @@ extension Central: CBPeripheralDelegate {
         }
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
-            walletDelegate?.exchangeReceiverInfoHandler()
+            walletDelegate?.onIdentifyWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
-            delegate?.writeSuccessHandler()
+            delegate?.onResponseSizeWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
         }
     }

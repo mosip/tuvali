@@ -106,12 +106,12 @@ class Wallet: NSObject {
     }
 }
 extension Wallet: WalletProtocol {
-    func exchangeReceiverInfoHandler() {
+    func onIdentifyWriteSuccess() {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         print("wallet delegate called")
     }
     
-    func disconnectHandler(data: Data?){
+    func onDisconnectStatusChange(data: Data?){
         print("Handling notification for disconnect handle")
         if let data {
             let connStatusID = Int(data[0])

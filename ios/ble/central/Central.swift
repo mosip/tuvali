@@ -9,7 +9,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
-    var delegate: PeripheralCommunicatorDelegate?
+    var delegate: PeripheralCommunicatorProtocol?
     var walletDelegate: WalletProtocol?
     var createConnection:(()->Void)?
 

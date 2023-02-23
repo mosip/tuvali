@@ -173,18 +173,18 @@ enum SemaphoreMarker: Int {
     case Error = 2
 }
 
-extension TransferHandler: PeripheralCommunicatorDelegate {
-    func transmissionReportHandler(data: Data?) {
+extension TransferHandler: PeripheralCommunicatorProtocol {
+    func onTransmissionReportRequest(data: Data?) {
         if let data {
             sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: data))
         }
     }
 
-    func writeSuccessHandler() {
+    func onResponseSizeWriteSuccess() {
         sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS, data: data))
     }
 
-    func verificationStatusChange(data: Data?) {
+    func onVerificationStatusChange(data: Data?) {
         let value = data
         if let value =  value {
             let status = Int(value[0])
