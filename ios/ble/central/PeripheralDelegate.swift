@@ -39,6 +39,14 @@ extension Central: CBPeripheralDelegate {
             retryCharacteristicsDiscovery(peripheral,service)
             return
         }
+        
+        let mtu = peripheral.maximumWriteValueLength(for: .withoutResponse);
+        
+        if mtu < 64 {
+            ErrorHandler.sharedInstance.handle(error: OpenId4vpError.invalidMTUSizeError(mtu: mtu))
+            return
+        }
+        
         for characteristic in serviceCharacteristics {
             // store a reference to the discovered characteristic in the Central for write.
             print("Characteristic UUID:: ", characteristic.uuid.uuidString)
