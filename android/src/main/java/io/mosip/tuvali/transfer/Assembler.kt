@@ -13,7 +13,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFA
   private val chunkReceivedMarkerByte: Byte = 1
 
   init {
-    Log.d(logTag, "expected total chunk size: $totalSize")
+    Log.i(logTag, "expected total chunk size: $totalSize")
     if (totalSize == 0) {
       throw CorruptedChunkReceivedException(0, 0, 0)
     }

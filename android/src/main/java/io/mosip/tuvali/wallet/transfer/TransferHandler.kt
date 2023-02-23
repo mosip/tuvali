@@ -48,7 +48,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
         val responseData = initResponseTransferMessage.data
         val maxChunkSize = initResponseTransferMessage.maxDataBytes
-        Log.d(logTag, "Total response size of data ${responseData.size}")
+        Log.i(logTag, "Total response size of data ${responseData.size}")
         chunker = Chunker(responseData, maxChunkSize)
         currentState = States.ResponseSizeWritePending
         this.sendMessage(ResponseSizeWritePendingMessage(responseData.size))

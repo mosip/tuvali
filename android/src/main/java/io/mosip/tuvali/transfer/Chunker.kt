@@ -12,7 +12,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAU
   private val preSlicedChunks: Array<ByteArray?> = Array(totalChunkCount) { null }
 
   init {
-    Log.d(logTag, "Total number of chunks calculated: $totalChunkCount")
+    Log.i(logTag, "Total number of chunks calculated: $totalChunkCount")
     val startTime = System.currentTimeMillis()
     for (idx in 0 until totalChunkCount) {
       preSlicedChunks[idx] = chunk(idx)

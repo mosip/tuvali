@@ -90,7 +90,7 @@ class Wallet: NSObject {
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
         if (encryptedData != nil) {
-            print("Complete Encrypted Data: \(encryptedData!.toHex())")
+            os_log("Complete Encrypted Data: \(encryptedData!.toHex())")
             print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
