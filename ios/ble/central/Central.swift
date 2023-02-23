@@ -19,15 +19,15 @@ class Central: NSObject, CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
-            print("Central Manager state is powered ON")
+            os_log("Central Manager state is powered ON")
             scanForPeripherals()
         default:
-            print("Central Manager is in powered OFF")
+            os_log("Central Manager is in powered OFF")
         }
     }
 
     deinit {
-        print("Central is DeInitializing")
+        os_log("Central is DeInitializing")
     }
 
     func scanForPeripherals() {
@@ -42,7 +42,7 @@ class Central: NSObject, CBCentralManagerDelegate {
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
                 guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                    print("Did not find the characteristic to write")
+                    os_log("Did not find the characteristic to write")
                     return
                 }
                 let messageData = Data(bytes: Array(data), count: data.count)
@@ -57,7 +57,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     func writeWithoutResp(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
             guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                print("Did not find the characteristic to write")
+                os_log("Did not find the characteristic to write")
                 return
             }
             let messageData = Data(bytes: Array(data), count: data.count)
