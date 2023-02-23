@@ -49,7 +49,8 @@ class Wallet(
 
   private var central: Central
 
-  private var maxDataBytes = 100
+  //default mtu is 23 bytes and the allowed data bytes is 20 bytes
+  private var maxDataBytes = 20
   private val mtuValues = arrayOf(512, 185, 100)
 
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)

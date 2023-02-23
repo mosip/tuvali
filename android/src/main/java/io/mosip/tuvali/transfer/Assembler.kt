@@ -4,7 +4,7 @@ import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 
-class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(mtuSize) {
+class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(maxDataBytes) {
   private val logTag = "Assembler"
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
@@ -29,8 +29,8 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
 
-    if (chunkSizeGreaterThanMtuSize(chunkData)) {
-      Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
+    if (chunkSizeGreaterThanMaxDataBytes(chunkData)) {
+      Log.e(logTag, "chunkSizeGreaterThanMaxDataBytes chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
       return seqNumberInMeta
     }
     if(crcReceivedIsNotEqualToCrcCalculated(chunkData.copyOfRange(4, chunkData.size), crcReceived)){
@@ -49,7 +49,7 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   ) = !CheckValue.verify(data, crc)
 
 
-  private fun chunkSizeGreaterThanMtuSize(chunkData: ByteArray) = chunkData.size > mtuSize
+  private fun chunkSizeGreaterThanMaxDataBytes(chunkData: ByteArray) = chunkData.size > maxDataBytes
 
   fun isComplete(): Boolean {
     if(chunkReceivedMarker.none { it != chunkReceivedMarkerByte }) {

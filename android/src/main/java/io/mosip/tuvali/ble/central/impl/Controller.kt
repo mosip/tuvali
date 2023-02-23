@@ -10,14 +10,14 @@ import io.mosip.tuvali.ble.central.state.message.*
 import io.mosip.tuvali.transfer.Util
 import java.util.UUID
 
-const val MTU_HEADERS_SIZE = 3
+const val MTU_HEADER_SIZE = 3
+const val REQUEST_MTU_TIME_OUT = -1
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
   private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender
-  private var requestedMTUValue = 0
-  private var requestMtuCounter = 0
+  private var requestedMTUValue = -1
   private lateinit var mtuValues : Array<Int>
   private var isMTURequestCallbackReceived: Boolean = false
 
@@ -101,16 +101,17 @@ class Controller(val context: Context) {
 
   fun requestMTU(mtuValues: Array<Int>, delayTime: Long) {
     this.mtuValues = mtuValues
-    while(requestMtuCounter<mtuValues.size) {
+    for (mtu in mtuValues) {
+      requestedMTUValue = mtu
+      gattClient?.requestMtu(requestedMTUValue, this::onRequestMTUSuccess, this::onRequestMTUFailure)
+      Util.sleepInRealTime(delayTime)
       if (isMTURequestCallbackReceived) {
         break
       }
-      requestedMTUValue = mtuValues[requestMtuCounter++]
-      gattClient?.requestMtu(requestedMTUValue, this::onRequestMTUSuccess, this::onRequestMTUFailure)
-      Util.sleepInRealTime(delayTime)
     }
-    if(!isMTURequestCallbackReceived) {
-      onRequestMTUFailure(0)
+    if (!isMTURequestCallbackReceived) {
+      requestedMTUValue = -1
+      onRequestMTUFailure(REQUEST_MTU_TIME_OUT)
     }
   }
 
@@ -132,7 +133,7 @@ class Controller(val context: Context) {
   private fun onRequestMTUSuccess(negotiatedMtu: Int) {
     if(requestedMTUValue == negotiatedMtu) {
       isMTURequestCallbackReceived = true
-      messageSender.sendMessage(RequestMTUSuccessMessage(negotiatedMtu - MTU_HEADERS_SIZE))
+      messageSender.sendMessage(RequestMTUSuccessMessage(negotiatedMtu - MTU_HEADER_SIZE))
     }
   }
 
