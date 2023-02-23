@@ -54,7 +54,7 @@ extension Central: CBPeripheralDelegate {
             }
         }
 
-        NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.CREATE_CONNECTION.rawValue), object: nil)
+        createConnection?()
     }
 
 
@@ -104,7 +104,6 @@ extension Central: CBPeripheralDelegate {
             delegate?.verificationStatusChange(data: verificationStatus)
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
             let disconnectStatus = characteristic.value as Data?
-//            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
             walletDelegate?.disconnectHandler(data: disconnectStatus)
             peripheral.setNotifyValue(false, for: characteristic)
         }
@@ -116,12 +115,11 @@ extension Central: CBPeripheralDelegate {
         }
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
-           // NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.EXCHANGE_RECEIVER_INFO.rawValue), object: nil)
              delegate?.exchangeReceiverInfoHandler()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
             delegate?.writeSuccessHandler()
         } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.INIT_RESPONSE_CHUNK_TRANSFER.rawValue), object: nil)
+//            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.INIT_RESPONSE_CHUNK_TRANSFER.rawValue), object: nil)
         }
     }
 

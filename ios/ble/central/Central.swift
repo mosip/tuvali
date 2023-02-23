@@ -11,7 +11,8 @@ class Central: NSObject, CBCentralManagerDelegate {
     var cbCharacteristics: [String: CBCharacteristic] = [:]
     var delegate: PeripheralCommunicatorDelegate?
     var walletDelegate: WalletProtocol?
-    
+    var createConnection:(()->Void)?
+
     public static var shared = Central()
 
     func initialize() {
