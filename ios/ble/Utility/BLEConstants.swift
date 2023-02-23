@@ -9,5 +9,5 @@ struct BLEConstants {
     static var DEFAULT_CHUNK_SIZE = 512
     static var seqNumberReservedByteSize = 2
     static var mtuReservedByteSize = 2
-    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
 }
