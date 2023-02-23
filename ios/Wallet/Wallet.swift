@@ -89,6 +89,7 @@ class Wallet: NSObject {
         var dataInBytes = Data(data.utf8)
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
+        
         if (encryptedData != nil) {
             print("Complete Encrypted Data: \(encryptedData!.toHex())")
             print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")

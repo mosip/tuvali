@@ -89,6 +89,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break
         }
+        
     }
 
     @objc
@@ -100,4 +101,9 @@ class Openid4vpBle: RCTEventEmitter {
     override static func requiresMainQueueSetup() -> Bool {
         return false
     }
+    
+    fileprivate func sendErrorEvent(_ message: String) {
+        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+    }
+    
 }

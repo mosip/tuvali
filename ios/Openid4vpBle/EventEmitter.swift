@@ -31,6 +31,14 @@ class EventEmitter {
         dispatch(name: "EVENT_NEARBY", body: eventData)
     }
     
+    func emitNearbyErrorEvent(message: String) {
+        var eventData: [String: String] = [:]
+        eventData["message"] = message
+        eventData["type"] = "onError"
+        
+        dispatch(name: "EVENT_NEARBY", body: eventData)
+    }
+    
     lazy var allEvents: [String] = {
         return [
             "EVENT_NEARBY",
