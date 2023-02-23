@@ -105,6 +105,7 @@ class Openid4vpBle: RCTEventEmitter {
 
     fileprivate func sendErrorEvent(_ message: String) {
         EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+        Wallet.shared.destroyConnection()
     }
 
 }
