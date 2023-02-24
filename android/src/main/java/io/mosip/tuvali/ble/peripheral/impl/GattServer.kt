@@ -6,10 +6,11 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import java.util.UUID
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
-  private val logTag = "GattServer"
+  private val logTag = getLogTag("GattServer")
   private lateinit var gattServer: BluetoothGattServer
   private var bluetoothDevice: BluetoothDevice? = null
 

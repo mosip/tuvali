@@ -7,6 +7,7 @@ import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 import org.json.JSONObject
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -37,6 +38,11 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
   override fun getName(): String {
     return NAME
+  }
+
+  @ReactMethod(isBlockingSynchronousMethod = true)
+  fun setTuvaliVersion(version: String){
+    tuvaliVersion = version
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -236,6 +242,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   // ) => EmitterSubscription;
 
   companion object {
+    var tuvaliVersion: String = "null"
     const val NAME = "Openid4vpBle"
     const val logTag = "Openid4vpBleModule"
   }

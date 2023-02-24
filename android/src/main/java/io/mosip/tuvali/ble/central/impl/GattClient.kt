@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothGatt.*
 import android.content.Context
 import android.util.Log
 import java.util.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class GattClient(var context: Context) {
   private var onNotificationReceived: ((UUID, ByteArray) -> Unit)? = null
@@ -21,7 +22,7 @@ class GattClient(var context: Context) {
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit
   private var peripheral: BluetoothDevice? = null
   private var bluetoothGatt: BluetoothGatt? = null
-  private val logTag = "BLECentral"
+  private val logTag = getLogTag("BLECentral")
   private var tempCounterMap = mutableMapOf<UUID, Int>()
 
   private val bluetoothGattCallback = object : BluetoothGattCallback() {
@@ -37,7 +38,7 @@ class GattClient(var context: Context) {
           tempCounterMap[characteristic.uuid!!] = (tempCounterMap[characteristic.uuid] as Int) + 1
         }
       }
-      Log.i(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
+      Log.d(logTag, "Status of write is $status for ${characteristic?.uuid}, tempWriteCounterForCharUUID: ${tempCounterMap[characteristic?.uuid]}")
 
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
