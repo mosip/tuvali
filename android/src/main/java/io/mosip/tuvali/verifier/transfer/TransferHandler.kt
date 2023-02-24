@@ -17,9 +17,10 @@ import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
 import kotlin.math.ceil
 import kotlin.math.min
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
-  private val logTag = "TransferHandler"
+  private val logTag = getLogTag("TransferHandler")
   enum class States {
     UnInitialised,
     RequestSizeWritePending,

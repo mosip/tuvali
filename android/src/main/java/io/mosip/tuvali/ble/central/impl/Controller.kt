@@ -5,6 +5,7 @@ import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothGatt
 import android.bluetooth.le.ScanResult
 import android.content.Context
+import android.util.Log
 import io.mosip.tuvali.ble.central.state.IMessageSender
 import io.mosip.tuvali.ble.central.state.message.*
 import io.mosip.tuvali.transfer.Util
@@ -15,6 +16,8 @@ const val REQUEST_MTU_TIME_OUT = -1
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
+  private val logTag = "CentralController"
+
   private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender
   private var requestedMTUValue = -1
@@ -119,7 +122,10 @@ class Controller(val context: Context) {
   fun disconnect(): Boolean {
     return if(gattClient != null) {
       gattClient!!.disconnect()
-    } else false
+    } else {
+      Log.i(logTag,"Bluetooth device not available to disconnect")
+      false
+    }
   }
 
   fun close() {

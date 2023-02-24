@@ -27,6 +27,7 @@ import io.mosip.tuvali.wallet.transfer.message.*
 import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 250L
 
@@ -36,7 +37,7 @@ class Wallet(
   private val eventResponseListener: (String) -> Unit,
   private val onBLEException: (Throwable) -> Unit
 ) : ICentralListener, ITransferListener {
-  private val logTag = "Wallet"
+  private val logTag = getLogTag("Wallet")
 
   private val secureRandom: SecureRandom = SecureRandom()
   private lateinit var verifierPK: ByteArray
@@ -325,12 +326,12 @@ class Wallet(
     val dataInBytes = data.toByteArray()
     Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
     val compressedBytes = Util.compress(dataInBytes)
-    Log.i(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
+    Log.d(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
     try {
       val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
       if (encryptedData != null) {
         Log.d(logTag, "Complete Encrypted Data: ${Hex.toHexString(encryptedData)}")
-        Log.d(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
+        Log.i(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
         transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
       } else {
         Log.e(

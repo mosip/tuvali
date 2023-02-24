@@ -12,9 +12,10 @@ import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import java.util.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
-  private val logTag = "Peripheral"
+  private val logTag = getLogTag("Peripheral")
   private val controller: Controller =
     Controller(context)
   private var messageSender: IMessageSender
