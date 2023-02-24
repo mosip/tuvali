@@ -71,7 +71,7 @@ class Chunker {
     private func chunk(seqNumber: Int) -> Data {
         let fromIndex = seqNumber * effectivePayloadSize
         if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
-            print( "fetching last chunk")
+           // print( "fetching last chunk")
             let chunkLength = lastChunkByteCount + chunkMetaSize
             return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
@@ -96,7 +96,7 @@ class Chunker {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            print("SequenceNumber: \(seqNumber)")
+           // print("SequenceNumber: \(seqNumber)")
             return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
         }
         return Data() //
