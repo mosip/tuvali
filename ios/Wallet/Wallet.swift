@@ -15,7 +15,6 @@ class Wallet: NSObject {
 
     private override init() {
         super.init()
-        lookForDestroyConnection()
     }
 
     @objc(getModuleName:withRejecter:)
@@ -27,34 +26,11 @@ class Wallet: NSObject {
         self.advIdentifier = identifier
     }
 
-    func registerCallbackForEvent(event: NotificationEvent, callback: @escaping (_ notification: Notification) -> Void) {
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: event.rawValue), object: nil, queue: nil) { [unowned self] notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            callback(notification)
-        }
-    }
-
     func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
     }
 
-    func lookForDestroyConnection(){
-        registerCallbackForEvent(event: NotificationEvent.DISCONNECT_STATUS_CHANGE) { notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            if let notifyObj = notification.userInfo?["disconnectStatus"] as? Data {
-                let connStatusID = Int(notifyObj[0])
-                if connStatusID == 1 {
-                    print("con statusid:", connStatusID)
-                    self.destroyConnection()
-                }
-            } else {
-                print("weird reason!!")
-            }
-        }
-    }
-
     func destroyConnection(){
-        NotificationCenter.default.removeObserver(self)
         onDeviceDisconnected(isManualDisconnect: false)
     }
 
@@ -96,6 +72,7 @@ class Wallet: NSObject {
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
+                self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
                 var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
                 if currentMTUSize == nil || currentMTUSize! < 0 {
@@ -118,9 +95,6 @@ class Wallet: NSObject {
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
         var iv = (self.secretTranslator?.initializationVector())!
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
-        registerCallbackForEvent(event: NotificationEvent.EXCHANGE_RECEIVER_INFO) { notification in
-            EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
-        }
     }
 
     func onDeviceDisconnected(isManualDisconnect: Bool) {
@@ -129,6 +103,25 @@ class Wallet: NSObject {
                 central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
             }
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
+        }
+    }
+}
+extension Wallet: WalletProtocol {
+    func onIdentifyWriteSuccess() {
+        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        print("wallet delegate called")
+    }
+    
+    func onDisconnectStatusChange(data: Data?){
+        print("Handling notification for disconnect handle")
+        if let data {
+            let connStatusID = Int(data[0])
+            if connStatusID == 1 {
+                print("con statusid:", connStatusID)
+                destroyConnection()
+            }
+        } else {
+            print("weird reason!!")
         }
     }
 }

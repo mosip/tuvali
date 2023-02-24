@@ -33,6 +33,7 @@
 		8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */; };
 		E223F0322977BE090042F919 /* TransferHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E223F0312977BE090042F919 /* TransferHandler.swift */; };
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
+		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
 		E2F1AFCD2971883500AC3355 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */; };
 		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
@@ -82,6 +83,7 @@
 		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
 		E223F0312977BE090042F919 /* TransferHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHandler.swift; sourceTree = "<group>"; };
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
+		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
 		E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -189,6 +191,7 @@
 				8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */,
 				8D069F6C2964724700AB61A9 /* Characteristics.swift */,
 				0ACACE892966D8C800DABDFE /* Utils.swift */,
+				E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */,
 			);
 			path = peripheral;
 			sourceTree = "<group>";
@@ -344,6 +347,7 @@
 				E25800A42976BF8700968EA0 /* chunker.swift in Sources */,
 				0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */,
 				8D069F6B29644B7C00AB61A9 /* PeripheralExtension.swift in Sources */,
+				E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */,
 				8D179C8F29548B3A00017EE5 /* CryptoBoxImpl.swift in Sources */,
 				8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */,
 				8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */,

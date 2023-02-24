@@ -80,14 +80,6 @@ class TransferHandler {
         var notifyObj: Data
         Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
         print("transmission report requested")
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, queue: nil) { [unowned self] notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            if let notifyObj = notification.userInfo?["report"] as? Data {
-                sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: notifyObj))
-            } else {
-                print("invalid report")
-            }
-        }
     }
 
     private func handleTransmissionReport(report: Data) {
@@ -99,19 +91,6 @@ class TransferHandler {
             currentState = States.TransferVerified
             EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
             print("Emitting send-vc:response RECEIVED message")
-            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.VERIFICATION_STATUS_RESPONSE) {
-                notification in
-                // TODO -- Add all React native events under an Enum
-                let value = notification.userInfo?["status"] as? Data
-                if let value =  value {
-                    let status = Int(value[0])
-                    if status == 0 {
-                        EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"ACCEPTED\"")
-                    } else if status == 1 {
-                        EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
-                    }
-                }
-            }
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
             sendRetryRespChunk(missingChunks: r.missingSequences!)
@@ -127,10 +106,6 @@ class TransferHandler {
         let d = decimalString.data(using: .utf8)
         print(d!)
         Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: d!)
-        NotificationCenter.default.addObserver(forName: Notification.Name(rawValue: "RESPONSE_SIZE_WRITE_SUCCESS"), object: nil, queue: nil) { [unowned self] notification in
-            print("Handling notification for \(notification.name.rawValue)")
-            sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS, data: data))
-        }
     }
 
     private func initResponseChunkSend() {
@@ -198,6 +173,26 @@ enum SemaphoreMarker: Int {
     case Error = 2
 }
 
+extension TransferHandler: PeripheralCommunicatorProtocol {
+    func onTransmissionReportRequest(data: Data?) {
+        if let data {
+            sendMessage(message: imessage(msgType: .HANDLE_TRANSMISSION_REPORT, data: data))
+        }
+    }
 
+    func onResponseSizeWriteSuccess() {
+        sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_SUCCESS, data: data))
+    }
 
-
+    func onVerificationStatusChange(data: Data?) {
+        let value = data
+        if let value =  value {
+            let status = Int(value[0])
+            if status == 0 {
+                EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"ACCEPTED\"")
+            } else if status == 1 {
+                EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
+            }
+        }
+    }
+}

@@ -7,7 +7,7 @@ class Openid4vpBle: RCTEventEmitter {
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
-        ErrorHandler.sharedInstance.setOnError(onError: self.sendErrorEvent)
+        ErrorHandler.sharedInstance.setOnError(onError: self.handleError)
     }
 
     @objc
@@ -82,8 +82,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
-            Wallet.shared.registerCallbackForEvent(event: NotificationEvent.CREATE_CONNECTION) {
-                notification in
+            Central.shared.createConnection = {
                 callback([])
             }
         default:
@@ -103,9 +102,9 @@ class Openid4vpBle: RCTEventEmitter {
         return false
     }
 
-    fileprivate func sendErrorEvent(_ message: String) {
-        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+    fileprivate func handleError(_ message: String) {
         Wallet.shared.destroyConnection()
+        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
     }
 
 }
