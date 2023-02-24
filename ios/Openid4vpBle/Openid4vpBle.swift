@@ -4,6 +4,7 @@ import Foundation
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
     var tuvaliVersion: String = " "
+
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)

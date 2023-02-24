@@ -1,6 +1,6 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import type { OpenIDBLEShare } from './types/bleshare';
-import {tuvaliVersion} from './tuvaliVersion';
+import { tuvaliVersion } from './tuvaliVersion';
 
 const LINKING_ERROR =
   `The package 'react-native-openid4vp-ble' doesn't seem to be linked. Make sure: \n\n` +
@@ -19,7 +19,7 @@ const Openid4vpBle: OpenIDBLEShare = NativeModules.Openid4vpBle
       }
     );
 
-Openid4vpBle.setTuvaliVersion(tuvaliVersion)
+Openid4vpBle.setTuvaliVersion(tuvaliVersion);
 
 if (Platform.OS === 'android') {
   const eventEmitter = new NativeEventEmitter();
