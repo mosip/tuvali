@@ -7,6 +7,7 @@ class Openid4vpBle: RCTEventEmitter {
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
+        ErrorHandler.sharedInstance.setOnError(onError: self.handleError)
     }
 
     @objc
@@ -96,6 +97,7 @@ class Openid4vpBle: RCTEventEmitter {
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break
         }
+
     }
 
     @objc
@@ -107,4 +109,10 @@ class Openid4vpBle: RCTEventEmitter {
     override static func requiresMainQueueSetup() -> Bool {
         return false
     }
+
+    fileprivate func handleError(_ message: String) {
+        Wallet.shared.destroyConnection()
+        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+    }
+
 }
