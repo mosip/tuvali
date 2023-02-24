@@ -3,7 +3,7 @@ import Foundation
 @available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-
+    var tuvaliVersion: String = " "
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -45,6 +45,14 @@ class Openid4vpBle: RCTEventEmitter {
         return "GetConnectionParametersDebug"
     }
 
+    @objc(setTuvaliVersion:)
+    func setTuvaliVersion(version: String) -> String{
+        tuvaliVersion = version
+        os_log("Tuvali version - %{public}@",tuvaliVersion);
+        Central.shared.tuvaliVersion = tuvaliVersion
+        return tuvaliVersion
+      }
+
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
         Wallet.shared.destroyConnection()
@@ -77,9 +85,9 @@ class Openid4vpBle: RCTEventEmitter {
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         switch mode {
         case "advertiser":
-            print("Advertiser")
+            os_log("Advertiser")
         case "discoverer":
-            print("Discoverer")
+            os_log("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
             Central.shared.createConnection = {

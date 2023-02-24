@@ -14,6 +14,7 @@ export interface OpenIDBLEShare {
   handleLogEvents: (
     callback: (event: NearbyLog) => void
   ) => EmitterSubscription;
+  setTuvaliVersion: (version: string) => void;
 }
 
 export type ConnectionMode = 'dual' | 'advertiser' | 'discoverer';

@@ -36,7 +36,7 @@ class Wallet: NSObject {
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
-            print("Found NO ADV Identifier")
+            os_log("Found NO ADV Identifier")
             return false
         }
         let advIdentifierData = hexStringToData(string: advIdentifier)
@@ -89,7 +89,7 @@ class Wallet: NSObject {
         let publicKey = self.cryptoBox.getPublicKey()
         print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            print("Write Identify - Found NO KEY")
+            os_log("Write Identify - Found NO KEY")
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))

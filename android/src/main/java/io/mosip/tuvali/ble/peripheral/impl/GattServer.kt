@@ -6,10 +6,11 @@ import android.content.Context
 import android.os.Build
 import android.util.Log
 import java.util.UUID
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
-  private val logTag = "GattServer"
+  private val logTag = getLogTag("GattServer")
   private lateinit var gattServer: BluetoothGattServer
   private var bluetoothDevice: BluetoothDevice? = null
 
@@ -31,6 +32,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     onMTUChangedCallback = onMTUChanged
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
+    Log.i(logTag, "Device Address: ${bluetoothManager.adapter.address}")
   }
 
   fun close() {
@@ -43,8 +45,10 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   fun writeToChar(serviceUUID: UUID, charUUID: UUID, data: ByteArray): Boolean {
-    if(bluetoothDevice == null) return false
-
+    if(bluetoothDevice == null) {
+      Log.i(logTag, "Bluetooth device not available to write to char $charUUID")
+      return false
+    }
     val service = gattServer.getService(serviceUUID)
     val characteristic = service.getCharacteristic(charUUID)
     characteristic.value = data
@@ -56,16 +60,19 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   override fun onConnectionStateChange(device: BluetoothDevice?, status: Int, newState: Int) {
-    Log.d(logTag, "onConnectionStateChange: status: $status, newState: $newState, device: $device, deviceHash: ${device.hashCode()}, deviceBondState: ${device?.bondState}")
+    Log.i(logTag, "onConnectionStateChange: deviceAddress: ${device?.address}, status: $status," +
+      " newState: $newState,  deviceHash: ${device.hashCode()}, deviceBondState: ${device?.bondState}")
+
     bluetoothDevice = if(newState == BluetoothProfile.STATE_CONNECTED){
       // Required by Android SDK to connect from peripheral side
       val connect = gattServer.connect(device, false)
-      Log.d(logTag, "connecting from Peripheral to central: $connect")
+      Log.i(logTag, "Connection initiated to central: $connect with device address: ${device?.address}")
 
       onDeviceConnectedCallback(status, newState)
       device?.let { setPhy(it) }
       device
     } else {
+      Log.i(logTag,"Received disconnect from central with device address: ${device?.address}")
       onDeviceNotConnectedCallback(status, newState)
       null
     }
@@ -141,9 +148,13 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
 
   fun disconnect(): Boolean {
     return if(bluetoothDevice != null) {
+      Log.d(logTag, "Disconnecting from central with device address: ${bluetoothDevice?.address}")
       gattServer.cancelConnection(bluetoothDevice)
       bluetoothDevice = null
       true
-    } else false
+    } else {
+      Log.i(logTag,"Bluetooth device not available to disconnect !!")
+      false
+    }
   }
 }
