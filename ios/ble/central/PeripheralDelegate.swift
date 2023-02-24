@@ -39,6 +39,14 @@ extension Central: CBPeripheralDelegate {
             retryCharacteristicsDiscovery(peripheral,service)
             return
         }
+        
+        let mtu = peripheral.maximumWriteValueLength(for: .withoutResponse);
+        
+        if mtu < 64 {
+            ErrorHandler.sharedInstance.handle(error: OpenId4vpError.invalidMTUSizeError(mtu: mtu))
+            return
+        }
+        
         for characteristic in serviceCharacteristics {
             // store a reference to the discovered characteristic in the Central for write.
             print("Characteristic UUID:: ", characteristic.uuid.uuidString)
@@ -54,7 +62,7 @@ extension Central: CBPeripheralDelegate {
             }
         }
 
-        NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.CREATE_CONNECTION.rawValue), object: nil)
+        createConnection?()
     }
 
 
@@ -98,13 +106,13 @@ extension Central: CBPeripheralDelegate {
             let report = characteristic.value as Data?
             print("ts report is :::", report)
             // TODO: figure out why object isn't sent out across
-            NotificationCenter.default.post(name: Notification.Name(rawValue: "HANDLE_TRANSMISSION_REPORT"), object: nil, userInfo: ["report": report])
+            delegate?.onTransmissionReportRequest(data: report)
         } else if characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID {
             let verificationStatus = characteristic.value as Data?
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.VERIFICATION_STATUS_RESPONSE.rawValue), object: nil, userInfo: ["status": verificationStatus])
+            delegate?.onVerificationStatusChange(data: verificationStatus)
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
             let disconnectStatus = characteristic.value as Data?
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.DISCONNECT_STATUS_CHANGE.rawValue), object: nil, userInfo: ["disconnectStatus": disconnectStatus])
+            walletDelegate?.onDisconnectStatusChange(data: disconnectStatus)
             peripheral.setNotifyValue(false, for: characteristic)
         }
     }
@@ -115,11 +123,10 @@ extension Central: CBPeripheralDelegate {
         }
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.EXCHANGE_RECEIVER_INFO.rawValue), object: nil)
+            walletDelegate?.onIdentifyWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.RESPONSE_SIZE_WRITE_SUCCESS.rawValue), object: nil)
+            delegate?.onResponseSizeWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
-            NotificationCenter.default.post(name: Notification.Name(rawValue: NotificationEvent.INIT_RESPONSE_CHUNK_TRANSFER.rawValue), object: nil)
         }
     }
 

@@ -3,9 +3,10 @@ package io.mosip.tuvali.transfer
 import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(mtuSize) {
-  private val logTag = "Assembler"
+class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(maxDataBytes) {
+  private val logTag = getLogTag("Assembler")
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
   val totalChunkCount = getTotalChunkCount(totalSize)
@@ -13,7 +14,7 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   private val chunkReceivedMarkerByte: Byte = 1
 
   init {
-    Log.d(logTag, "expected total chunk size: $totalSize")
+    Log.i(logTag, "expected total chunk size: $totalSize")
     if (totalSize == 0) {
       throw CorruptedChunkReceivedException(0, 0, 0)
     }
@@ -29,8 +30,8 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
 
-    if (chunkSizeGreaterThanMtuSize(chunkData)) {
-      Log.e(logTag, "chunkSizeGreaterThanMtuSize chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
+    if (chunkSizeGreaterThanMaxDataBytes(chunkData)) {
+      Log.e(logTag, "chunkSizeGreaterThanMaxDataBytes chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
       return seqNumberInMeta
     }
     if(crcReceivedIsNotEqualToCrcCalculated(chunkData.copyOfRange(4, chunkData.size), crcReceived)){
@@ -49,11 +50,11 @@ class Assembler(private val totalSize: Int, private val mtuSize: Int = DEFAULT_C
   ) = !CheckValue.verify(data, crc)
 
 
-  private fun chunkSizeGreaterThanMtuSize(chunkData: ByteArray) = chunkData.size > mtuSize
+  private fun chunkSizeGreaterThanMaxDataBytes(chunkData: ByteArray) = chunkData.size > maxDataBytes
 
   fun isComplete(): Boolean {
     if(chunkReceivedMarker.none { it != chunkReceivedMarkerByte }) {
-      Log.d(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
+      Log.i(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
       return true
     }
     return false

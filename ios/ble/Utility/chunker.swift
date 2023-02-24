@@ -96,7 +96,7 @@ class Chunker {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            print("SequenceNumber: \(seqNumber) , Sha256: \(payload.sha256())")
+            print("SequenceNumber: \(seqNumber)")
             return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
         }
         return Data() //

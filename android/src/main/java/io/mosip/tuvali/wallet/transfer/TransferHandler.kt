@@ -10,11 +10,12 @@ import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID, private val transferListener: ITransferListener) :
   Handler(looper) {
   private lateinit var retryChunker: RetryChunker
-  private val logTag = "TransferHandler"
+  private val logTag = getLogTag("TransferHandler")
   private var chunkCounter = 0;
   private var isRetryFrame = false;
 
@@ -47,8 +48,9 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       IMessage.TransferMessageTypes.INIT_RESPONSE_TRANSFER.ordinal -> {
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
         val responseData = initResponseTransferMessage.data
-        Log.d(logTag, "Total response size of data ${responseData.size}")
-        chunker = Chunker(responseData)
+        val maxChunkSize = initResponseTransferMessage.maxDataBytes
+        Log.i(logTag, "Total response size of data ${responseData.size}")
+        chunker = Chunker(responseData, maxChunkSize)
         currentState = States.ResponseSizeWritePending
         this.sendMessage(ResponseSizeWritePendingMessage(responseData.size))
       }

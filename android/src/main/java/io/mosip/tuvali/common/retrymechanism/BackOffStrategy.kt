@@ -1,4 +1,4 @@
-package io.mosip.tuvali.retrymechanism.lib
+package io.mosip.tuvali.common.retrymechanism
 
 import kotlin.math.min
 import kotlin.math.pow

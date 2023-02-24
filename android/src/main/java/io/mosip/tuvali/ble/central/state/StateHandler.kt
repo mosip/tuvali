@@ -9,13 +9,14 @@ import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
 import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(
   looper: Looper,
   private val controller: Controller,
   private val listener: ICentralListener
 ) : Handler(looper), IMessageSender {
-  private val logTag = "CentralHandlerThread"
+  private val logTag = getLogTag("CentralHandlerThread")
   private var currentState: States = States.Init
 
   //TODO: Add explicit ordinal value for below enum
@@ -140,19 +141,18 @@ class StateHandler(
       }
       IMessage.CentralStates.REQUEST_MTU.ordinal -> {
         val requestMTUMessage = msg.obj as RequestMTUMessage
-        Log.d(logTag, "request mtu change to ${requestMTUMessage.mtu}")
-        controller.requestMTU(requestMTUMessage.mtu)
+        Log.d(logTag, "Requesting mtu change")
         currentState = States.RequestingMTU
+        controller.requestMTU(requestMTUMessage.mtuValues, requestMTUMessage.delayTime)
       }
       IMessage.CentralStates.REQUEST_MTU_SUCCESS.ordinal -> {
         val requestMTUSuccessMessage = msg.obj as RequestMTUSuccessMessage
-
         Log.d(logTag, "MTU changed to ${requestMTUSuccessMessage.mtu}.")
         listener.onRequestMTUSuccess(requestMTUSuccessMessage.mtu)
         currentState = States.Connected
       }
       IMessage.CentralStates.REQUEST_MTU_FAILURE.ordinal -> {
-        Log.d(logTag, "failed to request MTU Change.")
+        Log.d(logTag, "Failed to request MTU Change.")
         val requestMTUFailureMessage = msg.obj as RequestMTUFailureMessage
         listener.onRequestMTUFailure(requestMTUFailureMessage.errorCode)
         currentState = States.Connected

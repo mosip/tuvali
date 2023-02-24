@@ -2,17 +2,18 @@ package io.mosip.tuvali.transfer
 
 import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.intToTwoBytesBigEndian
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CHUNK_SIZE) :
-  ChunkerBase(mtuSize) {
-  private val logTag = "Chunker"
+class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE) :
+  ChunkerBase(maxDataBytes) {
+  private val logTag = getLogTag("Chunker")
   private var chunksReadCounter: Int = 0
   private val lastChunkByteCount = getLastChunkByteCount(data.size)
   private val totalChunkCount = getTotalChunkCount(data.size).toInt()
   private val preSlicedChunks: Array<ByteArray?> = Array(totalChunkCount) { null }
 
   init {
-    Log.d(logTag, "Total number of chunks calculated: $totalChunkCount")
+    Log.i(logTag, "Total number of chunks calculated: $totalChunkCount")
     val startTime = System.currentTimeMillis()
     for (idx in 0 until totalChunkCount) {
       preSlicedChunks[idx] = chunk(idx)
@@ -43,11 +44,11 @@ class Chunker(private val data: ByteArray, private val mtuSize: Int = DEFAULT_CH
   }
 
   /*
-  <------------------------------------------------------- MTU ------------------------------------------------------------------->
+  <--------------------------------------------------Max Data Bytes -------------------------------------------------------------->
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
   |                       |                             |                                                                         |
   |  chunk sequence no    |   checksum value of data    |         chunk payload                                                   |
-  |      (2 bytes)        |         (2 bytes)           |       (upto MTU-4 bytes)                                                |
+  |      (2 bytes)        |         (2 bytes)           |       (upto MaxDataBytes -4 bytes)                                      |
   |                       |                             |                                                                         |
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */

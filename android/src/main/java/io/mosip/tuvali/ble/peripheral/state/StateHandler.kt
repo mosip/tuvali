@@ -10,14 +10,14 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
-
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(
   looper: Looper,
   private val controller: Controller,
   private val peripheralListener: IPeripheralListener
 ) : Handler(looper), IMessageSender {
-  private val logTag = "PeripheralHandlerThread"
+  private val logTag = getLogTag("PeripheralHandlerThread")
 
   enum class States {
     Init,
@@ -129,7 +129,7 @@ class StateHandler(
         Log.d(logTag, "disconnect and close gatt server")
         val disconnecting = controller.disconnect()
 
-        currentState = if(disconnecting) {
+        currentState = if(disconnecting == true) {
           sendMessageDelayed(CloseOnDisconnectTimeoutMessage(), 50)
           States.Closing
         } else {

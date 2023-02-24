@@ -2,13 +2,15 @@ package io.mosip.tuvali.ble.peripheral.impl
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.util.Log
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
-const val HEADERS_SIZE_IN_MTU = 3
+const val MTU_HEADER_SIZE = 3
 
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
-  private lateinit var gattServer: GattServer
+  private val logTag = "PeripheralController"
+  private var gattServer: GattServer? = null
   private lateinit var messageSender: IMessageSender
 
   fun setHandlerThread(messageSender: IMessageSender) {
@@ -17,8 +19,8 @@ class Controller(val context: Context) {
 
   fun setupGattService(gattServiceMessage: SetupGattServiceMessage) {
     gattServer = GattServer(context)
-    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onMTUChanged)
-    gattServer.addService(gattServiceMessage.service, this::onServiceAdded)
+    gattServer?.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onMTUChanged)
+    gattServer?.addService(gattServiceMessage.service, this::onServiceAdded)
   }
 
   fun startAdvertisement(advertisementStartMessage: AdvertisementStartMessage) {
@@ -34,11 +36,16 @@ class Controller(val context: Context) {
   }
 
   fun sendData(sendDataMessage: SendDataMessage) {
-    val isNotificationTriggered = gattServer.writeToChar(
+    val isNotificationTriggered = gattServer?.writeToChar(
       sendDataMessage.serviceUUID,
       sendDataMessage.charUUID,
       sendDataMessage.data
     )
+    if(isNotificationTriggered == null) {
+      Log.i(logTag, "Gatt server is null, ignoring write to char: ${sendDataMessage.charUUID}")
+      return
+    }
+    Log.i(logTag, "Is notification triggered for char ${sendDataMessage.charUUID}: $isNotificationTriggered")
     val sendDataNotifiedMessage =
       SendDataTriggeredMessage(sendDataMessage.charUUID, isNotificationTriggered)
     messageSender.sendMessage(sendDataNotifiedMessage)
@@ -75,21 +82,28 @@ class Controller(val context: Context) {
   }
 
   private fun onMTUChanged(mtu: Int) {
-    val mtuChangedMessage = MtuChangedMessage(mtu - HEADERS_SIZE_IN_MTU)
+    val mtuChangedMessage = MtuChangedMessage(mtu - MTU_HEADER_SIZE)
     messageSender.sendMessage(mtuChangedMessage)
   }
 
   fun closeServer() {
-    gattServer.close()
+    gattServer?.close()
   }
 
-  fun disconnect(): Boolean {
-    return gattServer.disconnect()
+  fun disconnect(): Boolean? {
+    //TODO: remove the if condition after spurious disconnect event issue is resolved
+    if(gattServer == null) {
+      Log.i(logTag, "Gatt server is null, ignoring disconnect")
+      return true
+    }
+    return gattServer?.disconnect()
   }
 
   fun stopAdvertisement() {
     if (advertiser != null) {
       advertiser?.stop()
+    }else {
+      Log.i(logTag, "Bluetooth device not available to stop advertisement")
     }
   }
 }
