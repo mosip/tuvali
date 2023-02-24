@@ -10,7 +10,7 @@ const val MTU_HEADER_SIZE = 3
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
   private val logTag = "PeripheralController"
-  private lateinit var gattServer: GattServer
+  private var gattServer: GattServer? = null
   private lateinit var messageSender: IMessageSender
 
   fun setHandlerThread(messageSender: IMessageSender) {
@@ -19,8 +19,8 @@ class Controller(val context: Context) {
 
   fun setupGattService(gattServiceMessage: SetupGattServiceMessage) {
     gattServer = GattServer(context)
-    gattServer.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onMTUChanged)
-    gattServer.addService(gattServiceMessage.service, this::onServiceAdded)
+    gattServer?.start(this::onDeviceConnected, this::onDeviceNotConnected, this::onReceivedWrite, this::onMTUChanged)
+    gattServer?.addService(gattServiceMessage.service, this::onServiceAdded)
   }
 
   fun startAdvertisement(advertisementStartMessage: AdvertisementStartMessage) {
@@ -36,12 +36,16 @@ class Controller(val context: Context) {
   }
 
   fun sendData(sendDataMessage: SendDataMessage) {
-    val isNotificationTriggered = gattServer.writeToChar(
+    val isNotificationTriggered = gattServer?.writeToChar(
       sendDataMessage.serviceUUID,
       sendDataMessage.charUUID,
       sendDataMessage.data
     )
-    println("isNotificationTriggered : $isNotificationTriggered")
+    if(isNotificationTriggered == null) {
+      Log.i(logTag, "Gatt server is null, ignoring write to char: ${sendDataMessage.charUUID}")
+      return
+    }
+    Log.i(logTag, "Is notification triggered for char ${sendDataMessage.charUUID}: $isNotificationTriggered")
     val sendDataNotifiedMessage =
       SendDataTriggeredMessage(sendDataMessage.charUUID, isNotificationTriggered)
     messageSender.sendMessage(sendDataNotifiedMessage)
@@ -83,11 +87,16 @@ class Controller(val context: Context) {
   }
 
   fun closeServer() {
-    gattServer.close()
+    gattServer?.close()
   }
 
-  fun disconnect(): Boolean {
-    return gattServer.disconnect()
+  fun disconnect(): Boolean? {
+    //TODO: remove the if condition after spurious disconnect event issue is resolved
+    if(gattServer == null) {
+      Log.i(logTag, "Gatt server is null, ignoring disconnect")
+      return true
+    }
+    return gattServer?.disconnect()
   }
 
   fun stopAdvertisement() {

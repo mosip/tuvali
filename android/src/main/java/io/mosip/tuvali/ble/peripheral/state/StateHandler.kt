@@ -129,7 +129,7 @@ class StateHandler(
         Log.d(logTag, "disconnect and close gatt server")
         val disconnecting = controller.disconnect()
 
-        currentState = if(disconnecting) {
+        currentState = if(disconnecting == true) {
           sendMessageDelayed(CloseOnDisconnectTimeoutMessage(), 50)
           States.Closing
         } else {
