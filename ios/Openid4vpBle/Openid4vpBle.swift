@@ -3,8 +3,9 @@ import Foundation
 @available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-    var tuvaliVersion: String = " "
-
+    
+    var tuvaliVersion: String = "unknown"
+    
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -48,9 +49,9 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(setTuvaliVersion:)
     func setTuvaliVersion(version: String) -> String{
-        tuvaliVersion = version
-        os_log("Tuvali version - %{public}@",tuvaliVersion);
-        Central.shared.tuvaliVersion = tuvaliVersion
+//        tuvaliVersion = version
+//        os_log("Tuvali version - %{public}@",tuvaliVersion);
+//        Central.shared.tuvaliVersion = tuvaliVersion
         return tuvaliVersion
       }
 

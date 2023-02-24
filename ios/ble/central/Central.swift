@@ -10,7 +10,6 @@ class Central: NSObject, CBCentralManagerDelegate {
     var centralManager: CBCentralManager!
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
-    var tuvaliVersion: String?
     var delegate: PeripheralCommunicatorProtocol?
     var walletDelegate: WalletProtocol?
     var createConnection:(()->Void)?
@@ -25,20 +24,20 @@ class Central: NSObject, CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
-            os_log("Central Manager state is powered ON : v%{public}@", tuvaliVersion!)
+            os_log("Central Manager state is powered ON")
             scanForPeripherals()
         default:
-            os_log("Central Manager state is powered OFF : v%{public}@", tuvaliVersion!)
+            os_log("Central Manager state is powered OFF")
         }
     }
 
     deinit {
-        os_log("Central is DeInitializing : v%{public}@", tuvaliVersion!)
+        os_log("Central is DeInitializing")
     }
 
     func scanForPeripherals() {
         centralManager.scanForPeripherals(withServices: [Peripheral.SERVICE_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
-        os_log("scanning happening :::::::  v%{public}@", tuvaliVersion!)
+        os_log("scanning happening :::::::")
     }
 
     /**
@@ -48,7 +47,7 @@ class Central: NSObject, CBCentralManagerDelegate {
         if let connectedPeripheral = connectedPeripheral {
             if connectedPeripheral.canSendWriteWithoutResponse {
                 guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                    os_log("Did not find the characteristic to write : v%{public}@",tuvaliVersion!)
+                    os_log("Did not find the characteristic to write")
                     return
                 }
                 let messageData = Data(bytes: Array(data), count: data.count)
@@ -63,7 +62,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     func writeWithoutResp(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
             guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                os_log("Did not find the characteristic to write : v%{public}@",tuvaliVersion!)
+                os_log("Did not find the characteristic to write")
                 return
             }
             let messageData = Data(bytes: Array(data), count: data.count)
