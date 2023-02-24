@@ -65,9 +65,9 @@ class Wallet: NSObject {
         var dataInBytes = Data(data.utf8)
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
-        
+
         if (encryptedData != nil) {
-            print("Complete Encrypted Data: \(encryptedData!.toHex())")
+            //print("Complete Encrypted Data: \(encryptedData!.toHex())")
             print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
@@ -111,7 +111,7 @@ extension Wallet: WalletProtocol {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
         print("wallet delegate called")
     }
-    
+
     func onDisconnectStatusChange(data: Data?){
         print("Handling notification for disconnect handle")
         if let data {
