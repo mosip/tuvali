@@ -24,7 +24,7 @@ extension Central {
     }
 
     func centralManager(_ central: CBCentralManager, didConnect peripheral: CBPeripheral) {
-        os_log("Connected to peripheral: v%@ : %@", tuvaliVersion!, String(describing: peripheral.name))
+        os_log("Connected to peripheral: v%@", String(describing: peripheral.name))
         central.stopScan()
         peripheral.discoverServices([Peripheral.SERVICE_UUID])
     }
