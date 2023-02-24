@@ -134,10 +134,12 @@ class GattClient(var context: Context) {
         peripheral?.let { onDeviceConnected(it) }
 
       } else if (newState == BluetoothProfile.STATE_DISCONNECTED) {
-        Log.i(logTag, "Disconnected from the peripheral")
+        Log.i(logTag, "Disconnected from the peripheral with address: ${gatt?.device?.address}")
         peripheral?.let{ onDeviceDisconnected() }
 
         peripheral = null;
+      }else {
+        Log.w(logTag, "Received connection state change with status: $status, newState: $newState, device address: ${gatt?.device?.address}")
       }
     }
   }

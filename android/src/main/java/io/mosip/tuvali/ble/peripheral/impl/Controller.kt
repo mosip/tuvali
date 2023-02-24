@@ -2,12 +2,14 @@ package io.mosip.tuvali.ble.peripheral.impl
 
 import android.bluetooth.BluetoothGattCharacteristic
 import android.content.Context
+import android.util.Log
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
 const val MTU_HEADER_SIZE = 3
 
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
+  private val logTag = "PeripheralController"
   private lateinit var gattServer: GattServer
   private lateinit var messageSender: IMessageSender
 
@@ -91,6 +93,8 @@ class Controller(val context: Context) {
   fun stopAdvertisement() {
     if (advertiser != null) {
       advertiser?.stop()
+    }else {
+      Log.i(logTag, "Bluetooth device not available to stop advertisement")
     }
   }
 }
