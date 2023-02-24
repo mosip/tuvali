@@ -14,8 +14,7 @@ extension Central {
             print("adv data::", advertisementData, "scan resuly:::", scanResponseData)
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             print("veri pub key::", publicKeyData)
-            if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
-                Wallet.shared.setVerifierPublicKey(publicKeyData: publicKeyData)
+            walletDelegate?.hasSameIdentifier(payload: advertisementData, publicData: publicKeyData) {
                 peripheral.delegate = self
                 central.connect(peripheral)
                 connectedPeripheral = peripheral
@@ -34,7 +33,7 @@ extension Central {
         if let connectedPeripheral = connectedPeripheral {
             central.cancelPeripheralConnection(connectedPeripheral)
         }
-        Wallet.shared.destroyConnection()
+        onDeviceDisconnected(isManualDisconnect: false)
     }
     
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {

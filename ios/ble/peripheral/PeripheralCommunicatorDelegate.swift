@@ -10,4 +10,6 @@ protocol PeripheralCommunicatorProtocol: AnyObject {
 protocol WalletProtocol: AnyObject {
     func onIdentifyWriteSuccess()
     func onDisconnectStatusChange(data: Data?)
+    func createConnectionHandler()
+    func hasSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void))
 }

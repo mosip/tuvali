@@ -3,11 +3,10 @@ import Foundation
 @available(iOS 13.0, *)
 class TransferHandler {
     var data: Data?
+    var delegate: TransferHandlerDelegate?
     private var currentState: States = States.UnInitialised
     private var responseStartTimeInMillis: UInt64 = 0
     private var chunker: Chunker?
-
-    public static var shared = TransferHandler()
 
     func initialize(initdData: Data) {
         data = initdData
@@ -70,15 +69,16 @@ class TransferHandler {
 
     private func sendRetryRespChunk(missingChunks: [Int]) {
         for chunkIndex in missingChunks {
-            let chunk = chunker?.getChunkWithIndex(index: chunkIndex)
-            Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk!)
+            if let chunk = chunker?.getChunkWithIndex(index: chunkIndex) {
+                delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk, withResponse: true)
+            }
             // checks if no more missing chunks exist on verifier
         }
         sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT, data: nil))
     }
     private func requestTransmissionReport() {
         var notifyObj: Data
-        Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
+        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) }, withResponse: false)
         print("transmission report requested")
     }
 
@@ -103,9 +103,10 @@ class TransferHandler {
     private func sendResponseSize(size: Int) {
         // TODO: Send a stringified number in a byte array
         let decimalString = String(size)
-        let d = decimalString.data(using: .utf8)
-        print(d!)
-        Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: d!)
+        if let data = decimalString.data(using: .utf8) {
+            print(data)
+            delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: data, withResponse: true)
+        }
     }
 
     private func initResponseChunkSend() {
@@ -118,7 +119,7 @@ class TransferHandler {
             while !chunker.isComplete() {
                 let chunk = chunker.next()
                 print("SequenceNumber: \(Array(chunk.prefix(2)))")
-                Central.shared.writeWithoutResp(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk)
+                delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk, withResponse: false)
                 Thread.sleep(forTimeInterval: 0.020)
             }
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))

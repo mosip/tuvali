@@ -31,6 +31,7 @@
 		8D31C3FC2956B20F0073B710 /* WalletCryptoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3FB2956B20F0073B710 /* WalletCryptoBox.swift */; };
 		8D31C3FE2956B2650073B710 /* WalletCryptoBoxBuilder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */; };
 		8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */; };
+		A7A42E4129A8CCF10026167C /* Wallet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */; };
 		E223F0322977BE090042F919 /* TransferHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E223F0312977BE090042F919 /* TransferHandler.swift */; };
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
 		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
@@ -80,6 +81,7 @@
 		8D31C3FB2956B20F0073B710 /* WalletCryptoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBox.swift; sourceTree = "<group>"; };
 		8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxBuilder.swift; sourceTree = "<group>"; };
 		8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxImpl.swift; sourceTree = "<group>"; };
+		A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Wallet+Extension.swift"; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
 		E223F0312977BE090042F919 /* TransferHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHandler.swift; sourceTree = "<group>"; };
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
@@ -143,6 +145,7 @@
 			children = (
 				0A62BB702938C1EC0092E47D /* Wallet.swift */,
 				E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */,
+				A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */,
 			);
 			path = Wallet;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */,
 				8D069F652964466900AB61A9 /* Central.swift in Sources */,
 				FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */,
+				A7A42E4129A8CCF10026167C /* Wallet+Extension.swift in Sources */,
 				8D31C3F42956AD8B0073B710 /* KeyGenerator.swift in Sources */,
 				8D069F672964475A00AB61A9 /* CentralManagerDelegate.swift in Sources */,
 				8D069F6D2964724700AB61A9 /* Characteristics.swift in Sources */,

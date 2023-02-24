@@ -13,12 +13,10 @@ class Central: NSObject, CBCentralManagerDelegate {
     var tuvaliVersion: String?
     var delegate: PeripheralCommunicatorProtocol?
     var walletDelegate: WalletProtocol?
-    var createConnection:(()->Void)?
+    var createConnection: (() -> Void)?
 
-    public static var shared = Central()
-
-    func initialize() {
-        walletDelegate = Wallet.shared
+    override init() {
+        super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
@@ -68,6 +66,15 @@ class Central: NSObject, CBCentralManagerDelegate {
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
+        }
+    }
+    
+    func onDeviceDisconnected(isManualDisconnect: Bool) {
+        if(!isManualDisconnect) {
+            if let connectedPeripheral = self.connectedPeripheral {
+                centralManager.cancelPeripheralConnection(connectedPeripheral)
+            }
+            EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }
 }

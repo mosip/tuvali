@@ -4,17 +4,18 @@ import Gzip
 @objc(Wallet)
 @available(iOS 13.0, *)
 class Wallet: NSObject {
-
-    static let shared = Wallet()
+    
     var central: Central?
     var secretTranslator: SecretTranslator?
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
+    var createConnection: (() -> Void)?
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
 
-    private override init() {
+    override init() {
         super.init()
+        central = Central()
     }
 
     @objc(getModuleName:withRejecter:)
@@ -29,9 +30,17 @@ class Wallet: NSObject {
     func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
     }
+    
+    func setTuvaliVersion(_ version: String) {
+        central?.tuvaliVersion = version
+    }
+    
+    func startScanning(){
+        central?.walletDelegate = self
+    }
 
     func destroyConnection(){
-        onDeviceDisconnected(isManualDisconnect: false)
+        central?.onDeviceDisconnected(isManualDisconnect: false)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -70,11 +79,12 @@ class Wallet: NSObject {
             print("Complete Encrypted Data: \(encryptedData!.toHex())")
             print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
             DispatchQueue.main.async {
-                let transferHandler = TransferHandler.shared
+                let transferHandler = TransferHandler()
+                transferHandler.delegate = self
                 // DOUBT: why is encrypted data written twice ?
                 self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
-                var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
+                var currentMTUSize = self.central?.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
                 if currentMTUSize == nil || currentMTUSize! < 0 {
                    currentMTUSize = BLEConstants.DEFAULT_CHUNK_SIZE
                 }
@@ -103,25 +113,6 @@ class Wallet: NSObject {
                 central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
             }
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
-        }
-    }
-}
-extension Wallet: WalletProtocol {
-    func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
-        print("wallet delegate called")
-    }
-    
-    func onDisconnectStatusChange(data: Data?){
-        print("Handling notification for disconnect handle")
-        if let data {
-            let connStatusID = Int(data[0])
-            if connStatusID == 1 {
-                print("con statusid:", connStatusID)
-                destroyConnection()
-            }
-        } else {
-            print("weird reason!!")
         }
     }
 }
