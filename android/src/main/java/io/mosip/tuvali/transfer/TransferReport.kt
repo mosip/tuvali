@@ -20,15 +20,10 @@ class TransferReport  {
   constructor(bytes: ByteArray){
     this.type = ReportType.values()[bytes[0].toInt()]
     this.totalPages = Util.twoBytesToIntBigEndian(byteArrayOf(bytes[1], bytes[2]))
-    val sequenceNumberByteArray = bytes.drop(3)
-    if (sequenceNumberByteArray.size % 2 != 0) {
-      sequenceNumberByteArray.dropLast(1)
-    }
-    this.missingSequences = sequenceNumberByteArray.chunked(2)
+    this.missingSequences = bytes.drop(3).chunked(2)
                             .fold(intArrayOf())
                             { acc, twoBytes -> acc + Util.twoBytesToIntBigEndian(twoBytes.toByteArray())}
   }
-
 
   /*
   +---------+------------------+---------------------+-------------------+-------------------+-------------------+
