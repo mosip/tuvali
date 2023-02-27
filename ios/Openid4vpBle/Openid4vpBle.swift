@@ -27,6 +27,7 @@ class Openid4vpBle: RCTEventEmitter {
         let firstPartOfPk = paramsObj["pk"] as? String
         print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
         wallet = Wallet()
+        wallet?.setTuvaliVersion(tuvaliVersion)
         if let firstPartOfPk {
             wallet?.setAdvIdentifier(identifier: firstPartOfPk)
         }
@@ -54,7 +55,6 @@ class Openid4vpBle: RCTEventEmitter {
     func setTuvaliVersion(version: String) -> String{
         tuvaliVersion = version
         os_log("Tuvali version - %{public}@",tuvaliVersion);
-        wallet?.setTuvaliVersion(version)
         return tuvaliVersion
       }
 
