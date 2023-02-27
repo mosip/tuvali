@@ -57,7 +57,7 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
-        Wallet.shared.destroyConnection(isManualDisconnect: true)
+        Wallet.shared.destroyConnection(isSelfDisconnect: true)
         callback([])
         return "check" as! Any
     }
@@ -114,7 +114,7 @@ class Openid4vpBle: RCTEventEmitter {
     }
 
     fileprivate func handleError(_ message: String) {
-        Wallet.shared.destroyConnection(isManualDisconnect: false)
+        Wallet.shared.destroyConnection(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
     }
 

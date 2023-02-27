@@ -194,7 +194,7 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
             } else if status == 1 {
                 EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
             }
-            Wallet.shared.destroyConnection(isManualDisconnect: true)
+            Wallet.shared.destroyConnection(isSelfDisconnect: true)
         }
     }
 }
