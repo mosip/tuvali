@@ -90,6 +90,7 @@ class TransferHandler {
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
             EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
+            sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_COMPLETE))
             print("Emitting send-vc:response RECEIVED message")
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
@@ -193,6 +194,7 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
             } else if status == 1 {
                 EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
             }
+            Wallet.shared.destroyConnection(isManualDisconnect: true)
         }
     }
 }
