@@ -29,7 +29,7 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 250L
+private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
 class Wallet(
   context: Context,
@@ -205,7 +205,7 @@ class Wallet(
 
   override fun onRequestMTUFailure(errorCode: Int) {
     //TODO: Handle onRequest MTU failure
-    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries.")
+    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries  with error code: $errorCode.")
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
