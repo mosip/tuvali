@@ -20,7 +20,7 @@ import kotlin.math.min
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
-  private val logTag = getLogTag("TransferHandler")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   enum class States {
     UnInitialised,
     RequestSizeWritePending,
