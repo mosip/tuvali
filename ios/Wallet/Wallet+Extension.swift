@@ -1,10 +1,3 @@
-//
-//  Wallet+Extension.swift
-//  Openid4vpBle
-//
-//  Created by Dhivya Venkatachalam on 24/02/23.
-//
-
 import Foundation
 import CoreBluetooth
 
@@ -25,9 +18,7 @@ extension Wallet: WalletProtocol {
                 print("con statusid:", connStatusID)
                 destroyConnection()
             }
-        } else {
-            print("weird reason!!")
-        }
+        } 
     }
     
     func hasSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void)) {
