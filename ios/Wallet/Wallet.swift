@@ -36,7 +36,7 @@ class Wallet: NSObject {
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
-            os_log("Found NO ADV Identifier")
+            os_log(.info, "Found NO ADV Identifier")
             return false
         }
         let advIdentifierData = hexStringToData(string: advIdentifier)
@@ -68,7 +68,7 @@ class Wallet: NSObject {
 
         if (encryptedData != nil) {
             //print("Complete Encrypted Data: \(encryptedData!.toHex())")
-            print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
+            os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
@@ -85,11 +85,11 @@ class Wallet: NSObject {
     }
 
     func writeToIdentifyRequest() {
-        print("::: write identify called ::: ")
+        //os_log("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
-        print("verifier pub key:::", self.verifierPublicKey)
+        //os_log(.info, "verifier pub key::: %{public}@", (self.verifierPublicKey)! as CVarArg)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            os_log("Write Identify - Found NO KEY")
+            os_log(.info, "Write Identify - Found NO KEY")
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
@@ -109,19 +109,19 @@ class Wallet: NSObject {
 extension Wallet: WalletProtocol {
     func onIdentifyWriteSuccess() {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
-        print("wallet delegate called")
+        os_log(.info, "wallet delegate called")
     }
 
     func onDisconnectStatusChange(data: Data?){
-        print("Handling notification for disconnect handle")
+        //print("Handling notification for disconnect handle")
         if let data {
             let connStatusID = Int(data[0])
             if connStatusID == 1 {
-                print("con statusid:", connStatusID)
+                //print("con statusid:", connStatusID)
                 destroyConnection()
             }
         } else {
-            print("weird reason!!")
+            //print("weird reason!!")
         }
     }
 }

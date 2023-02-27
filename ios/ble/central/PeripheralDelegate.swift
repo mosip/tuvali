@@ -27,7 +27,7 @@ extension Central: CBPeripheralDelegate {
             peripheral.discoverCharacteristics(CharacteristicIds.allCases.map{CBUUID(string: $0.rawValue)}, for: service)
         }
 
-        print("found \(String(describing: peripheral.services?.count)) services for peripheral \(String(describing: peripheral.name))")
+        os_log(.info, "found %{public}@ services for peripheral %{public}@",String(describing: peripheral.services?.count),String(describing: peripheral.name))
     }
 
     func peripheral(_ peripheral: CBPeripheral, didDiscoverCharacteristicsFor service: CBService, error: Error?) {
@@ -39,17 +39,17 @@ extension Central: CBPeripheralDelegate {
             retryCharacteristicsDiscovery(peripheral,service)
             return
         }
-        
+
         let mtu = peripheral.maximumWriteValueLength(for: .withoutResponse);
-        
+
         if mtu < 64 {
             ErrorHandler.sharedInstance.handle(error: OpenId4vpError.invalidMTUSizeError(mtu: mtu))
             return
         }
-        
+
         for characteristic in serviceCharacteristics {
             // store a reference to the discovered characteristic in the Central for write.
-            print("Characteristic UUID:: ", characteristic.uuid.uuidString)
+            //print("Characteristic UUID:: ", characteristic.uuid.uuidString)
             if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
                 // BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withoutResponse)
             }
@@ -97,14 +97,14 @@ extension Central: CBPeripheralDelegate {
     }
 
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
-        print("Central was able to update value for the characteristic: ", characteristic.uuid.uuidString)
+        os_log(.info, "Central was able to update value for the characteristic: %{public}s", characteristic.uuid.uuidString)
         if let error = error {
-            os_log("Unable to recieve updates from device: %s", error.localizedDescription)
+            os_log(.info, "Unable to recieve updates from device: %{public}@", error.localizedDescription)
             return
         }
         if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID {
             let report = characteristic.value as Data?
-            print("ts report is :::", report)
+            //print("ts report is :::", report)
             // TODO: figure out why object isn't sent out across
             delegate?.onTransmissionReportRequest(data: report)
         } else if characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID {
@@ -119,7 +119,7 @@ extension Central: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
-            os_log("Unable to write to characteristic: %@", error.localizedDescription)
+            os_log(.info, "Unable to write to characteristic: %{public}@", error.localizedDescription)
         }
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {

@@ -64,19 +64,19 @@ class Openid4vpBle: RCTEventEmitter {
     @objc
     func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let messageComponents = message.components(separatedBy: "\n")
-        print("new message is :::: ", messageComponents)
+        //print("new message is :::: ", messageComponents)
 
         switch messageComponents[0] {
         case "exchange-receiver-info":
-            print("EXCHANGE-RECEIVER-INFO")
+            //print("EXCHANGE-RECEIVER-INFO")
             callback([])
         case "exchange-sender-info":
-            print("EXCHANGE-SENDER-INFO")
+            //print("EXCHANGE-SENDER-INFO")
             callback([])
             Wallet.shared.writeToIdentifyRequest()
         case "send-vc":
             callback([])
-            print(">> raw message size", messageComponents[1].count)
+            os_log(.info, ">> raw message size : %{public}d", messageComponents[1].count)
             Wallet.shared.sendData(data: messageComponents[1])
         default:
             print("DEFAULT SEND: MESSAGE:: ", message)

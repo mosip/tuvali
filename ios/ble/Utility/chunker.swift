@@ -28,8 +28,8 @@ class Chunker {
     }
 
     func assignPreSlicedChunks(){
-        print("preSlicedChunks called ::: ")
-        print("expected total data size: \(chunkData?.count) and totalChunkCount: \(totalChunkCount)")
+        //print("preSlicedChunks called ::: ")
+        os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
         for i in 0..<totalChunkCount {
             preSlicedChunks.append(chunk(seqNumber: i))
         }
@@ -105,7 +105,7 @@ class Chunker {
     func isComplete() -> Bool {
         let isComplete = chunksReadCounter > (totalChunkCount - 1)
         if isComplete {
-            print("isComplete: true, totalChunks: \(totalChunkCount) , chunkReadCounter(1-indexed): \(chunksReadCounter)")
+            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadCounter)
         }
        return isComplete
     }

@@ -95,7 +95,7 @@ class StateHandler(
 
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
         val receivedWriteMessage = msg.obj as ReceivedWriteMessage
-        Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")
+        //Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")
         if (receivedWriteMessage.characteristic != null) {
           peripheralListener.onReceivedWrite(receivedWriteMessage.characteristic.uuid, receivedWriteMessage.data)
         }

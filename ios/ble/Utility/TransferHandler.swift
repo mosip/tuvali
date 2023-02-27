@@ -23,10 +23,10 @@ class TransferHandler {
     private func handleMessage(msg: imessage) {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data!
-            print("Total response size of data",responseData.count)
+            os_log(.info, "Total response size of data %{public}d",(responseData.count))
             // TODO: Init chunker to use the exchanged MTU size
             chunker = Chunker(chunkData: responseData, mtuSize: msg.mtuSize)
-            print("MTU found to be", BLEConstants.DEFAULT_CHUNK_SIZE)
+            os_log(.info, "MTU found to be %{public}d", BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
             sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_PENDING, data: responseData, dataSize: responseData.count))
         }
@@ -79,13 +79,13 @@ class TransferHandler {
     private func requestTransmissionReport() {
         var notifyObj: Data
         Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
-        print("transmission report requested")
+        os_log(.info, "transmission report requested")
     }
 
     private func handleTransmissionReport(report: Data) {
         let r = TransferReport(bytes: report)
-        print(" got the transfer report type \(r.type)")
-        print("missing pages: ", r.totalPages)
+        //print(" got the transfer report type \(r.type)")
+        //print("missing pages: ", r.totalPages)
 
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
@@ -104,12 +104,12 @@ class TransferHandler {
         // TODO: Send a stringified number in a byte array
         let decimalString = String(size)
         let d = decimalString.data(using: .utf8)
-        print(d!)
+        //print(d!)
         Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: d!)
     }
 
     private func initResponseChunkSend() {
-        print("initResponseChunkSend")
+        //print("initResponseChunkSend")
         sendMessage(message: imessage(msgType: .INIT_RESPONSE_CHUNK_TRANSFER, data: data, dataSize: data?.count))
     }
 

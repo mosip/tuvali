@@ -18,7 +18,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAU
     for (idx in 0 until totalChunkCount) {
       preSlicedChunks[idx] = chunk(idx)
     }
-    Log.d(logTag, "Chunks pre-populated in ${System.currentTimeMillis() - startTime} ms time")
+    //Log.d(logTag, "Chunks pre-populated in ${System.currentTimeMillis() - startTime} ms time")
   }
 
   fun next(): ByteArray {
@@ -34,8 +34,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAU
   private fun chunk(seqNumber: Int): ByteArray {
     val fromIndex = seqNumber * effectivePayloadSize
 
-    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
-      Log.d(logTag, "fetching last chunk")
+    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) { Log.d(logTag, "fetching last chunk")
       frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
     } else {
       val toIndex = (seqNumber + 1) * effectivePayloadSize
@@ -53,10 +52,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAU
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */
   private fun frameChunk(seqNumber: Int, fromIndex: Int, toIndex: Int): ByteArray {
-    Log.d(
-      logTag,
-      "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber"
-    )
+    //Log.d(logTag, "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber")
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
 
