@@ -67,11 +67,9 @@ class Wallet: NSObject {
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
 
         if (encryptedData != nil) {
-            //print("Complete Encrypted Data: \(encryptedData!.toHex())")
             //os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
-                // DOUBT: why is encrypted data written twice ?
                 self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
                 var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
@@ -85,9 +83,7 @@ class Wallet: NSObject {
     }
 
     func writeToIdentifyRequest() {
-        //os_log("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
-        //os_log(.info, "verifier pub key::: %{public}@", (self.verifierPublicKey)! as CVarArg)
         guard let verifierPublicKey = self.verifierPublicKey else {
             os_log(.info, "Write Identify - Found NO KEY")
             return
@@ -113,11 +109,9 @@ extension Wallet: WalletProtocol {
     }
 
     func onDisconnectStatusChange(data: Data?){
-        //print("Handling notification for disconnect handle")
         if let data {
             let connStatusID = Int(data[0])
             if connStatusID == 1 {
-                //print("con statusid:", connStatusID)
                 destroyConnection()
             }
         } else {

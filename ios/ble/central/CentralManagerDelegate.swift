@@ -11,9 +11,7 @@ extension Central {
         if let uuidDict = dataDict, let data = uuidDict[CBUUID(string: "AB2A")], let data = data {
             let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
             let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
-            //print("adv data::", advertisementData, "scan resuly:::", scanResponseData)
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
-            //os_log(.info, "verifier public key:: %{public}@", publicKeyData as CVarArg)
             if Wallet.shared.isSameAdvIdentifier(advertisementPayload: advertisementData) {
                 Wallet.shared.setVerifierPublicKey(publicKeyData: publicKeyData)
                 peripheral.delegate = self

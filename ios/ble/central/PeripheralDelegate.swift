@@ -48,13 +48,7 @@ extension Central: CBPeripheralDelegate {
         }
 
         for characteristic in serviceCharacteristics {
-            // store a reference to the discovered characteristic in the Central for write.
-            //print("Characteristic UUID:: ", characteristic.uuid.uuidString)
-            if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
-                // BLEConstants.DEFAULT_CHUNK_SIZE = peripheral.maximumWriteValueLength(for: .withoutResponse)
-            }
             self.cbCharacteristics[characteristic.uuid.uuidString] = characteristic
-            // subscribe to the characteristics for (2036, 2037)
             if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID ||
                 characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID || characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID
             {
@@ -69,13 +63,13 @@ extension Central: CBPeripheralDelegate {
     func retryServicesDiscovery(_ peripheral : CBPeripheral){
         if retryStrategy.shouldRetry() {
             let waitTime = retryStrategy.getWaitTime()
-            os_log("Error while discovering services retrying again after %d time", waitTime)
+            os_log(.error, "Error while discovering services retrying again after %{public}d time", waitTime)
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(waitTime))) {
                 peripheral.discoverServices([Peripheral.SERVICE_UUID])
             }
         }
         else {
-            os_log("Error while discovering services after retrying multiple times")
+            os_log(.error, "Error while discovering services after retrying multiple times")
             retryStrategy.reset()
             return
         }
@@ -84,13 +78,13 @@ extension Central: CBPeripheralDelegate {
     func retryCharacteristicsDiscovery(_ peripheral : CBPeripheral, _ service : CBService){
         if retryStrategy.shouldRetry() {
             let waitTime = retryStrategy.getWaitTime()
-            os_log("Error while discovering services retrying again after %d time", waitTime)
+            os_log(.error, "Error while discovering services retrying again after %{public}d time", waitTime)
             DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(waitTime))) {
                 peripheral.discoverCharacteristics(CharacteristicIds.allCases.map{CBUUID(string: $0.rawValue)}, for: service)
             }
         }
         else {
-            os_log("Error while discovering services after retrying multiple times")
+            os_log(.error, "Error while discovering services after retrying multiple times")
             retryStrategy.reset()
             return
         }
@@ -104,8 +98,6 @@ extension Central: CBPeripheralDelegate {
         }
         if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_RESPONSE_CHAR_UUID {
             let report = characteristic.value as Data?
-            //print("ts report is :::", report)
-            // TODO: figure out why object isn't sent out across
             delegate?.onTransmissionReportRequest(data: report)
         } else if characteristic.uuid == NetworkCharNums.VERIFICATION_STATUS_CHAR_UUID {
             let verificationStatus = characteristic.value as Data?

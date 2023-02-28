@@ -33,16 +33,13 @@ struct WalletViewModel {
 
     @available(iOS 13.0, *)
     mutating func writeIdentity() {
-        print("::: write idendity called ::: ")
         let publicKey = WalletCryptoBoxImpl().getPublicKey()
-        print("verifier pub key:::", BLEConstants.verifierPublicKey)
         secretTranslators = WalletCryptoBoxImpl().buildSecretsTranslator(verifierPublicKey: BLEConstants.verifierPublicKey)
         var iv = (secretTranslators?.initializationVector())!
         central.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
      }
 
     mutating func setAdvIdentifier(advIdentifier: String) {
-         //   advIdentifiers = advIdentifier
         BLEConstants.ADV_IDENTIFIER = advIdentifier
     }
 
