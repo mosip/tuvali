@@ -17,7 +17,7 @@ class StateHandler(
   private val controller: Controller,
   private val peripheralListener: IPeripheralListener
 ) : Handler(looper), IMessageSender {
-  private val logTag = getLogTag((this::class.java.simpleName).toString())
+  private val logTag = getLogTag(javaClass.simpleName)
 
   enum class States {
     Init,

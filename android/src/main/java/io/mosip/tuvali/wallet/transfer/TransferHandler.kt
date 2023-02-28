@@ -15,7 +15,7 @@ import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID, private val transferListener: ITransferListener) :
   Handler(looper) {
   private lateinit var retryChunker: RetryChunker
-  private val logTag = getLogTag((this::class.java.simpleName).toString())
+  private val logTag = getLogTag(javaClass.simpleName)
   private var chunkCounter = 0;
   private var isRetryFrame = false;
 

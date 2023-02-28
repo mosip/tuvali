@@ -37,7 +37,7 @@ class Wallet(
   private val eventResponseListener: (String) -> Unit,
   private val onBLEException: (Throwable) -> Unit
 ) : ICentralListener, ITransferListener {
-  private val logTag = getLogTag((this::class.java.simpleName).toString())
+  private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
   private lateinit var verifierPK: ByteArray

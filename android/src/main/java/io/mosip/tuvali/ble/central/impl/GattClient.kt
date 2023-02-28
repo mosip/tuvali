@@ -22,7 +22,7 @@ class GattClient(var context: Context) {
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit
   private var peripheral: BluetoothDevice? = null
   private var bluetoothGatt: BluetoothGatt? = null
-  private val logTag = getLogTag((this::class.java.simpleName).toString())
+  private val logTag = getLogTag(javaClass.simpleName)
   private var tempCounterMap = mutableMapOf<UUID, Int>()
 
   private val bluetoothGattCallback = object : BluetoothGattCallback() {
