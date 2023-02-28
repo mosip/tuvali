@@ -30,8 +30,8 @@ class Wallet: NSObject {
         verifierPublicKey = publicKeyData
     }
 
-    func destroyConnection(){
-        onDeviceDisconnected(isManualDisconnect: false)
+    func destroyConnection(isSelfDisconnect: Bool){
+        onDeviceDisconnected(isSelfDisconnect: isSelfDisconnect)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -93,11 +93,11 @@ class Wallet: NSObject {
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
     }
 
-    func onDeviceDisconnected(isManualDisconnect: Bool) {
-        if(!isManualDisconnect) {
-            if let connectedPeripheral = central?.connectedPeripheral {
-                central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
-            }
+    func onDeviceDisconnected(isSelfDisconnect: Bool) {
+        if let connectedPeripheral = central?.connectedPeripheral {
+            central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
+        }
+        if(!isSelfDisconnect) {
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }

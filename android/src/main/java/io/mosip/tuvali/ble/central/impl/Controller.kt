@@ -7,6 +7,7 @@ import android.bluetooth.le.ScanResult
 import android.content.Context
 import android.util.Log
 import io.mosip.tuvali.ble.central.state.IMessageSender
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.ble.central.state.message.*
 import io.mosip.tuvali.transfer.Util
 import java.util.UUID
@@ -16,7 +17,7 @@ const val REQUEST_MTU_TIME_OUT = -1
 
 class Controller(val context: Context) {
   private lateinit var scanner: Scanner
-  private val logTag = "CentralController"
+  private val logTag = getLogTag(javaClass.simpleName)
 
   private var gattClient: GattClient? = null
   private lateinit var messageSender: IMessageSender

@@ -35,8 +35,8 @@
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
 		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
-		E2F1AFCD2971883500AC3355 /* WalletViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */; };
 		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
+		FD494F4D29ADBE00002612C1 /* BackOffStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */; };
 		FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA18F3E2977B69A00290433 /* CRC16.swift */; };
 		FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */; };
 		FDD941202980FD2500FBBDD4 /* TransferReport.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */; };
@@ -85,9 +85,9 @@
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
 		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
-		E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletViewModel.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
 		F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBle.swift; sourceTree = "<group>"; };
+		FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackOffStrategy.swift; path = ble/Utility/BackOffStrategy.swift; sourceTree = "<group>"; };
 		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
 		FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferReport.swift; sourceTree = "<group>"; };
@@ -125,6 +125,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */,
 				0D36889529A782AA000B12CD /* Error */,
 				FDA18F3D2977B67C00290433 /* crc */,
 				8D069F612964454700AB61A9 /* ble */,
@@ -142,7 +143,6 @@
 			isa = PBXGroup;
 			children = (
 				0A62BB702938C1EC0092E47D /* Wallet.swift */,
-				E2F1AFCC2971883500AC3355 /* WalletViewModel.swift */,
 			);
 			path = Wallet;
 			sourceTree = "<group>";
@@ -332,6 +332,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FD494F4D29ADBE00002612C1 /* BackOffStrategy.swift in Sources */,
 				E223F0322977BE090042F919 /* TransferHandler.swift in Sources */,
 				8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */,
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
@@ -362,7 +363,6 @@
 				0ACACE8A2966D8C800DABDFE /* Utils.swift in Sources */,
 				F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */,
 				E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */,
-				E2F1AFCD2971883500AC3355 /* WalletViewModel.swift in Sources */,
 				8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */,
 				8D31C3FC2956B20F0073B710 /* WalletCryptoBox.swift in Sources */,
 			);
