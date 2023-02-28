@@ -25,20 +25,20 @@ class Central: NSObject, CBCentralManagerDelegate {
     func centralManagerDidUpdateState(_ central: CBCentralManager) {
         switch central.state {
         case .poweredOn:
-            os_log(.info, "Central Manager state is powered ON")
+            os_log("Central Manager state is powered ON")
             scanForPeripherals()
         default:
-            os_log(.info, "Central Manager state is powered OFF")
+            os_log("Central Manager state is powered OFF")
         }
     }
 
     deinit {
-        os_log(.info, "Central is DeInitializing")
+        os_log("Central is DeInitializing")
     }
 
     func scanForPeripherals() {
         centralManager.scanForPeripherals(withServices: [Peripheral.SERVICE_UUID], options: [CBCentralManagerScanOptionAllowDuplicatesKey: false])
-        os_log(.info, "scanning happening")
+        os_log("scanning happening :::::::")
     }
 
     /**
@@ -46,13 +46,9 @@ class Central: NSObject, CBCentralManagerDelegate {
      */
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
-            if connectedPeripheral.canSendWriteWithoutResponse {
-                guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                    os_log(.info, "Did not find the characteristic to write")
-                    return
-                }
-                let messageData = Data(bytes: Array(data), count: data.count)
-                connectedPeripheral.writeValue(messageData, for: characteristic, type: .withResponse)
+            guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
+                os_log("Did not find the characteristic to write")
+                return
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withResponse)
@@ -67,7 +63,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     func writeWithoutResp(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
             guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
-                os_log(.info, "Did not find the characteristic to write")
+                os_log("Did not find the characteristic to write")
                 return
             }
             let messageData = Data(bytes: Array(data), count: data.count)
