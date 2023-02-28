@@ -43,7 +43,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   private var responseStartTimeInMillis: Long = 0
 
   override fun handleMessage(msg: Message) {
-    Log.d(logTag, "Received message to transfer thread handler: ${msg.what} and ${msg.data}")
+    //Log.d(logTag, "Received message to transfer thread handler: ${msg.what} and ${msg.data}")
     when (msg.what) {
       IMessage.TransferMessageTypes.INIT_RESPONSE_TRANSFER.ordinal -> {
         val initResponseTransferMessage = msg.obj as InitResponseTransferMessage
@@ -123,7 +123,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     if (report.type == TransferReport.ReportType.SUCCESS) {
       currentState = States.TransferVerified
       transferListener.onResponseSent()
-      Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
+      //Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
     } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
       currentState = States.PartiallyTransferred
       this.sendMessage(InitRetryTransferMessage(report.missingSequences))
@@ -144,7 +144,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
 
     val chunkArray = chunker?.next()
     if (chunkArray != null) {
-      Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, Sha256: ${Util.getSha256(chunkArray)}")
+      //Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkArray.copyOfRange(0,2))}, Sha256: ${Util.getSha256(chunkArray)}")
       writeResponseChunk(chunkArray)
     }
   }
