@@ -27,7 +27,7 @@ class TransferReport  {
                     missingSequences?.append(Utils.twoBytesToIntBigEndian(num: missingChunkSlice))
                     missingChunksData = missingChunksData.dropFirst(2)
                 }
-                print(missingSequences)
+                //os_log(.debug,"%{public}@", missingSequences)
             }
         } else {
             type = .MISSING_CHUNKS
@@ -42,14 +42,3 @@ class TransferReport  {
  |(1 byte) |    (2 bytes)     |       (2 bytes)     |    (2 bytes)      |     (2 bytes)     |                   |
  +---------+------------------+---------------------+-------------------+-------------------+-------------------+
  */
-//  func toByteArray(): ByteArray {
-//    val missingSeqBytes = missingSequences?.fold(byteArrayOf()) { acc, sNo -> acc + Util.intToTwoBytesBigEndian(sNo) }
-//    val metadata = byteArrayOf(type.ordinal.toByte()) + Util.intToTwoBytesBigEndian(totalPages)
-//
-//    return if(missingSeqBytes != null) {
-//      metadata + missingSeqBytes
-//    } else {
-//      metadata
-//    }
-//  }
-//}
