@@ -23,7 +23,7 @@ class CRC {
         if got == expected {
             return true
         }
-        os_log(.error, "non-equal CRC; evaluated= %{public}@, expect= %{public}@", got, expected)
+        print("non-equal CRC; evaluated=\(got), expect=\(expected)")
         return false
     }
 }

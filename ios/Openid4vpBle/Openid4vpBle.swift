@@ -22,9 +22,10 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(setConnectionParameters:)
     func setConnectionParameters(params: String) -> Any {
+        print("SetConnectionParameters->Params::\(params)")
         var paramsObj = stringToJson(jsonText: params)
         var firstPartOfPk = paramsObj["pk"]
-        //os_log(.info, "synchronized setConnectionParameters called with %{public}s and %{public}s ", params, firstPartOfPk)
+        print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
         Wallet.shared.setAdvIdentifier(identifier: firstPartOfPk as! String)
         return "data" as Any
     }
@@ -35,7 +36,7 @@ class Openid4vpBle: RCTEventEmitter {
             do {
                 dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
             } catch let error as NSError {
-                os_log(.error, " %{public}@ ", error)
+                print(error)
             }
         }
         return dictonary!
@@ -64,21 +65,22 @@ class Openid4vpBle: RCTEventEmitter {
     @objc
     func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let messageComponents = message.components(separatedBy: "\n")
+        print("new message is :::: ", messageComponents)
 
         switch messageComponents[0] {
         case "exchange-receiver-info":
-            os_log(.info, "EXCHANGE-RECEIVER-INFO")
+            print("EXCHANGE-RECEIVER-INFO")
             callback([])
         case "exchange-sender-info":
-            os_log(.info, "EXCHANGE-SENDER-INFO")
+            print("EXCHANGE-SENDER-INFO")
             callback([])
             Wallet.shared.writeToIdentifyRequest()
         case "send-vc":
             callback([])
-            os_log(.info, ">> raw message size : %{public}d", messageComponents[1].count)
+            print(">> raw message size", messageComponents[1].count)
             Wallet.shared.sendData(data: messageComponents[1])
         default:
-            os_log(.info, "DEFAULT SEND: MESSAGE : %{public}s ", message)
+            print("DEFAULT SEND: MESSAGE:: ", message)
         }
     }
 
@@ -86,16 +88,16 @@ class Openid4vpBle: RCTEventEmitter {
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         switch mode {
         case "advertiser":
-            os_log(.info, "Advertiser")
+            os_log("Advertiser")
         case "discoverer":
-            os_log(.info, "Discoverer")
+            os_log("Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
             Central.shared.createConnection = {
                 callback([])
             }
         default:
-            os_log(.info, "DEFAULT CASE: MESSAGE :  %{public}s", mode)
+            print("DEFAULT CASE: MESSAGE:: ", mode)
             break
         }
     }
