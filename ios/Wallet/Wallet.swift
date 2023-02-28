@@ -121,7 +121,7 @@ extension Wallet: WalletProtocol {
                 destroyConnection()
             }
         } else {
-            os_log(.info, "weird reason!!")
+            os_log(.info, "Got null for disconnect status")
         }
     }
 }
