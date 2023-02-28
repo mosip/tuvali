@@ -6,7 +6,7 @@ import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE) :
   ChunkerBase(maxDataBytes) {
-  private val logTag = getLogTag("Chunker")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   private var chunksReadCounter: Int = 0
   private val lastChunkByteCount = getLastChunkByteCount(data.size)
   private val totalChunkCount = getTotalChunkCount(data.size).toInt()

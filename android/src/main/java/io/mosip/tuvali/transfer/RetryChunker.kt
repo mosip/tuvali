@@ -4,7 +4,7 @@ import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class RetryChunker(private val chunker: Chunker, private val missedSequences: IntArray) {
-  private val logTag = getLogTag("RetryChunker")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   private var seqCounter = 0
 
   init {

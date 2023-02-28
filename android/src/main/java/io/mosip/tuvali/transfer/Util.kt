@@ -78,7 +78,7 @@ class Util {
     }
 
     fun getLogTag(moduleName: String): String{
-      return moduleName+": v"+Openid4vpBleModule.tuvaliVersion
+      return "${moduleName} : v${Openid4vpBleModule.tuvaliVersion}"
     }
   }
 }

@@ -36,7 +36,7 @@ class Verifier(
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
-  private val logTag = getLogTag("Verifier")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var iv: ByteArray

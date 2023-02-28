@@ -3,9 +3,9 @@ import Foundation
 @available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-    
+
     var tuvaliVersion: String = "unknown"
-    
+
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -99,7 +99,6 @@ class Openid4vpBle: RCTEventEmitter {
             print("DEFAULT CASE: MESSAGE:: ", mode)
             break
         }
-
     }
 
     @objc
