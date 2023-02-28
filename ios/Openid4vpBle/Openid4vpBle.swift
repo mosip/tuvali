@@ -68,10 +68,10 @@ class Openid4vpBle: RCTEventEmitter {
 
         switch messageComponents[0] {
         case "exchange-receiver-info":
-            //print("EXCHANGE-RECEIVER-INFO")
+            os_log(.info, "EXCHANGE-RECEIVER-INFO")
             callback([])
         case "exchange-sender-info":
-            //print("EXCHANGE-SENDER-INFO")
+            os_log(.info, "EXCHANGE-SENDER-INFO")
             callback([])
             Wallet.shared.writeToIdentifyRequest()
         case "send-vc":

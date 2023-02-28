@@ -34,7 +34,8 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAU
   private fun chunk(seqNumber: Int): ByteArray {
     val fromIndex = seqNumber * effectivePayloadSize
 
-    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) { Log.d(logTag, "fetching last chunk")
+    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
+      Log.d(logTag, "fetching last chunk")
       frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
     } else {
       val toIndex = (seqNumber + 1) * effectivePayloadSize

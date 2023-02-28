@@ -68,7 +68,7 @@ class Wallet: NSObject {
 
         if (encryptedData != nil) {
             //print("Complete Encrypted Data: \(encryptedData!.toHex())")
-            os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
+            //os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
                 // DOUBT: why is encrypted data written twice ?
@@ -121,7 +121,7 @@ extension Wallet: WalletProtocol {
                 destroyConnection()
             }
         } else {
-            //print("weird reason!!")
+            os_log(.info, "weird reason!!")
         }
     }
 }

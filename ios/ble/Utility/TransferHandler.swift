@@ -84,8 +84,8 @@ class TransferHandler {
 
     private func handleTransmissionReport(report: Data) {
         let r = TransferReport(bytes: report)
-        //print(" got the transfer report type \(r.type)")
-        //print("missing pages: ", r.totalPages)
+        os_log(.info, "Got the transfer report :  %{public}d", (r.type.rawValue))
+        os_log(.info, "Missing pages: %{public}d ", (r.totalPages))
 
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
