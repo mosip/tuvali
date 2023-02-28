@@ -10,7 +10,7 @@ import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
-  private val logTag = getLogTag("GattServer")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   private lateinit var gattServer: BluetoothGattServer
   private var bluetoothDevice: BluetoothDevice? = null
 

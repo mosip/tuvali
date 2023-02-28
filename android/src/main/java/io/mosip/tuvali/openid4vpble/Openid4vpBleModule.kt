@@ -242,7 +242,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   // ) => EmitterSubscription;
 
   companion object {
-    var tuvaliVersion: String = "null"
+    var tuvaliVersion: String = "unknown"
     const val NAME = "Openid4vpBle"
     const val logTag = "Openid4vpBleModule"
   }

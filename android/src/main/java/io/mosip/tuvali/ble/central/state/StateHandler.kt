@@ -16,7 +16,7 @@ class StateHandler(
   private val controller: Controller,
   private val listener: ICentralListener
 ) : Handler(looper), IMessageSender {
-  private val logTag = getLogTag("CentralHandlerThread")
+  private val logTag = getLogTag((this::class.java.simpleName).toString())
   private var currentState: States = States.Init
 
   //TODO: Add explicit ordinal value for below enum
