@@ -72,6 +72,7 @@ class TransferHandler {
         }
         sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT, data: nil))
     }
+    
     private func requestTransmissionReport() {
         var notifyObj: Data
         Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
@@ -188,5 +189,9 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
             }
             Wallet.shared.destroyConnection(isSelfDisconnect: true)
         }
+    }
+    
+    func onFailedToSendTransferReportRequest() {
+        requestTransmissionReport()
     }
 }
