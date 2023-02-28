@@ -56,7 +56,7 @@ class GattService {
 
     val transferReportRequestChar = BluetoothGattCharacteristic(
       TRANSFER_REPORT_REQUEST_CHAR_UUID,
-      BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE,
+      BluetoothGattCharacteristic.PROPERTY_WRITE_NO_RESPONSE or BluetoothGattCharacteristic.PROPERTY_WRITE,
       BluetoothGattCharacteristic.PERMISSION_WRITE
     )
 

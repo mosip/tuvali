@@ -20,7 +20,7 @@ import kotlin.math.min
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
-  private val logTag = getLogTag("TransferHandler")
+  private val logTag = getLogTag(javaClass.simpleName)
   enum class States {
     UnInitialised,
     RequestSizeWritePending,
@@ -130,7 +130,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     if (assembler?.isComplete() == true) {
       return
     }
-    Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))},  Sha256: ${Util.getSha256(chunkData)}")
+    //Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))},  Sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
   }
 

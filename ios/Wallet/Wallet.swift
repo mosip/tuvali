@@ -30,13 +30,13 @@ class Wallet: NSObject {
         verifierPublicKey = publicKeyData
     }
 
-    func destroyConnection(){
-        onDeviceDisconnected(isManualDisconnect: false)
+    func destroyConnection(isSelfDisconnect: Bool){
+        onDeviceDisconnected(isSelfDisconnect: isSelfDisconnect)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
-            os_log("Found NO ADV Identifier")
+            os_log(.info, "Found NO ADV Identifier")
             return false
         }
         let advIdentifierData = hexStringToData(string: advIdentifier)
@@ -67,11 +67,9 @@ class Wallet: NSObject {
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
 
         if (encryptedData != nil) {
-            //print("Complete Encrypted Data: \(encryptedData!.toHex())")
-            print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
+            //os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler.shared
-                // DOUBT: why is encrypted data written twice ?
                 self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
                 var currentMTUSize =  Central.shared.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
@@ -85,11 +83,9 @@ class Wallet: NSObject {
     }
 
     func writeToIdentifyRequest() {
-        print("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
-        print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            os_log("Write Identify - Found NO KEY")
+            os_log(.info, "Write Identify - Found NO KEY")
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
@@ -97,11 +93,11 @@ class Wallet: NSObject {
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
     }
 
-    func onDeviceDisconnected(isManualDisconnect: Bool) {
-        if(!isManualDisconnect) {
-            if let connectedPeripheral = central?.connectedPeripheral {
-                central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
-            }
+    func onDeviceDisconnected(isSelfDisconnect: Bool) {
+        if let connectedPeripheral = central?.connectedPeripheral {
+            central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
+        }
+        if(!isSelfDisconnect) {
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }
@@ -109,19 +105,17 @@ class Wallet: NSObject {
 extension Wallet: WalletProtocol {
     func onIdentifyWriteSuccess() {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
-        print("wallet delegate called")
+        os_log(.info, "wallet delegate called")
     }
 
     func onDisconnectStatusChange(data: Data?){
-        print("Handling notification for disconnect handle")
         if let data {
             let connStatusID = Int(data[0])
             if connStatusID == 1 {
-                print("con statusid:", connStatusID)
-                destroyConnection()
+                destroyConnection(isSelfDisconnect: false)
             }
         } else {
-            print("weird reason!!")
+            os_log(.error, "No data received during disconnect")
         }
     }
 }

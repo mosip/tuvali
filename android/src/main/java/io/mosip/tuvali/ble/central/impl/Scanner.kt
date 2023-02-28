@@ -7,8 +7,10 @@ import android.content.Context
 import android.os.ParcelUuid
 import android.util.Log
 import java.util.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Scanner(context: Context) {
+  private val logTag =  getLogTag(javaClass.simpleName)
   private lateinit var advPayload: String
   private lateinit var onScanStartFailure: (Int) -> Unit
   private lateinit var onDeviceFound: (ScanResult) -> Unit
@@ -23,7 +25,7 @@ class Scanner(context: Context) {
 
   private val leScanCallback: ScanCallback = object : ScanCallback() {
     override fun onScanResult(callbackType: Int, result: ScanResult) {
-      Log.d("BLE Central", "Found the device: $result. The bytes are: ${result.scanRecord?.bytes}")
+      Log.d(logTag, "Found the device: $result. The bytes are: ${result.scanRecord?.bytes}")
 
       onDeviceFound(result)
     }

@@ -17,16 +17,15 @@ class TransferHandler {
         handleMessage(msg: message)
     }
     deinit{
-        print("deinit happend in transferh")
+        os_log(.debug, "deinit happend in transferhandler")
     }
 
     private func handleMessage(msg: imessage) {
         if msg.msgType == .INIT_RESPONSE_TRANSFER {
             var responseData = msg.data!
-            print("Total response size of data",responseData.count)
-            // TODO: Init chunker to use the exchanged MTU size
+            os_log(.info, "Total response size of data %{public}d",(responseData.count))
             chunker = Chunker(chunkData: responseData, mtuSize: msg.mtuSize)
-            print("MTU found to be", BLEConstants.DEFAULT_CHUNK_SIZE)
+            os_log(.info, "MTU found to be %{public}d", BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
             sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_PENDING, data: responseData, dataSize: responseData.count))
         }
@@ -38,7 +37,7 @@ class TransferHandler {
             currentState = States.ResponseSizeWriteSuccess
             initResponseChunkSend()
         } else if msg.msgType == .RESPONSE_SIZE_WRITE_FAILED {
-            print("failed to write response size")
+            os_log(.error, "Failed to write response size")
             currentState = States.ResponseWriteFailed
         } else if msg.msgType == .INIT_RESPONSE_CHUNK_TRANSFER {
             currentState = .ResponseWritePending
@@ -55,16 +54,14 @@ class TransferHandler {
         } else if msg.msgType == .RESPONSE_CHUNK_WRITE_SUCCESS {
             // NoOp: iOS lacks support for writeWithoutResponse callbacks unlike Android
         } else if msg.msgType == .RESPONSE_CHUNK_WRITE_FAILURE {
-            // NoOp: might need to use this later when sent with resp
-            print("response chunk write failed")
+            os_log(.error, "Response chunk write failed")
         } else if msg.msgType == .RESPONSE_TRANSFER_COMPLETE {
             currentState = States.TransferComplete
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
         } else if msg.msgType == .RESPONSE_TRANSFER_FAILED {
             currentState = States.ResponseWriteFailed
-            // TODO: should response transfer be retried
         } else {
-            print("out of scope")
+            os_log(.error, "Out of scope")
         }
     }
 
@@ -72,44 +69,41 @@ class TransferHandler {
         for chunkIndex in missingChunks {
             let chunk = chunker?.getChunkWithIndex(index: chunkIndex)
             Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk!)
-            // checks if no more missing chunks exist on verifier
         }
         sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT, data: nil))
     }
+
     private func requestTransmissionReport() {
         var notifyObj: Data
-        Central.shared.writeWithoutResp(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
-        print("transmission report requested")
+        Central.shared.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) })
+        os_log(.info, "transmission report requested")
     }
 
     private func handleTransmissionReport(report: Data) {
         let r = TransferReport(bytes: report)
-        print(" got the transfer report type \(r.type)")
-        print("missing pages: ", r.totalPages)
+        os_log(.info, "Got the transfer report :  %{public}d", (r.type.rawValue))
+        os_log(.info, "Missing pages: %{public}d ", (r.totalPages))
 
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
             EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
-            print("Emitting send-vc:response RECEIVED message")
+            os_log(.info, "Emitting send-vc:response RECEIVED message")
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
             sendRetryRespChunk(missingChunks: r.missingSequences!)
         } else {
-            print("handle transfer report parsing, report-type=\(r.type)")
+            os_log(.info, "handle transfer report parsing, report-type= %{public}d", r.type.rawValue)
             sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: nil, dataSize: 0))
         }
     }
 
     private func sendResponseSize(size: Int) {
-        // TODO: Send a stringified number in a byte array
         let decimalString = String(size)
         let d = decimalString.data(using: .utf8)
-        print(d!)
         Central.shared.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: d!)
     }
 
     private func initResponseChunkSend() {
-        print("initResponseChunkSend")
         sendMessage(message: imessage(msgType: .INIT_RESPONSE_CHUNK_TRANSFER, data: data, dataSize: data?.count))
     }
 
@@ -117,13 +111,12 @@ class TransferHandler {
         if let chunker = chunker {
             while !chunker.isComplete() {
                 let chunk = chunker.next()
-               // print("SequenceNumber: \(Array(chunk.prefix(2)))")
                 Central.shared.writeWithoutResp(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk)
                 Thread.sleep(forTimeInterval: 0.020)
             }
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
         } else {
-                print("chunker is nil !")
+            os_log(.error, "chunker is nil !")
         }
     }
 }
@@ -193,6 +186,11 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
             } else if status == 1 {
                 EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
             }
+            Wallet.shared.destroyConnection(isSelfDisconnect: true)
         }
+    }
+
+    func onFailedToSendTransferReportRequest() {
+        requestTransmissionReport()
     }
 }

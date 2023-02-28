@@ -36,7 +36,7 @@ class Verifier(
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
-  private val logTag = getLogTag("Verifier")
+  private val logTag = getLogTag(javaClass.simpleName)
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var iv: ByteArray
@@ -169,7 +169,7 @@ class Verifier(
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         value?.let {
-          Log.d(logTag, "received response size on characteristic value: ${String(value)}")
+          //Log.d(logTag, "received response size on characteristic value: ${String(value)}")
           val responseSize: Int = String(value).toInt()
           Log.d(logTag, "received response size on characteristic: $responseSize")
           val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, negotiatedMTUSize)
@@ -245,8 +245,7 @@ class Verifier(
   }
 
   override fun onResponseReceived(data: ByteArray) {
-    Log.i(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
-    Log.d(logTag, "Complete encrypted data received: ${Hex.toHexString(data)}")
+    //Log.i(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
     try {
       val decryptedData = secretsTranslator?.decryptUponReceive(data)
       if (decryptedData != null) {

@@ -3,9 +3,9 @@ import Foundation
 @available(iOS 13.0, *)
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
-    
+
     var tuvaliVersion: String = "unknown"
-    
+
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -22,10 +22,9 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(setConnectionParameters:)
     func setConnectionParameters(params: String) -> Any {
-        print("SetConnectionParameters->Params::\(params)")
         var paramsObj = stringToJson(jsonText: params)
         var firstPartOfPk = paramsObj["pk"]
-        print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
+        //os_log(.info, "synchronized setConnectionParameters called with %{public}s and %{public}s ", params, firstPartOfPk)
         Wallet.shared.setAdvIdentifier(identifier: firstPartOfPk as! String)
         return "data" as Any
     }
@@ -36,7 +35,7 @@ class Openid4vpBle: RCTEventEmitter {
             do {
                 dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
             } catch let error as NSError {
-                print(error)
+                os_log(.error, " %{public}@ ", error)
             }
         }
         return dictonary!
@@ -57,29 +56,29 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
-        Wallet.shared.destroyConnection()
+        Wallet.shared.destroyConnection(isSelfDisconnect: true)
+        callback([])
         return "check" as! Any
     }
 
     @objc
     func send(_ message: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         let messageComponents = message.components(separatedBy: "\n")
-        print("new message is :::: ", messageComponents)
 
         switch messageComponents[0] {
         case "exchange-receiver-info":
-            print("EXCHANGE-RECEIVER-INFO")
+            os_log(.info, "EXCHANGE-RECEIVER-INFO")
             callback([])
         case "exchange-sender-info":
-            print("EXCHANGE-SENDER-INFO")
+            os_log(.info, "EXCHANGE-SENDER-INFO")
             callback([])
             Wallet.shared.writeToIdentifyRequest()
         case "send-vc":
             callback([])
-            print(">> raw message size", messageComponents[1].count)
+            os_log(.info, ">> raw message size : %{public}d", messageComponents[1].count)
             Wallet.shared.sendData(data: messageComponents[1])
         default:
-            print("DEFAULT SEND: MESSAGE:: ", message)
+            os_log(.info, "DEFAULT SEND: MESSAGE : %{public}s ", message)
         }
     }
 
@@ -87,19 +86,18 @@ class Openid4vpBle: RCTEventEmitter {
     func createConnection(_ mode: String, withCallback callback: @escaping RCTResponseSenderBlock) {
         switch mode {
         case "advertiser":
-            os_log("Advertiser")
+            os_log(.info, "Advertiser")
         case "discoverer":
-            os_log("Discoverer")
+            os_log(.info, "Discoverer")
             Central.shared.initialize()
             Wallet.shared.central = Central.shared
             Central.shared.createConnection = {
                 callback([])
             }
         default:
-            print("DEFAULT CASE: MESSAGE:: ", mode)
+            os_log(.info, "DEFAULT CASE: MESSAGE :  %{public}s", mode)
             break
         }
-
     }
 
     @objc
@@ -113,7 +111,7 @@ class Openid4vpBle: RCTEventEmitter {
     }
 
     fileprivate func handleError(_ message: String) {
-        Wallet.shared.destroyConnection()
+        Wallet.shared.destroyConnection(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
     }
 
