@@ -54,7 +54,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFA
 
   fun isComplete(): Boolean {
     if(chunkReceivedMarker.none { it != chunkReceivedMarkerByte }) {
-      Log.i(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
+      //Log.i(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
       return true
     }
     return false
