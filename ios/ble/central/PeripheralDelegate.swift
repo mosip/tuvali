@@ -96,6 +96,20 @@ extension Central: CBPeripheralDelegate {
         }
     }
 
+    func retryTransferReportRequest(){
+        if transferReportRequestRetryStrategy.shouldRetry() {
+            let waitTime = transferReportRequestRetryStrategy.getWaitTime()
+            os_log("Error while requesting transfer report retrying again after %d time", waitTime)
+            DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(Int(waitTime))) {
+                self.delegate?.onFailedToSendTransferReportRequest()
+            }
+        } else {
+            os_log("Failed to request transfer report even after multiple retries")
+            transferReportRequestRetryStrategy.reset()
+            return
+        }
+    }
+    
     func peripheral(_ peripheral: CBPeripheral, didUpdateValueFor characteristic: CBCharacteristic, error: Error?) {
         print("Central was able to update value for the characteristic: ", characteristic.uuid.uuidString)
         if let error = error {
@@ -119,14 +133,18 @@ extension Central: CBPeripheralDelegate {
 
     func peripheral(_ peripheral: CBPeripheral, didWriteValueFor characteristic: CBCharacteristic, error: Error?) {
         if let error = error {
-            os_log("Unable to write to characteristic: %@", error.localizedDescription)
+            os_log("Error while writing to characteristic: %@, error: %@", characteristic.uuid.uuidString, error.localizedDescription)
+            if characteristic.uuid == NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID {
+                retryTransferReportRequest()
+            }
+            return
         }
+        os_log("Successfully written to characteristic: %@", characteristic.uuid.uuidString)
 
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
             walletDelegate?.onIdentifyWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
             delegate?.onResponseSizeWriteSuccess()
-        } else if characteristic.uuid == NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID {
         }
     }
 
