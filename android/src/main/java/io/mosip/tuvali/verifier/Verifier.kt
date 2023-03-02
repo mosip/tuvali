@@ -39,7 +39,7 @@ class Verifier(
   private val logTag = getLogTag(javaClass.simpleName)
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
-  private lateinit var iv: ByteArray
+  private lateinit var nonce: ByteArray
   private var secureRandom: SecureRandom = SecureRandom()
   private var verifierCryptoBox: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
   private var peripheral: Peripheral
@@ -131,21 +131,21 @@ class Verifier(
     when (uuid) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
         value?.let {
-          // Total size of identity char value will be 12 bytes IV + 32 bytes pub key
+          // Total size of identity char value will be 12 bytes nonce + 32 bytes pub key
           if (value.size < 12 + 32) {
             return
           }
-          iv = value.copyOfRange(0, 12)
+          nonce = value.copyOfRange(0, 12)
           walletPubKey = value.copyOfRange(12, 12 + 32)
           Log.i(
             logTag,
-            "received wallet iv: ${Hex.toHexString(iv)}, wallet pub key: ${
+            "received wallet nonce: ${Hex.toHexString(nonce)}, wallet pub key: ${
               Hex.toHexString(
                 walletPubKey
               )
             }"
           )
-          secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPubKey)
+          secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPubKey)
           // TODO: Validate pub key, how to handle if not valid?
           messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_SENDER_INFO.value, "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
