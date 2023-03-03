@@ -1,5 +1,12 @@
 package io.mosip.tuvali.transfer
 
+import android.util.Log
+import kotlin.math.ceil
+import kotlin.math.min
+
+private const val PAGE_NUMBER_SIZE_IN_BYTES = 2
+private const val CHUNK_SEQUENCE_NUMBER_IN_BYTES = 2
+private const val TYPE_SIZE_IN_BYTES = 1
 class TransferReport  {
   val type: ReportType
   private val totalPages: Int
@@ -11,22 +18,29 @@ class TransferReport  {
     SUCCESS
   }
 
-  constructor(type: ReportType, totalPages: Int, missingSequences: IntArray?) {
+  constructor(type: ReportType, missingSequences: IntArray, maxDataBytes: Int) {
+    val transferReportPageSize: Int = (maxDataBytes - PAGE_NUMBER_SIZE_IN_BYTES - TYPE_SIZE_IN_BYTES) / CHUNK_SEQUENCE_NUMBER_IN_BYTES
+    val missedCount = missingSequences.size
+    this.totalPages = ceil(missedCount.toDouble() / transferReportPageSize).toInt()
     this.type = type
-    this.totalPages = totalPages
-    this.missingSequences = missingSequences
+    this.missingSequences = missingSequences.sliceArray(0 until min(transferReportPageSize, missedCount))
+    Log.i("TransferReport", "Missed Chunks Count: $missedCount, Total Pages: $totalPages, Transfer Report Page Size: $transferReportPageSize")
+
   }
 
   constructor(bytes: ByteArray){
     this.type = ReportType.values()[bytes[0].toInt()]
     this.totalPages = Util.twoBytesToIntBigEndian(byteArrayOf(bytes[1], bytes[2]))
-    val sequenceNumberByteArray = bytes.drop(3)
-    if (sequenceNumberByteArray.size % 2 != 0) {
-      sequenceNumberByteArray.dropLast(1)
-    }
+    val sequenceNumberByteArray = bytes.drop(PAGE_NUMBER_SIZE_IN_BYTES + TYPE_SIZE_IN_BYTES)
     this.missingSequences = sequenceNumberByteArray.chunked(2)
-                            .fold(intArrayOf())
-                            { acc, twoBytes -> acc + Util.twoBytesToIntBigEndian(twoBytes.toByteArray())}
+      .fold(intArrayOf())
+      { acc, twoBytes ->
+        if (twoBytes.size != 2) {
+          acc
+        } else {
+          acc + Util.twoBytesToIntBigEndian(twoBytes.toByteArray())
+        }
+      }
   }
 
   /*
