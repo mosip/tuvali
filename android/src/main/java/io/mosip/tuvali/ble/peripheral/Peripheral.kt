@@ -15,7 +15,7 @@ import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
-  private val logTag = getLogTag("Peripheral")
+  private val logTag = getLogTag(javaClass.simpleName)
   private val controller: Controller =
     Controller(context)
   private var messageSender: IMessageSender

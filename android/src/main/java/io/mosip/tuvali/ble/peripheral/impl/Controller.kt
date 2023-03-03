@@ -5,11 +5,12 @@ import android.content.Context
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 const val MTU_HEADER_SIZE = 3
 
 class Controller(val context: Context) {
   private var advertiser: Advertiser? = null
-  private val logTag = "PeripheralController"
+  private val logTag = getLogTag(javaClass.simpleName)
   private var gattServer: GattServer? = null
   private lateinit var messageSender: IMessageSender
 

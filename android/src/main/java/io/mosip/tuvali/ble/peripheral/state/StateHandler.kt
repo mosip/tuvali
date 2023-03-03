@@ -17,7 +17,7 @@ class StateHandler(
   private val controller: Controller,
   private val peripheralListener: IPeripheralListener
 ) : Handler(looper), IMessageSender {
-  private val logTag = getLogTag("PeripheralHandlerThread")
+  private val logTag = getLogTag(javaClass.simpleName)
 
   enum class States {
     Init,
@@ -95,7 +95,7 @@ class StateHandler(
 
       IMessage.PeripheralMessageTypes.RECEIVED_WRITE.ordinal -> {
         val receivedWriteMessage = msg.obj as ReceivedWriteMessage
-        Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")
+        //Log.d(logTag, "received write: characteristicUUID: ${receivedWriteMessage.characteristic?.uuid}, dataSize: ${receivedWriteMessage.data?.size}")
         if (receivedWriteMessage.characteristic != null) {
           peripheralListener.onReceivedWrite(receivedWriteMessage.characteristic.uuid, receivedWriteMessage.data)
         }

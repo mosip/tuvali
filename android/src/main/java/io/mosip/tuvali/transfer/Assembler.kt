@@ -6,7 +6,7 @@ import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(maxDataBytes) {
-  private val logTag = getLogTag("Assembler")
+  private val logTag = getLogTag(javaClass.simpleName)
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
   val totalChunkCount = getTotalChunkCount(totalSize)
@@ -40,7 +40,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFA
     lastReadSeqNumber = seqNumberInMeta
     System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
     chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
-    Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
+    //Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
     return seqNumberInMeta
   }
 
@@ -54,7 +54,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFA
 
   fun isComplete(): Boolean {
     if(chunkReceivedMarker.none { it != chunkReceivedMarkerByte }) {
-      Log.i(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
+      //Log.i(logTag, "Sha256 of complete data received: ${Util.getSha256(data)}")
       return true
     }
     return false
@@ -64,7 +64,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFA
     var missedSeqNumbers = intArrayOf()
     chunkReceivedMarker.forEachIndexed() { i, elem ->
       if (elem != chunkReceivedMarkerByte) {
-        Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
+        //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
         missedSeqNumbers += i
       }
     }

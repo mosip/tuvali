@@ -32,20 +32,20 @@ class Wallet: NSObject {
     }
     
     func setTuvaliVersion(_ version: String) {
-        central?.tuvaliVersion = version
+        //central?.tuvaliVersion = version
     }
     
     func startScanning(){
         central?.walletDelegate = self
     }
 
-    func destroyConnection(){
-        central?.onDeviceDisconnected(isManualDisconnect: false)
+    func destroyConnection(isSelfDisconnect: Bool){
+        central?.onDeviceDisconnected(isManualDisconnect: isSelfDisconnect)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
         guard let advIdentifier = advIdentifier else {
-            os_log("Found NO ADV Identifier")
+            os_log(.info, "Found NO ADV Identifier")
             return false
         }
         let advIdentifierData = hexStringToData(string: advIdentifier)
@@ -74,14 +74,17 @@ class Wallet: NSObject {
         var dataInBytes = Data(data.utf8)
         var compressedBytes = try! dataInBytes.gzipped()
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
-        
+
         if (encryptedData != nil) {
-            print("Complete Encrypted Data: \(encryptedData!.toHex())")
-            print("Sha256 of Encrypted Data: \(encryptedData!.sha256())")
+            //os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler()
                 transferHandler.delegate = self
+                transferHandler.destroyConnection = { [weak self] in
+                    self?.destroyConnection(isSelfDisconnect: true)
+                }
                 // DOUBT: why is encrypted data written twice ?
+
                 self.central?.delegate = transferHandler
                 transferHandler.initialize(initdData: encryptedData!)
                 var currentMTUSize = self.central?.connectedPeripheral?.maximumWriteValueLength(for: .withoutResponse)
@@ -95,11 +98,9 @@ class Wallet: NSObject {
     }
 
     func writeToIdentifyRequest() {
-        print("::: write identify called ::: ")
         let publicKey = self.cryptoBox.getPublicKey()
-        print("verifier pub key:::", self.verifierPublicKey)
         guard let verifierPublicKey = self.verifierPublicKey else {
-            os_log("Write Identify - Found NO KEY")
+            os_log(.info, "Write Identify - Found NO KEY")
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
@@ -107,11 +108,11 @@ class Wallet: NSObject {
         central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
     }
 
-    func onDeviceDisconnected(isManualDisconnect: Bool) {
-        if(!isManualDisconnect) {
-            if let connectedPeripheral = central?.connectedPeripheral {
-                central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
-            }
+    func onDeviceDisconnected(isSelfDisconnect: Bool) {
+        if let connectedPeripheral = central?.connectedPeripheral {
+            central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
+        }
+        if(!isSelfDisconnect) {
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }

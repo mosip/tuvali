@@ -29,7 +29,7 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 250L
+private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
 class Wallet(
   context: Context,
@@ -37,7 +37,7 @@ class Wallet(
   private val eventResponseListener: (String) -> Unit,
   private val onBLEException: (Throwable) -> Unit
 ) : ICentralListener, ITransferListener {
-  private val logTag = getLogTag("Wallet")
+  private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
   private lateinit var verifierPK: ByteArray
@@ -205,7 +205,7 @@ class Wallet(
 
   override fun onRequestMTUFailure(errorCode: Int) {
     //TODO: Handle onRequest MTU failure
-    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries.")
+    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries  with error code: $errorCode.")
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
@@ -330,8 +330,7 @@ class Wallet(
     try {
       val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
       if (encryptedData != null) {
-        Log.d(logTag, "Complete Encrypted Data: ${Hex.toHexString(encryptedData)}")
-        Log.i(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
+        //Log.i(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
         transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
       } else {
         Log.e(

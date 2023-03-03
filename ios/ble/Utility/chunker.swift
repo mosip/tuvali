@@ -28,8 +28,7 @@ class Chunker {
     }
 
     func assignPreSlicedChunks(){
-        print("preSlicedChunks called ::: ")
-        print("expected total data size: \(chunkData?.count) and totalChunkCount: \(totalChunkCount)")
+        os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
         for i in 0..<totalChunkCount {
             preSlicedChunks.append(chunk(seqNumber: i))
         }
@@ -71,7 +70,6 @@ class Chunker {
     private func chunk(seqNumber: Int) -> Data {
         let fromIndex = seqNumber * effectivePayloadSize
         if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
-            print( "fetching last chunk")
             let chunkLength = lastChunkByteCount + chunkMetaSize
             return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
@@ -91,12 +89,9 @@ class Chunker {
      */
 
     private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
-        //print("fetching chunk size:",toIndex,"-", fromIndex,"}, chunkSequenceNumber(0-indexed):", seqNumber)
-//        return intToTwoBytesBigEndian(num: seqNumber) + intToTwoBytesBigEndian(num: chunkLength) + chunkData!.subdata(in: fromIndex..<toIndex)
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            print("SequenceNumber: \(seqNumber)")
             return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
         }
         return Data() //
@@ -105,18 +100,10 @@ class Chunker {
     func isComplete() -> Bool {
         let isComplete = chunksReadCounter > (totalChunkCount - 1)
         if isComplete {
-            print("isComplete: true, totalChunks: \(totalChunkCount) , chunkReadCounter(1-indexed): \(chunksReadCounter)")
+            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadCounter)
         }
        return isComplete
     }
-
-//    func intToTwoBytesBigEndian(num: Int) -> [UInt8] {
-//        if num < 256 {
-//            let minValue: UInt8 = 0
-//            return [minValue, UInt8(num)]
-//        }
-//        return [UInt8(num/256), UInt8(num%256)]
-//    }
 
     func intToBytes(_ value: UInt16) -> Data {
         var value = value.bigEndian

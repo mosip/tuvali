@@ -16,7 +16,7 @@ extension Wallet: WalletProtocol {
             let connStatusID = Int(data[0])
             if connStatusID == 1 {
                 print("con statusid:", connStatusID)
-                destroyConnection()
+                destroyConnection(isSelfDisconnect: false)
             }
         } 
     }
