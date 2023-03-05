@@ -11,6 +11,7 @@ class TransferReport  {
   val type: ReportType
   private val totalPages: Int
   val missingSequences: IntArray?
+  private val logTag = Util.getLogTag(javaClass.simpleName)
 
   //TODO: give static number to respective types below
   enum class ReportType {
@@ -20,11 +21,11 @@ class TransferReport  {
 
   constructor(type: ReportType, missingSequences: IntArray, maxDataBytes: Int) {
     val transferReportPageSize: Int = (maxDataBytes - PAGE_NUMBER_SIZE_IN_BYTES - TYPE_SIZE_IN_BYTES) / CHUNK_SEQUENCE_NUMBER_IN_BYTES
-    val missedCount = missingSequences.size
-    this.totalPages = ceil(missedCount.toDouble() / transferReportPageSize).toInt()
+    val missedSequenceNumberCount = missingSequences.size
+    this.totalPages = ceil(missedSequenceNumberCount.toDouble() / transferReportPageSize).toInt()
     this.type = type
-    this.missingSequences = missingSequences.sliceArray(0 until min(transferReportPageSize, missedCount))
-    Log.i("TransferReport", "Missed Chunks Count: $missedCount, Total Pages: $totalPages, Transfer Report Page Size: $transferReportPageSize")
+    this.missingSequences = missingSequences.sliceArray(0 until min(transferReportPageSize, missedSequenceNumberCount))
+    Log.i(logTag, "Missed Sequence Number Count: $missedSequenceNumberCount, Total Pages: $totalPages, Transfer Report Page Size: $transferReportPageSize")
 
   }
 
