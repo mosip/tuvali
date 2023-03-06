@@ -1,6 +1,7 @@
 package io.mosip.tuvali.cryptography;
 
 import org.bouncycastle.crypto.InvalidCipherTextException;
+import org.bouncycastle.util.encoders.Hex;
 
 /*
 vk: verifier key
@@ -11,19 +12,19 @@ wallet sending data to verifier | w->v: wallet encrypts with vk and verifier dec
 verifier sending data to wallet | v->w: verifier encrypts with wk and wallet decrypts with wk
  */
 class SenderTransfersOwnershipOfData implements SecretsTranslator {
-    private byte[] initVector;
+    private byte[] nonce;
     private CipherBox senderCipherBox;
     private CipherBox receiverCipherBox;
 
-    public SenderTransfersOwnershipOfData(byte[] initVector, CipherPackage cipherPackage) {
-        this.initVector = initVector;
+    public SenderTransfersOwnershipOfData(byte[] nonce, CipherPackage cipherPackage) {
+        this.nonce = nonce;
         this.senderCipherBox = cipherPackage.getSelf();
         this.receiverCipherBox = cipherPackage.getOther();
     }
 
     @Override
-    public byte[] initializationVector() {
-        return initVector;
+    public byte[] getNonce() {
+        return nonce;
     }
 
     @Override

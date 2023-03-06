@@ -11,7 +11,7 @@ class Wallet: NSObject {
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
     var advIdentifier: String?
     var verifierPublicKey: Data?
-    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
 
     private override init() {
         super.init()
@@ -89,8 +89,8 @@ class Wallet: NSObject {
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
-        var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
+        var nonce = (self.secretTranslator?.getNonce())!
+        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: nonce + publicKey)
     }
 
     func onDeviceDisconnected(isSelfDisconnect: Bool) {

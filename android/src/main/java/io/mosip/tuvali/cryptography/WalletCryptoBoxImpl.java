@@ -18,10 +18,10 @@ class WalletCryptoBoxImpl implements WalletCryptoBox {
 
     @Override
     public SecretsTranslator buildSecretsTranslator(byte[] verifierPublicKey) {
-        byte[] ivBytes = new byte[CryptoBox.INITIALISATION_VECTOR_LENGTH];
-        secureRandom.nextBytes(ivBytes);
+        byte[] nonceBytes = new byte[CryptoBox.NONCE_LENGTH];
+        secureRandom.nextBytes(nonceBytes);
 
-        CipherPackage cipherPackage = selfCryptoBox.createCipherPackage(verifierPublicKey, KeyGenerator.WALLET_INFO, KeyGenerator.VERIFIER_INFO, ivBytes);
-        return new SenderTransfersOwnershipOfData(ivBytes, cipherPackage);
+        CipherPackage cipherPackage = selfCryptoBox.createCipherPackage(verifierPublicKey, KeyGenerator.WALLET_INFO, KeyGenerator.VERIFIER_INFO, nonceBytes);
+        return new SenderTransfersOwnershipOfData(nonceBytes, cipherPackage);
     }
 }
