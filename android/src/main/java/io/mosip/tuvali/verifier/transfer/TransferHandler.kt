@@ -42,11 +42,11 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       IMessage.TransferMessageTypes.RESPONSE_SIZE_READ.ordinal -> {
         responseStartTimeInMillis = System.currentTimeMillis()
         val responseSizeReadSuccessMessage = msg.obj as ResponseSizeReadSuccessMessage
-        val mtuSize = responseSizeReadSuccessMessage.mtuSize
+        val maxChunkSize = responseSizeReadSuccessMessage.maxDataBytes
 
         try {
-          Log.d(logTag, "MTU size used for assembler: $mtuSize bytes")
-          assembler = Assembler(responseSizeReadSuccessMessage.responseSize, mtuSize)
+          Log.d(logTag, "MTU size used for assembler: $maxChunkSize bytes")
+          assembler = Assembler(responseSizeReadSuccessMessage.responseSize, maxChunkSize)
         } catch (c: CorruptedChunkReceivedException) {
           this.sendMessage(ResponseTransferFailedMessage("Corrupted Data from Remote " + c.message.toString()))
           return

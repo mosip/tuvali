@@ -11,7 +11,6 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.DEFAULT_CHUNK_SIZE
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -45,7 +44,7 @@ class Verifier(
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
-  private var negotiatedMTUSize = DEFAULT_CHUNK_SIZE
+  private var maxDataBytes = 20
 
   //TODO: Update UUIDs as per specification
   companion object {
@@ -160,7 +159,7 @@ class Verifier(
           val receivedReportType = value[0].toInt()
           if (receivedReportType == TransferReportRequest.ReportType.RequestReport.ordinal) {
             val remoteRequestedTransferReportMessage =
-              RemoteRequestedTransferReportMessage(receivedReportType, negotiatedMTUSize)
+              RemoteRequestedTransferReportMessage(receivedReportType, maxDataBytes)
             transferHandler.sendMessage(remoteRequestedTransferReportMessage)
           } else if (receivedReportType == TransferReportRequest.ReportType.Error.ordinal) {
             onResponseReceivedFailed("received error on transfer Report request from remote")
@@ -172,7 +171,7 @@ class Verifier(
           //Log.d(logTag, "received response size on characteristic value: ${String(value)}")
           val responseSize: Int = String(value).toInt()
           Log.d(logTag, "received response size on characteristic: $responseSize")
-          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, negotiatedMTUSize)
+          val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, maxDataBytes)
           transferHandler.sendMessage(responseSizeReadSuccessMessage)
         }
       }
@@ -234,7 +233,7 @@ class Verifier(
       throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")
     }
 
-    negotiatedMTUSize = mtu
+    maxDataBytes = mtu
   }
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
