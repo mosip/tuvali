@@ -14,14 +14,14 @@
 // As a wallet
 // phase-2: share and generate secretsTranslator
 // let secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPublicKey)
-// let iv = secretsTranslator.getInitializationVector()
+// let nonce = secretsTranslator.getNonce()
 
-At this stage we have both 'iv' and 'walletPublicKey'
+At this stage we have both 'nonce' and 'walletPublicKey'
 -----------------------network call----------------------------------------------
 (4)
 // As a verifier
 // phase-2: share and generate secretsTranslator
-// let secretsTranslator = verifierCryptoBox.buildSecretsTranslator(iv, walletPublicKey)
+// let secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPublicKey)
 
 (5)
 // As a verifier
