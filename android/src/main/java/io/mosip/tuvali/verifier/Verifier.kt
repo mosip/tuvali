@@ -160,7 +160,7 @@ class Verifier(
           val receivedReportType = value[0].toInt()
           if (receivedReportType == TransferReportRequest.ReportType.RequestReport.ordinal) {
             val remoteRequestedTransferReportMessage =
-              RemoteRequestedTransferReportMessage(receivedReportType)
+              RemoteRequestedTransferReportMessage(receivedReportType, negotiatedMTUSize)
             transferHandler.sendMessage(remoteRequestedTransferReportMessage)
           } else if (receivedReportType == TransferReportRequest.ReportType.Error.ordinal) {
             onResponseReceivedFailed("received error on transfer Report request from remote")
