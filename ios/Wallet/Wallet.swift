@@ -31,16 +31,12 @@ class Wallet: NSObject {
         verifierPublicKey = publicKeyData
     }
     
-    func setTuvaliVersion(_ version: String) {
-        //central?.tuvaliVersion = version
-    }
-    
     func startScanning(){
         central?.walletDelegate = self
     }
 
-    func destroyConnection(isSelfDisconnect: Bool){
-        central?.onDeviceDisconnected(isManualDisconnect: isSelfDisconnect)
+    func handleDestroyConnection(isSelfDisconnect: Bool) {
+        central?.disconnectAndClose(isSelfDisconnect: isSelfDisconnect)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -76,7 +72,6 @@ class Wallet: NSObject {
         var encryptedData = secretTranslator?.encryptToSend(data: compressedBytes)
 
         if (encryptedData != nil) {
-            //os_log(.info, "Sha256 of Encrypted Data: %{public}@ ", (encryptedData!.sha256()))
             DispatchQueue.main.async {
                 let transferHandler = TransferHandler()
                 transferHandler.delegate = self
@@ -105,15 +100,6 @@ class Wallet: NSObject {
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
         var iv = (self.secretTranslator?.initializationVector())!
-        central?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
-    }
-
-    func onDeviceDisconnected(isSelfDisconnect: Bool) {
-        if let connectedPeripheral = central?.connectedPeripheral {
-            central?.centralManager.cancelPeripheralConnection(connectedPeripheral)
-        }
-        if(!isSelfDisconnect) {
-            EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
-        }
+        central?.writeWithResponse(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
     }
 }

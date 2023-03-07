@@ -23,13 +23,12 @@ class Openid4vpBle: RCTEventEmitter {
     @objc(setConnectionParameters:)
     func setConnectionParameters(params: String) -> Any {
         print("SetConnectionParameters->Params::\(params)")
-        let paramsObj = stringToJson(jsonText: params)
-        let firstPartOfPk = paramsObj["pk"] as? String
-        print("synchronized setConnectionParameters called with", params, "and", firstPartOfPk)
+        let connectionParameter = stringToJson(jsonText: params)
+        let privateKey = connectionParameter["pk"] as? String
+        print("synchronized setConnectionParameters called with", params, "and", privateKey)
         wallet = Wallet()
-        wallet?.setTuvaliVersion(tuvaliVersion)
-        if let firstPartOfPk {
-            wallet?.setAdvIdentifier(identifier: firstPartOfPk)
+        if let privateKey {
+            wallet?.setAdvIdentifier(identifier: privateKey)
         }
         return "data" as Any
     }
@@ -60,7 +59,7 @@ class Openid4vpBle: RCTEventEmitter {
 
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
-        wallet?.destroyConnection(isSelfDisconnect: true)
+        wallet?.handleDestroyConnection(isSelfDisconnect: true)
         return "check" as! Any
     }
 
@@ -113,7 +112,7 @@ class Openid4vpBle: RCTEventEmitter {
     }
 
     fileprivate func handleError(_ message: String) {
-        wallet?.destroyConnection(isSelfDisconnect: false)
+        wallet?.handleDestroyConenction(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
     }
 

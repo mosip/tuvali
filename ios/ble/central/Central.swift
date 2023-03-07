@@ -42,7 +42,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     /**
      * write(..) writes data on a charUUID without response
      */
-    func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
+    func writeWithResponse(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
             guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
                 os_log(.info, "Did not find the characteristic to write")
@@ -69,11 +69,15 @@ class Central: NSObject, CBCentralManagerDelegate {
         }
     }
     
-    func onDeviceDisconnected(isManualDisconnect: Bool) {
+    func disconnectAndClose(isSelfDisconnect: Bool) {
         if let connectedPeripheral = self.connectedPeripheral {
             centralManager.cancelPeripheralConnection(connectedPeripheral)
         }
-        if(!isManualDisconnect) {
+        destroyConnection(isSelfDisconnect: isSelfDisconnect)
+    }
+
+    func destroyConnection(isSelfDisconnect: Bool){
+        if(!isSelfDisconnect) {
             EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
         }
     }

@@ -16,12 +16,12 @@ extension Wallet: WalletProtocol {
             let connStatusID = Int(data[0])
             if connStatusID == 1 {
                 print("con statusid:", connStatusID)
-                destroyConnection(isSelfDisconnect: false)
+                handleDestroyConnection(isSelfDisconnect: false)
             }
         } 
     }
     
-    func hasSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void)) {
+    func setVeriferKeyOnSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void)) {
         if isSameAdvIdentifier(advertisementPayload: payload) {
             setVerifierPublicKey(publicKeyData: publicData)
             completion()
@@ -36,7 +36,7 @@ extension Wallet: WalletProtocol {
 extension Wallet: TransferHandlerDelegate {
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data, withResponse: Bool) {
         if withResponse {
-            central?.write(serviceUuid: serviceUuid, charUUID: charUUID, data: data)
+            central?.writeWithResponse(serviceUuid: serviceUuid, charUUID: charUUID, data: data)
         } else {
             central?.writeWithoutResp(serviceUuid: serviceUuid, charUUID: charUUID, data: data)
         }

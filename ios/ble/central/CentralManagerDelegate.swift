@@ -13,7 +13,7 @@ extension Central {
             let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             print("veri pub key::", publicKeyData)
-            walletDelegate?.hasSameIdentifier(payload: advertisementData, publicData: publicKeyData) {
+            walletDelegate?.setVeriferKeyOnSameIdentifier(payload: advertisementData, publicData: publicKeyData) {
                 peripheral.delegate = self
                 central.connect(peripheral)
                 connectedPeripheral = peripheral
@@ -32,7 +32,7 @@ extension Central {
         if let connectedPeripheral = connectedPeripheral {
             central.cancelPeripheralConnection(connectedPeripheral)
         }
-        onDeviceDisconnected(isManualDisconnect: false)
+        disconnectAndClose(isSelfDisconnect: false)
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {

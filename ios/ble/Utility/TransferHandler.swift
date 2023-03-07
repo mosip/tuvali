@@ -77,7 +77,7 @@ class TransferHandler {
 
     private func requestTransmissionReport() {
         var notifyObj: Data
-        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) }, withResponse: false)
+        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) }, withResponse: true)
         os_log(.info, "transmission report requested")
     }
 
@@ -102,7 +102,6 @@ class TransferHandler {
     private func sendResponseSize(size: Int) {
         let decimalString = String(size)
         if let data = decimalString.data(using: .utf8) {
-            print(data)
             delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: data, withResponse: true)
         }
     }
@@ -191,7 +190,6 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
             } else if status == 1 {
                 EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"REJECTED\"")
             }
-          //  Wallet.shared.destroyConnection(isSelfDisconnect: true)
             destroyConnection?()
         }
     }
