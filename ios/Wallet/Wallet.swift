@@ -36,7 +36,10 @@ class Wallet: NSObject {
     }
 
     func handleDestroyConnection(isSelfDisconnect: Bool) {
-        central?.disconnectAndClose(isSelfDisconnect: isSelfDisconnect)
+        central?.disconnectAndClose()
+        if !isSelfDisconnect {
+            central?.destroyConnection()
+        }
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -76,7 +79,7 @@ class Wallet: NSObject {
                 let transferHandler = TransferHandler()
                 transferHandler.delegate = self
                 transferHandler.destroyConnection = { [weak self] in
-                    self?.destroyConnection(isSelfDisconnect: true)
+                    self?.handleDestroyConnection(isSelfDisconnect: true)
                 }
                 // DOUBT: why is encrypted data written twice ?
 

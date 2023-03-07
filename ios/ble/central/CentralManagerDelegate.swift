@@ -32,7 +32,7 @@ extension Central {
         if let connectedPeripheral = connectedPeripheral {
             central.cancelPeripheralConnection(connectedPeripheral)
         }
-        disconnectAndClose(isSelfDisconnect: false)
+        destroyConnection()
     }
 
     func centralManager(_ central: CBCentralManager, didFailToConnect peripheral: CBPeripheral, error: Error?) {
