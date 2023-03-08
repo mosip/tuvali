@@ -1,27 +1,27 @@
 import Foundation
 
 class SenderTransferOwnershipOfData: SecretTranslator {
-    var senderCiperBox: CipherBox
+    var senderCipherBox: CipherBox
     var receiverCipherBox: CipherBox
-    var initVector: Data
-    
-    init(CipherPackage: CipherPackage, initVector: Data) {
-        self.senderCiperBox = CipherPackage.getSelfCipherBox
+    var nonce: Data
+
+    init(CipherPackage: CipherPackage, nonce: Data) {
+        self.senderCipherBox = CipherPackage.getSelfCipherBox
         self.receiverCipherBox = CipherPackage.getOtherCipherBox
-        self.initVector = initVector
+        self.nonce = nonce
     }
-    
-    func initializationVector() -> Data {
-        return self.initVector
+
+    func getNonce() -> Data {
+        return self.nonce
     }
-    
+
     func encryptToSend(data: Data) -> Data {
         let encrypt = (receiverCipherBox.encrypt(message: data))
         return encrypt
     }
-    
+
     func decryptUponReceive(data: Data) -> Data {
-        let decrypt = (senderCiperBox.decrypt(message: data))
+        let decrypt = (senderCipherBox.decrypt(message: data))
         return decrypt
     }
 }

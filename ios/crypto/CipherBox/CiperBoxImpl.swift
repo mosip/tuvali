@@ -6,19 +6,19 @@ class CipherBoxImpl: CipherBox {
     let secretKey: SymmetricKey
     let initializationVector: Data
     let digestSizeInBytes: Int
-    
+
     init(secretKey: SymmetricKey, initializationVector: Data, digestSizeInBytes: Int) {
         self.secretKey = secretKey
         self.initializationVector = initializationVector
         self.digestSizeInBytes = digestSizeInBytes
     }
-    
+
     func encrypt(message: Data) -> Data {
         let encryptedSealedBox = try! AES.GCM.seal(message, using: secretKey, nonce: AES.GCM.Nonce(data: initializationVector))
         let cipherWithAuthTag = encryptedSealedBox.ciphertext + encryptedSealedBox.tag
         return cipherWithAuthTag
     }
-    
+
     func decrypt(message: Data) -> Data {
         let cipherMessage = message.dropLast(digestSizeInBytes)
         let cipherTag = message.suffix(digestSizeInBytes)
@@ -45,7 +45,7 @@ extension String {
     func hexToString()->String{
         var finalString = ""
         let chars = Array(self)
-        
+
         for count in stride(from: 0, to: chars.count - 1, by: 2){
             let firstDigit =  Int.init("\(chars[count])", radix: 16) ?? 0
             let lastDigit = Int.init("\(chars[count + 1])", radix: 16) ?? 0

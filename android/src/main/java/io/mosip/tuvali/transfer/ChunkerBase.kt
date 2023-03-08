@@ -2,9 +2,7 @@ package io.mosip.tuvali.transfer
 
 import kotlin.math.ceil
 
-const val DEFAULT_CHUNK_SIZE = 182
-
-open class ChunkerBase(maxDataBytes: Int = DEFAULT_CHUNK_SIZE) {
+open class ChunkerBase(maxDataBytes: Int) {
   private val seqNumberReservedByteSize = 2
   private val crcChecksumValueByteSize = 2
   val chunkMetaSize = seqNumberReservedByteSize + crcChecksumValueByteSize

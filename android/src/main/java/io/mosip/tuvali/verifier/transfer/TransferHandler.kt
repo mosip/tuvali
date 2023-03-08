@@ -9,14 +9,12 @@ import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
-import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
 import kotlin.math.ceil
-import kotlin.math.min
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
@@ -44,11 +42,11 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       IMessage.TransferMessageTypes.RESPONSE_SIZE_READ.ordinal -> {
         responseStartTimeInMillis = System.currentTimeMillis()
         val responseSizeReadSuccessMessage = msg.obj as ResponseSizeReadSuccessMessage
-        val mtuSize = responseSizeReadSuccessMessage.mtuSize
+        val maxChunkSize = responseSizeReadSuccessMessage.maxDataBytes
 
         try {
-          Log.d(logTag, "MTU size used for assembler: $mtuSize bytes")
-          assembler = Assembler(responseSizeReadSuccessMessage.responseSize, mtuSize)
+          Log.d(logTag, "MTU size used for assembler: $maxChunkSize bytes")
+          assembler = Assembler(responseSizeReadSuccessMessage.responseSize, maxChunkSize)
         } catch (c: CorruptedChunkReceivedException) {
           this.sendMessage(ResponseTransferFailedMessage("Corrupted Data from Remote " + c.message.toString()))
           return
@@ -62,9 +60,10 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       }
       IMessage.TransferMessageTypes.REMOTE_REQUESTED_TRANSFER_REPORT.ordinal -> {
         val remoteRequestedTransferReportMessage = msg.obj as RemoteRequestedTransferReportMessage
+        val maxDataBytes = remoteRequestedTransferReportMessage.maxDataBytes
         when(remoteRequestedTransferReportMessage.transferReportRequestCharValue) {
           TransferReportRequest.ReportType.RequestReport.ordinal -> {
-            handleTransferReportRequest()
+            handleTransferReportRequest(maxDataBytes)
           }
           TransferReportRequest.ReportType.Error.ordinal -> {
             transferListener.onResponseReceivedFailed("received error on transfer summary request char from remote")
@@ -89,10 +88,10 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     }
   }
 
-  private fun handleTransferReportRequest() {
+  private fun handleTransferReportRequest(maxDataBytes: Int) {
     if (assembler?.isComplete() == true) {
       Log.d(logTag, "success frame: transfer completed")
-      val transferReport = TransferReport(TransferReport.ReportType.SUCCESS, 0, null)
+      val transferReport = TransferReport(TransferReport.ReportType.SUCCESS, intArrayOf(), maxDataBytes)
       transferListener.sendDataOverNotification(
         GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID,
         transferReport.toByteArray()
@@ -103,21 +102,15 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
 
     val missedSequenceNumbers = assembler?.getMissedSequenceNumbers()
     val missedCount = missedSequenceNumbers?.size
-    val totalPages: Double = ceil(missedCount!!.toDouble() / defaultTransferReportPageSize)
 
-    Log.d(
-      logTag,
-      "failure frame: missedChunksCount: $missedCount, defaultTransferReportPageSize: $defaultTransferReportPageSize, totalPages: $totalPages"
-    )
-
-    if(assembler != null && missedCount > (0.7 * assembler!!.totalChunkCount)) {
+    if(assembler != null && missedCount!! > (0.7 * assembler!!.totalChunkCount)) {
       throw TooManyFailureChunksException("Failing VC transfer as failure chunks are more than 70% of total chunks")
     }
 
     val transferReport =TransferReport(
       TransferReport.ReportType.MISSING_CHUNKS,
-      totalPages.toInt(),
-      missedSequenceNumbers.sliceArray(0 until min(defaultTransferReportPageSize, missedCount))
+      missedSequenceNumbers!!,
+      maxDataBytes
     )
 
     transferListener.sendDataOverNotification(

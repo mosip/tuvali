@@ -5,7 +5,7 @@ import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Assembler(private val totalSize: Int, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE): ChunkerBase(maxDataBytes) {
+class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {
   private val logTag = getLogTag(javaClass.simpleName)
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null

@@ -86,16 +86,16 @@ class Wallet(
   fun writeToIdentifyRequest() {
     val publicKey = walletCryptoBox.publicKey()
     secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
-    val iv = secretsTranslator?.initializationVector()
+    val nonce = secretsTranslator?.nonce
     central.write(
       Verifier.SERVICE_UUID,
       GattService.IDENTIFY_REQUEST_CHAR_UUID,
-      iv!! + publicKey!!
+      nonce!! + publicKey!!
     )
     Log.d(
       logTag,
-      "Started to write - generated IV ${
-        Hex.toHexString(iv)
+      "Started to write - generated nonce ${
+        Hex.toHexString(nonce)
       }, Public Key of wallet: ${Hex.toHexString(publicKey)}"
     )
   }

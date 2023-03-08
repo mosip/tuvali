@@ -15,8 +15,8 @@ class VerifierCryptoBoxImpl implements VerifierCryptoBox {
     }
 
     @Override
-    public SecretsTranslator buildSecretsTranslator(byte[] initVector, byte[] walletPublicKey) {
-        CipherPackage cipherPackage = selfCryptoBox.createCipherPackage(walletPublicKey, KeyGenerator.VERIFIER_INFO, KeyGenerator.WALLET_INFO, initVector);
-        return new SenderTransfersOwnershipOfData(initVector, cipherPackage);
+    public SecretsTranslator buildSecretsTranslator(byte[] nonce, byte[] walletPublicKey) {
+        CipherPackage cipherPackage = selfCryptoBox.createCipherPackage(walletPublicKey, KeyGenerator.VERIFIER_INFO, KeyGenerator.WALLET_INFO, nonce);
+        return new SenderTransfersOwnershipOfData(nonce, cipherPackage);
     }
 }

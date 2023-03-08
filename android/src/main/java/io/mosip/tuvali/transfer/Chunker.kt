@@ -4,7 +4,7 @@ import android.util.Log
 import io.mosip.tuvali.transfer.Util.Companion.intToTwoBytesBigEndian
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Chunker(private val data: ByteArray, private val maxDataBytes: Int = DEFAULT_CHUNK_SIZE) :
+class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   ChunkerBase(maxDataBytes) {
   private val logTag = getLogTag(javaClass.simpleName)
   private var chunksReadCounter: Int = 0

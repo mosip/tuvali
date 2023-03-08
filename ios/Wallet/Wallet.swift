@@ -11,7 +11,7 @@ class Wallet: NSObject {
     var advIdentifier: String?
     var verifierPublicKey: Data?
     var createConnection: (() -> Void)?
-    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"wallet\"}"
+    static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
 
     override init() {
         super.init()
@@ -102,7 +102,7 @@ class Wallet: NSObject {
             return
         }
         secretTranslator = (cryptoBox.buildSecretsTranslator(verifierPublicKey: verifierPublicKey))
-        var iv = (self.secretTranslator?.initializationVector())!
-        central?.writeWithResponse(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: iv + publicKey)
+        var nonce = (self.secretTranslator?.getNonce())!
+        central?.writeWithResponse(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID, data: nonce + publicKey)
     }
 }
