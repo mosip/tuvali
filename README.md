@@ -10,18 +10,20 @@ This contains the source code for the ios, android modules as well as a sample a
 
 ```bash
 # Install latest version
-npm install react-native-openid4vp-ble
+npm install mosip/tuvali
 
 # or
 
 # Install specific version
-npm install react-native-openid4vp-ble@github:mosip/tuvali#v0.3.5
+npm install mosip/tuvali#v0.3.7
 ```
 
 # API documentation
 Firstly, for establishing the secured connection over BLE the connection params which include `cid` and `Public key` needs to be exchanged between two devices. The exchange of parameters can be accomplished, but is not limited to, by using a QR code.
 
 For example use QR code generator to visually display params and QR code scanner to get params. A mobile app that displays a QR code can act as an `advertiser` by including its connection params as data in the QR code and another device can act as `discoverer` which scans the QR code, it can extract the connection params and initiate a BLE connection with the advertising device.
+
+> Note: The terms `advertiser` and `discoverer` are used for legacy API compatibility reasons. These terms will be replaced with `Verifier` and `Wallet` soon. Hence the terms are used interchangeably as required.
 
 ## Connection parameters exchange
 The device on which the QR code is displayed shall generate connection parameters using getConnectionParameters() method:
@@ -58,8 +60,7 @@ The device that displays the QR code will become `advertiser` and waits for a co
 
 ```typescript
 Openid4vpBle.createConnection('advertiser', () => {
-  // A secure Bluetooth connection is created
-  // Any device on which app is installed may call Openid4vpBle.send()
+  // Add the code that needs to run when bluetooth advertisement started successfully
 });
 ```
 
@@ -67,8 +68,7 @@ and the other device that scans the QR code will become `discoverer` and will at
 
 ```typescript
 Openid4vpBle.createConnection('discoverer', () => {
-  // A secure Bluetooth connection is created
-  // Any device on which app is installed may call Openid4vpBle.send()
+  // Add the code that needs to run when bluetooth scan started successfully
 });
 ```
 
@@ -78,18 +78,34 @@ Once the connection is established, either app can send the data:
 
 ```typescript
 Openid4vpBle.send(message, () => {
-// data sent
-// TODO: document message structure
+  // Add the code that needs to run once data is shared successfully
 });
 ```
+
+Following sequence of actions should be performed to transfer data over BLE
+1. Exchange Wallet public key
+  Discoverer calls `Openid4vpBle.send` with message type "exchange-sender-info". The callback passed is executed on successful writing wallet public key to Identify characteristic
+2. Send VC data
+  At the moment, only VC data is being exchanged from Wallet to Verifier instead of VP response mentioned in the specification. Hence `Openid4vpBle.send` should be called message type "send-vc" for sending VC data from Wallet to Verifier.
+3. Send VC response
+  Verifier can exchange "Accept/Reject" status to Wallet with following message type for `Openid4vpBle.send` method
+  - For Accept status, message type "send-vc:response\n1"
+  - For Reject status, message type "send-vc:response\n2"
+
 
 Data received from other app via BLE can be subscribed to using:
 ```typescript
 Openid4vpBle.handleNearbyEvents((event) => {
-// data received as event
-// TODO: Document event structure for data and error
+  // Add the code that needs to run once data is received
 })
 ```
+
+Here are the different types of events that can be received
+1. Advertiser gets an event when Identify charactertistic value is received on Verifier side. The format of the event is 
+`{"type": "msg", "data": "exchange-sender-info\n{\"deviceName\": \"Wallet\"}}`
+2. Advertiser gets an event when VC data is received. The format of the event is `{"type": "msg", "data": "send-vc\n<Entire VC data>}`
+3. Both Advertiser and Discoverer can receive disconnected event in the following format `{"type": "onDisconnected"}`
+4. Both Advertiser and Discoverer can receive error event in the following format `{"type": "onError", "message": "Something went wrong in BLE: ${e.cause}"}`
 
 ## Connection closure
 
