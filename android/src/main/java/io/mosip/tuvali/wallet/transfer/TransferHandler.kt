@@ -12,12 +12,14 @@ import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
+const val MAXIMUM_RETRY_FRAME_LIMIT = 5;
+
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID, private val transferListener: ITransferListener) :
   Handler(looper) {
   private lateinit var retryChunker: RetryChunker
   private val logTag = getLogTag(javaClass.simpleName)
   private var chunkCounter = 0;
-  private var isRetryFrame = false;
+  private var retryCounter = 0;
 
   enum class States {
     UnInitialised,
@@ -80,7 +82,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
         handleTransmissionReport(handleTransmissionReportMessage.report)
       }
       IMessage.TransferMessageTypes.RESPONSE_CHUNK_WRITE_SUCCESS.ordinal -> {
-        if(isRetryFrame) {
+        if(retryCounter > 0) {
           sendRetryResponseChunk()
         } else {
           sendResponseChunk()
@@ -104,7 +106,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
         val initRetryTransferMessage = msg.obj as InitRetryTransferMessage
-        isRetryFrame = true
+        retryCounter++;
         retryChunker = RetryChunker(chunker!!, initRetryTransferMessage.missedSequences)
         sendRetryResponseChunk()
       }
@@ -124,8 +126,14 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       currentState = States.TransferVerified
       transferListener.onResponseSent()
       //Log.d(logTag, "handleMessage: Successfully transferred vc in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
-    } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null && !isRetryFrame) {
+    } else if(report.type == TransferReport.ReportType.MISSING_CHUNKS && report.missingSequences != null) {
       currentState = States.PartiallyTransferred
+
+      if(retryCounter >= MAXIMUM_RETRY_FRAME_LIMIT) {
+        this.sendMessage(ResponseTransferFailureMessage("Reached Retry Limit"))
+        return
+      }
+
       this.sendMessage(InitRetryTransferMessage(report.missingSequences))
     } else {
       this.sendMessage(ResponseTransferFailureMessage("Invalid Report"))

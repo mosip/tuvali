@@ -28,6 +28,7 @@ import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.wallet.exception.TransferFailedException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
@@ -270,7 +271,7 @@ class Wallet(
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
-    // TODO: Handle error
+    throw TransferFailedException(errorMsg)
   }
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
