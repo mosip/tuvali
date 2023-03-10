@@ -60,6 +60,7 @@ class Openid4vpBle: RCTEventEmitter {
     @objc(destroyConnection:)
     func destroyConnection(withCallback callback: @escaping RCTResponseSenderBlock) -> Any {
         wallet?.handleDestroyConnection(isSelfDisconnect: true)
+        wallet = nil
         return "check" as! Any
     }
 

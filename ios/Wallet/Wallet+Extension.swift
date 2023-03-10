@@ -6,6 +6,11 @@ protocol TransferHandlerDelegate: AnyObject {
 }
 
 extension Wallet: WalletProtocol {
+    
+    func onDisconnect() {
+        self.onDeviceDisconnected()
+    }
+    
     func onIdentifyWriteSuccess() {
         EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
     }

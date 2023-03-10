@@ -13,4 +13,5 @@ protocol WalletProtocol: AnyObject {
     func onDisconnectStatusChange(data: Data?)
     func createConnectionHandler()
     func setVeriferKeyOnSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void))
+    func onDisconnect()
 }

@@ -36,10 +36,14 @@ class Wallet: NSObject {
     }
 
     func handleDestroyConnection(isSelfDisconnect: Bool) {
-        central?.disconnectAndClose()
+        central?.disconnect()
         if !isSelfDisconnect {
-            central?.destroyConnection()
+            onDeviceDisconnected()
         }
+    }
+    
+    func onDeviceDisconnected(){
+        EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {

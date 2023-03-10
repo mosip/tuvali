@@ -69,13 +69,9 @@ class Central: NSObject, CBCentralManagerDelegate {
         }
     }
     
-    func disconnectAndClose() {
+    func disconnect() {
         if let connectedPeripheral = self.connectedPeripheral {
             centralManager.cancelPeripheralConnection(connectedPeripheral)
         }
-    }
-
-    func destroyConnection(){
-            EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
     }
 }
