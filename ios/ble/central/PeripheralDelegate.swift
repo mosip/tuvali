@@ -55,8 +55,7 @@ extension Central: CBPeripheralDelegate {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
         }
-
-        createConnection?()
+        walletDelegate?.createConnectionHandler()
     }
 
 

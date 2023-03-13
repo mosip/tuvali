@@ -13,12 +13,10 @@ class Central: NSObject, CBCentralManagerDelegate {
     var cbCharacteristics: [String: CBCharacteristic] = [:]
     var delegate: PeripheralCommunicatorProtocol?
     var walletDelegate: WalletProtocol?
-    var createConnection:(()->Void)?
+    var createConnection: (() -> Void)?
 
-    public static var shared = Central()
-
-    func initialize() {
-        walletDelegate = Wallet.shared
+    override init() {
+        super.init()
         centralManager = CBCentralManager(delegate: self, queue: nil)
     }
 
@@ -44,7 +42,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     /**
      * write(..) writes data on a charUUID without response
      */
-    func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
+    func writeWithResponse(serviceUuid: CBUUID, charUUID: CBUUID, data: Data) {
         if let connectedPeripheral = connectedPeripheral {
             guard let characteristic = self.cbCharacteristics[charUUID.uuidString] else {
                 os_log(.info, "Did not find the characteristic to write")
@@ -68,6 +66,12 @@ class Central: NSObject, CBCentralManagerDelegate {
             }
             let messageData = Data(bytes: Array(data), count: data.count)
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
+        }
+    }
+    
+    func disconnect() {
+        if let connectedPeripheral = self.connectedPeripheral {
+            centralManager.cancelPeripheralConnection(connectedPeripheral)
         }
     }
 }
