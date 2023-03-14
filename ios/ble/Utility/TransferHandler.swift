@@ -8,7 +8,9 @@ class TransferHandler {
     private var responseStartTimeInMillis: UInt64 = 0
     private var chunker: Chunker?
     var destroyConnection: (() -> Void)?
-
+    private var failureFrameRetryCounter = 0
+    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 5
+    
     func initialize(initdData: Data) {
         data = initdData
     }
@@ -60,6 +62,7 @@ class TransferHandler {
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
         } else if msg.msgType == .RESPONSE_TRANSFER_FAILED {
             currentState = States.ResponseWriteFailed
+            ErrorHandler.sharedInstance.handle(error: OpenId4vpError.responseTransferFailure)
         } else {
             os_log(.error, "Out of scope")
         }
@@ -89,12 +92,19 @@ class TransferHandler {
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
             EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
+            failureFrameRetryCounter = 0
             os_log(.info, "Emitting send-vc:response RECEIVED message")
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
-            sendRetryRespChunk(missingChunks: r.missingSequences!)
+            if (failureFrameRetryCounter >= MAX_FAILURE_FRAME_RETRY_LIMIT) {
+                sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED))
+            } else {
+                failureFrameRetryCounter+=1
+                sendRetryRespChunk(missingChunks: r.missingSequences!)
+            }
         } else {
             os_log(.info, "handle transfer report parsing, report-type= %{public}d", r.type.rawValue)
+            failureFrameRetryCounter = 0
             sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: nil, dataSize: 0))
         }
     }
