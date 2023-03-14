@@ -27,8 +27,8 @@ class Openid4vpBle: RCTEventEmitter {
         let publicKey = connectionParameter["pk"] as? String
         print("synchronized setConnectionParameters called with", params, "and", publicKey)
         wallet = Wallet()
-        if let privateKey {
-            wallet?.setAdvIdentifier(identifier: privateKey)
+        if let publicKey {
+            wallet?.setAdvIdentifier(identifier: publicKey)
         }
         return "data" as Any
     }
