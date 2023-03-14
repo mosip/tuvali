@@ -56,8 +56,9 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
     //Log.d(logTag, "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber")
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
+    val seqNumber = seqIndex +1
 
-    return intToTwoBytesBigEndian(seqIndex) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
+    return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
   }
 
   fun isComplete(): Boolean {
