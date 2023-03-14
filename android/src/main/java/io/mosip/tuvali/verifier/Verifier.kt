@@ -120,6 +120,7 @@ class Verifier(
   override fun onAdvertisementStartFailed(errorCode: Int) {
     Log.e(logTag, "onAdvertisementStartFailed: $errorCode")
     // TODO: Handle error
+
   }
 
   override fun sendDataOverNotification(charUUID: UUID, data: ByteArray) {
