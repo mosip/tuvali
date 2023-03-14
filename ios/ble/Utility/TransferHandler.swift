@@ -8,8 +8,8 @@ class TransferHandler {
     private var responseStartTimeInMillis: UInt64 = 0
     private var chunker: Chunker?
     var destroyConnection: (() -> Void)?
-    private var retryCount = 0
-    private let MAXIMUM_RETRY_FRAME_LIMIT = 5
+    private var failureFrameRetryCounter = 0
+    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 5
     
     func initialize(initdData: Data) {
         data = initdData
@@ -92,19 +92,19 @@ class TransferHandler {
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
             EventEmitter.sharedInstance.emitNearbyMessage(event: "send-vc:response", data: "\"RECEIVED\"")
-            retryCount = 0
+            failureFrameRetryCounter = 0
             os_log(.info, "Emitting send-vc:response RECEIVED message")
         } else if r.type == .MISSING_CHUNKS {
             currentState = .PartiallyTransferred
-            retryCount+=1
-            if (retryCount >= MAXIMUM_RETRY_FRAME_LIMIT) {
+            if (failureFrameRetryCounter >= MAX_FAILURE_FRAME_RETRY_LIMIT) {
                 sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED))
             } else {
+                failureFrameRetryCounter+=1
                 sendRetryRespChunk(missingChunks: r.missingSequences!)
             }
         } else {
             os_log(.info, "handle transfer report parsing, report-type= %{public}d", r.type.rawValue)
-            retryCount = 0
+            failureFrameRetryCounter = 0
             sendMessage(message: imessage(msgType: .RESPONSE_TRANSFER_FAILED, data: nil, dataSize: 0))
         }
     }
