@@ -22,24 +22,25 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun next(): ByteArray {
-    val seqIndex = chunksReadCounter
+    val sequenceIndex = chunksReadCounter
     chunksReadCounter++
-    return preSlicedChunks[seqIndex]!!
+    return preSlicedChunks[sequenceIndex]!!
   }
 
-  fun chunkBySequenceNumber(num: Int): ByteArray {
-    return preSlicedChunks[num]!!
+  fun chunkBySequenceNumber(sequenceNumber: Int): ByteArray {
+    val sequenceIndex = sequenceNumber -1
+    return preSlicedChunks[sequenceIndex]!!
   }
 
-  private fun chunk(seqIndex: Int): ByteArray {
-    val fromIndex = seqIndex * effectivePayloadSize
+  private fun chunk(sequenceIndex: Int): ByteArray {
+    val fromIndex = sequenceIndex * effectivePayloadSize
 
-    return if (seqIndex == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
+    return if (sequenceIndex == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
       Log.d(logTag, "fetching last chunk")
-      frameChunk(seqIndex, fromIndex, fromIndex + lastChunkByteCount)
+      frameChunk(sequenceIndex, fromIndex, fromIndex + lastChunkByteCount)
     } else {
-      val toIndex = (seqIndex + 1) * effectivePayloadSize
-      frameChunk(seqIndex, fromIndex, toIndex)
+      val toIndex = (sequenceIndex + 1) * effectivePayloadSize
+      frameChunk(sequenceIndex, fromIndex, toIndex)
     }
   }
 
@@ -52,13 +53,13 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   |                       |                             |                                                                         |
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */
-  private fun frameChunk(seqIndex: Int, fromIndex: Int, toIndex: Int): ByteArray {
+  private fun frameChunk(sequenceIndex: Int, fromIndex: Int, toIndex: Int): ByteArray {
     //Log.d(logTag, "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber")
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
-    val seqNumber = seqIndex +1
+    val sequenceNumber = sequenceIndex +1
 
-    return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
+    return intToTwoBytesBigEndian(sequenceNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
   }
 
   fun isComplete(): Boolean {
