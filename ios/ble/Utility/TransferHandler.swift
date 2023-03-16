@@ -79,7 +79,8 @@ class TransferHandler {
 
     private func requestTransmissionReport() {
         var notifyObj: Data
-        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) }, withResponse: true)
+        let data  = Data([UInt8(clamping: 1)])
+        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: data, withResponse: true)
         os_log(.info, "transmission report requested")
     }
 

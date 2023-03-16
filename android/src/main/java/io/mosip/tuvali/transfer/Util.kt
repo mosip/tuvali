@@ -9,6 +9,7 @@ import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import java.nio.ByteBuffer
 
 
 class Util {
@@ -22,11 +23,10 @@ class Util {
     // Big Endian conversion:
     // Convert int to an array with 2 bytes
     fun intToTwoBytesBigEndian(num: Int): ByteArray {
-      if (num < 256) {
-        val minValue = 0
-        return byteArrayOf(minValue.toByte(), num.toByte())
-      }
-      return byteArrayOf((num/256).toByte(), (num%256).toByte())
+      val byteBuffer = ByteBuffer.allocate(2)
+      val byteArray = byteBuffer.putShort(num.toShort()).array()
+      byteBuffer.clear()
+      return byteArray
     }
 
     // Big endian conversion: If there are two bytes in an array. The first byte of array will treated as MSB
@@ -42,10 +42,10 @@ class Util {
 
     @OptIn(ExperimentalUnsignedTypes::class)
     fun twoBytesToIntBigEndian(num: ByteArray): Int {
-      val convertedNum = num.toUByteArray()
-      val firstByte: UByte = convertedNum[0]
-      val secondByte: UByte = convertedNum[1]
-      return secondByte.toInt() + (256 * firstByte.toInt())
+      val byteBuffer = ByteBuffer.wrap(num)
+      val intValue = byteBuffer.short.toInt()
+      byteBuffer.clear()
+      return intValue
     }
 
     fun compress(bytes: ByteArray): ByteArray? {
