@@ -1,7 +1,8 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
-import io.mosip.tuvali.transfer.Util.Companion.intToTwoBytesBigEndian
+import io.mosip.tuvali.transfer.ArraySize.TwoBytes
+import io.mosip.tuvali.transfer.Util.Companion.intToByteArray
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
@@ -59,7 +60,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
     val crc = CheckValue.get(dataChunk)
     val sequenceNumber = sequenceIndex +1
 
-    return intToTwoBytesBigEndian(sequenceNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
+    return intToByteArray(sequenceNumber, TwoBytes) + intToByteArray(crc.toInt(), TwoBytes) + dataChunk
   }
 
   fun isComplete(): Boolean {

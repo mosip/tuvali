@@ -28,4 +28,9 @@ struct Utils {
         let value = UInt16(bigEndian: num.withUnsafeBytes { $0.pointee })
         return Int(value)
     }
+
+    static func intToBytes(num: Int) -> Data {
+      return withUnsafeBytes(of: UInt32(num).bigEndian) { Data($0) }
+    }
+
 }

@@ -9,24 +9,20 @@ import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.transfer.ArraySize.FourBytes
+import io.mosip.tuvali.transfer.ArraySize.TwoBytes
 import java.nio.ByteBuffer
 
-
+enum class ArraySize {
+  FourBytes,
+  TwoBytes
+}
 class Util {
   companion object {
     fun getSha256(data: ByteArray): String {
       val md = MessageDigest.getInstance("SHA-256")
       md.update(data)
       return Hex.toHexString(md.digest())
-    }
-
-    // Big Endian conversion:
-    // Convert int to an array with 2 bytes
-    fun intToTwoBytesBigEndian(num: Int): ByteArray {
-      val byteBuffer = ByteBuffer.allocate(2)
-      val byteArray = byteBuffer.putShort(num.toShort()).array()
-      byteBuffer.clear()
-      return byteArray
     }
 
     // Big endian conversion: If there are two bytes in an array. The first byte of array will treated as MSB
@@ -37,19 +33,41 @@ class Util {
            |  firstByte | secondByte  |
            |   (byte 0) |  (byte 1)   |
            +------------+-------------+
-    secondByte.toInt() + (256 * firstByte.toInt())
    */
 
-    @OptIn(ExperimentalUnsignedTypes::class)
-    fun twoBytesToIntBigEndian(num: ByteArray): Int {
-      val byteBuffer = ByteBuffer.wrap(num)
-      val intValue = byteBuffer.short.toInt()
+    fun intToByteArray(num: Int, size: ArraySize): ByteArray {
+      val capacity = if (size == TwoBytes) 2 else 4
+      val byteBuffer = ByteBuffer.allocate(capacity)
+      val byteArray = when (size) {
+        FourBytes -> {
+          byteBuffer.putInt(num)
+          byteBuffer.array()
+        }
+        TwoBytes -> {
+          byteBuffer.putShort(num.toShort())
+          byteBuffer.array()
+        }
+      }
       byteBuffer.clear()
-      return intValue
+      return byteArray
+
     }
 
+   fun byteArrayToInt(num: ByteArray, size: ArraySize): Int{
+     val byteBuffer = ByteBuffer.wrap(num)
+     var intValue = when (size){
+       FourBytes -> {
+         byteBuffer.int
+       }
+       TwoBytes -> {
+         byteBuffer.short.toInt()
+       }
+     }
+     byteBuffer.clear()
+     return intValue
+   }
+
     fun compress(bytes: ByteArray): ByteArray? {
-//      return bytes
       val out = ByteArrayOutputStream()
       try {
         GZIPOutputStream(out).use { gzipOutputStream ->
@@ -63,7 +81,6 @@ class Util {
     }
 
     fun decompress(bytes: ByteArray): ByteArray? {
-//      return bytes
       try {
         GZIPInputStream(ByteArrayInputStream(bytes)).use { gzipInputStream -> return gzipInputStream.readBytes() }
       } catch (e: Exception) {
@@ -78,7 +95,7 @@ class Util {
     }
 
     fun getLogTag(moduleName: String): String{
-      return "${moduleName} : v${Openid4vpBleModule.tuvaliVersion}"
+      return "$moduleName : v${Openid4vpBleModule.tuvaliVersion}"
     }
   }
 }

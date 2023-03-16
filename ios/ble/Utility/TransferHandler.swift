@@ -10,7 +10,7 @@ class TransferHandler {
     var destroyConnection: (() -> Void)?
     private var failureFrameRetryCounter = 0
     private let MAX_FAILURE_FRAME_RETRY_LIMIT = 5
-    
+
     func initialize(initdData: Data) {
         data = initdData
     }
@@ -110,10 +110,9 @@ class TransferHandler {
     }
 
     private func sendResponseSize(size: Int) {
-        let decimalString = String(size)
-        if let data = decimalString.data(using: .utf8) {
-            delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: data, withResponse: true)
-        }
+        let sizeByteArray = Utils.intToBytes(num: size)
+        delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: sizeByteArray, withResponse: true)
+
     }
 
     private func initResponseChunkSend() {
