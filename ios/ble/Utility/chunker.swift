@@ -30,7 +30,7 @@ class Chunker {
     func assignPreSlicedChunks(){
         os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
         for i in 0..<totalChunkCount {
-            preSlicedChunks.append(chunk(seqIndex: i))
+            preSlicedChunks.append(chunk(seqNumber: i))
         }
     }
 
@@ -52,10 +52,10 @@ class Chunker {
     }
 
     func next() -> Data {
-        var seqIndex = chunksReadCounter
+        var seqNumber = chunksReadCounter
         chunksReadCounter += 1
-        if seqIndex <= totalChunkCount - 1 {
-            return (preSlicedChunks[seqIndex])
+        if seqNumber <= totalChunkCount - 1 {
+            return (preSlicedChunks[seqNumber])
         }
        else
         {
@@ -67,14 +67,14 @@ class Chunker {
         return (preSlicedChunks[num])
     }
 
-    private func chunk(seqIndex: Int) -> Data {
-        let fromIndex = seqIndex * effectivePayloadSize
-        if (seqIndex == (totalChunkCount - 1) && lastChunkByteCount > 0) {
+    private func chunk(seqNumber: Int) -> Data {
+        let fromIndex = seqNumber * effectivePayloadSize
+        if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
             let chunkLength = lastChunkByteCount + chunkMetaSize
-            return frameChunk(seqIndex: seqIndex, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
+            return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
-            let toIndex = (seqIndex + 1) * effectivePayloadSize
-            return frameChunk(seqIndex: seqIndex, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
+            let toIndex = (seqNumber + 1) * effectivePayloadSize
+            return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
     }
 
@@ -88,8 +88,7 @@ class Chunker {
      +-----------------------+-----------------------------+-------------------------------------------------------------------------+
      */
 
-    private func frameChunk(seqIndex: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
-        let seqNumber = seqIndex + 1
+    private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
