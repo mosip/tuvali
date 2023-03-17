@@ -1,13 +1,13 @@
 package io.mosip.tuvali.wallet.exception
 
 import android.util.Log
-import io.mosip.tuvali.wallet.exception.WalletException
+import io.mosip.tuvali.transfer.Util
 
 class WalletExceptionHandler(val sendError: (String) -> Unit) {
-  private val logcat = "WalletExceptionHandler"
+  private val logTag = Util.getLogTag(javaClass.simpleName)
 
   fun handleException(e: WalletException){
-    Log.e(logcat, "Wallet got an Wallet Exception: $e")
+    Log.e(logTag, "Wallet Exception: $e")
     sendError(e.message ?: "Something went wrong in Wallet: ${e.cause}")
   }
 }

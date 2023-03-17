@@ -55,8 +55,7 @@ extension Central: CBPeripheralDelegate {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
         }
-
-        createConnection?()
+        walletDelegate?.createConnectionHandler()
     }
 
 
@@ -131,8 +130,6 @@ extension Central: CBPeripheralDelegate {
             }
             return
         }
-        os_log(.info, "Successfully written to characteristic:  %{public}s", characteristic.uuid.uuidString)
-
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
             walletDelegate?.onIdentifyWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {

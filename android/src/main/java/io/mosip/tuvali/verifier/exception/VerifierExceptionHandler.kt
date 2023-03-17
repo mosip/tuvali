@@ -1,13 +1,13 @@
 package io.mosip.tuvali.verifier.exception
 
 import android.util.Log
-import io.mosip.tuvali.wallet.exception.WalletException
+import io.mosip.tuvali.transfer.Util
 
 class VerifierExceptionHandler(val sendError: (String) -> Unit) {
-  private val logcat = "VerifierExHandler"
+  private val logTag = Util.getLogTag(javaClass.simpleName)
 
   fun handleException(e: VerifierException){
-    Log.e(logcat, "Verifier got an Verifier Exception: $e")
+    Log.e(logTag, "Verifier Exception: $e")
     sendError(e.message ?: "Something went wrong in Verifier: ${e.cause}")
   }
 }
