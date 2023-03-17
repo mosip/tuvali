@@ -22,24 +22,24 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun next(): ByteArray {
-    val seqIndex = chunksReadCounter
+    val seqNumber = chunksReadCounter
     chunksReadCounter++
-    return preSlicedChunks[seqIndex]!!
+    return preSlicedChunks[seqNumber]!!
   }
 
   fun chunkBySequenceNumber(num: Int): ByteArray {
     return preSlicedChunks[num]!!
   }
 
-  private fun chunk(seqIndex: Int): ByteArray {
-    val fromIndex = seqIndex * effectivePayloadSize
+  private fun chunk(seqNumber: Int): ByteArray {
+    val fromIndex = seqNumber * effectivePayloadSize
 
-    return if (seqIndex == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
+    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
       Log.d(logTag, "fetching last chunk")
-      frameChunk(seqIndex, fromIndex, fromIndex + lastChunkByteCount)
+      frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
     } else {
-      val toIndex = (seqIndex + 1) * effectivePayloadSize
-      frameChunk(seqIndex, fromIndex, toIndex)
+      val toIndex = (seqNumber + 1) * effectivePayloadSize
+      frameChunk(seqNumber, fromIndex, toIndex)
     }
   }
 
@@ -52,11 +52,10 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   |                       |                             |                                                                         |
   +-----------------------+-----------------------------+-------------------------------------------------------------------------+
    */
-  private fun frameChunk(seqIndex: Int, fromIndex: Int, toIndex: Int): ByteArray {
+  private fun frameChunk(seqNumber: Int, fromIndex: Int, toIndex: Int): ByteArray {
     //Log.d(logTag, "fetching chunk size: ${toIndex - fromIndex}, chunkSequenceNumber(0-indexed): $seqNumber")
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
-    val seqNumber = seqIndex +1
 
     return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
   }

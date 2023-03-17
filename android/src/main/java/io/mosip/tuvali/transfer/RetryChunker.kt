@@ -12,10 +12,10 @@ class RetryChunker(private val chunker: Chunker, private val missedSequences: In
   }
 
   fun next(): ByteArray {
-    val missedSeqNumber = missedSequences[seqCounter]
+    val missedSeqNo = missedSequences[seqCounter]
     seqCounter++
 
-    return chunker.chunkBySequenceNumber(missedSeqNumber)
+    return chunker.chunkBySequenceNumber(missedSeqNo)
   }
 
   fun isComplete(): Boolean {

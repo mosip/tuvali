@@ -26,7 +26,6 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       return 0
     }
     val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
-    val seqIndexInMeta = seqNumberInMeta - 1
     val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
@@ -39,8 +38,8 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
-    System.arraycopy(chunkData, chunkMetaSize, data, seqIndexInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
-    chunkReceivedMarker[seqIndexInMeta] = chunkReceivedMarkerByte
+    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
+    chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
     //Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
     return seqNumberInMeta
   }
@@ -66,9 +65,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
     chunkReceivedMarker.forEachIndexed() { i, elem ->
       if (elem != chunkReceivedMarkerByte) {
         //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
-        // missedSeqNumbers += i
-        var currentSeqNumber = i + 1
-        missedSeqNumbers = missedSeqNumbers + currentSeqNumber
+        missedSeqNumbers += i
       }
     }
     return missedSeqNumbers
