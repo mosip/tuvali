@@ -93,6 +93,11 @@ class Wallet: NSObject {
                 if currentMTUSize == nil || currentMTUSize! < 0 {
                    currentMTUSize = BLEConstants.DEFAULT_CHUNK_SIZE
                 }
+                // follow BLE 5.3 spec where max data size in a chunk is limited to 512
+                // now iOS impl is compatible to Android13 which follows BLE5.3 spec more closely
+                if currentMTUSize > BLEConstants.MAX_ALLOWED_DATA_LEN {
+                    currentMTUSize = BLEConstants.MAX_ALLOWED_DATA_LEN
+                }
                 let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!, mtuSize: currentMTUSize)
                 transferHandler.sendMessage(message: imsgBuilder)
             }
