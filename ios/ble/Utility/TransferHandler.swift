@@ -9,8 +9,8 @@ class TransferHandler {
     private var chunker: Chunker?
     var destroyConnection: (() -> Void)?
     private var failureFrameRetryCounter = 0
-    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 5
-    
+    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 15
+
     func initialize(initdData: Data) {
         data = initdData
     }
