@@ -7,7 +7,9 @@ import android.content.Context
 import android.util.Log
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-
+//Set maximum attribute value as defined by spec Core 5.3
+//https://github.com/dariuszseweryn/RxAndroidBle/pull/808
+private const val MAX_ALLOWED_MTU_VALUE = 512
 class GattClient(var context: Context) {
   private var onNotificationReceived: ((UUID, ByteArray) -> Unit)? = null
   private lateinit var onReadSuccess: (UUID, ByteArray?) -> Unit
@@ -100,9 +102,15 @@ class GattClient(var context: Context) {
 
     override fun onMtuChanged(gatt: BluetoothGatt?, mtu: Int, status: Int) {
       super.onMtuChanged(gatt, mtu, status)
+      var allowedMTU = mtu
+      // follow BLE 5.3 spec where max data size in a chunk is limited to 512 to make it compatible to Android 13
+      if(mtu > MAX_ALLOWED_MTU_VALUE) {
+        allowedMTU = MAX_ALLOWED_MTU_VALUE
+        Log.d(logTag, "MTU value is changed from $mtu to $allowedMTU")
+      }
       if (status == GATT_SUCCESS) {
-        onRequestMTUSuccess(mtu)
-        Log.i(logTag, "Successfully changed mtu size: $mtu")
+        onRequestMTUSuccess(allowedMTU)
+        Log.i(logTag, "Successfully changed mtu size: $allowedMTU")
       } else {
         onRequestMTUFailure(status)
         Log.i(logTag, "Failed to change mtu due to ErrorCode: $status")
