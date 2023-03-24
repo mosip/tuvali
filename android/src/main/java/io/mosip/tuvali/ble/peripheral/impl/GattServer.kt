@@ -7,6 +7,11 @@ import android.os.Build
 import android.util.Log
 import java.util.UUID
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import kotlin.math.min
+
+//Set maximum attribute value as defined by spec Core 5.3
+//https://github.com/dariuszseweryn/RxAndroidBle/pull/808
+private const val MAX_ALLOWED_MTU_VALUE = 512
 
 @SuppressLint("MissingPermission")
 class GattServer(private val context: Context) : BluetoothGattServerCallback() {
@@ -80,7 +85,9 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
 
   override fun onMtuChanged(device: BluetoothDevice?, mtu: Int) {
     Log.d(logTag, "onMtuChanged: mtu: $mtu, device: $device")
-    onMTUChangedCallback(mtu)
+    val allowedMTU = min( mtu, MAX_ALLOWED_MTU_VALUE)
+    Log.d(logTag, "successfully changed mtu to $allowedMTU")
+    onMTUChangedCallback(allowedMTU)
   }
 
   private fun setPhy(bluetoothDevice: BluetoothDevice) {

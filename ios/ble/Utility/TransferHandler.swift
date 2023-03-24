@@ -9,8 +9,8 @@ class TransferHandler {
     private var chunker: Chunker?
     var destroyConnection: (() -> Void)?
     private var failureFrameRetryCounter = 0
-    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 5
-    
+    private let MAX_FAILURE_FRAME_RETRY_LIMIT = 15
+
     func initialize(initdData: Data) {
         data = initdData
     }
@@ -27,7 +27,6 @@ class TransferHandler {
             var responseData = msg.data!
             os_log(.info, "Total response size of data %{public}d",(responseData.count))
             chunker = Chunker(chunkData: responseData, mtuSize: msg.mtuSize)
-            os_log(.info, "MTU found to be %{public}d", BLEConstants.DEFAULT_CHUNK_SIZE)
             currentState = States.ResponseSizeWritePending
             sendMessage(message: imessage(msgType: .RESPONSE_SIZE_WRITE_PENDING, data: responseData, dataSize: responseData.count))
         }

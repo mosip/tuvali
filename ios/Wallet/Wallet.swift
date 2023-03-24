@@ -4,7 +4,7 @@ import Gzip
 @objc(Wallet)
 @available(iOS 13.0, *)
 class Wallet: NSObject {
-    
+
     var central: Central?
     var secretTranslator: SecretTranslator?
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
@@ -30,7 +30,7 @@ class Wallet: NSObject {
     func setVerifierPublicKey(publicKeyData: Data) {
         verifierPublicKey = publicKeyData
     }
-    
+
     func startScanning(){
         central?.walletDelegate = self
     }
@@ -41,7 +41,7 @@ class Wallet: NSObject {
             onDeviceDisconnected()
         }
     }
-    
+
     func onDeviceDisconnected(){
         EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
     }
@@ -93,6 +93,9 @@ class Wallet: NSObject {
                 if currentMTUSize == nil || currentMTUSize! < 0 {
                    currentMTUSize = BLEConstants.DEFAULT_CHUNK_SIZE
                 }
+                // follow BLE 5.3 spec where max data size in a chunk is limited to 512
+                // now iOS impl is compatible to Android13 which follows BLE5.3 spec more closely
+                currentMTUSize =  min(currentMTUSize!, BLEConstants.MAX_ALLOWED_DATA_LEN)
                 let imsgBuilder = imessage(msgType: .INIT_RESPONSE_TRANSFER, data: encryptedData!, mtuSize: currentMTUSize)
                 transferHandler.sendMessage(message: imsgBuilder)
             }
