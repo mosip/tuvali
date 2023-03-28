@@ -7,7 +7,7 @@ class VerifierExceptionHandler(val sendError: (String) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)
 
   fun handleException(e: VerifierException){
-    Log.e(logTag, "Verifier Exception: $e")
+    Log.e(logTag, "Verifier Exception(#${e.errorCode}): $e")
     sendError(e.message ?: "Something went wrong in Verifier: ${e.cause}")
   }
 }

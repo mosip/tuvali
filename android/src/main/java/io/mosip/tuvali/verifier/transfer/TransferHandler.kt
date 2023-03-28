@@ -5,6 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
+import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
 import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.TransferReportRequest
@@ -131,7 +132,9 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
+      transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e,
+        ErrorCodes.InternalTransferHandlerException.code
+      ))
       Log.d(logTag, "dispatchMessage " + e.message)
     }
   }

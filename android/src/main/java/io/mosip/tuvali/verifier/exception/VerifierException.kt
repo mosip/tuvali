@@ -1,3 +1,5 @@
 package io.mosip.tuvali.verifier.exception
 
-open class VerifierException(message: String): Throwable(message)
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+
+open class VerifierException(message: String, errorCode: Int): BLEException(message, null, errorCode = errorCode)

@@ -1,3 +1,5 @@
 package io.mosip.tuvali.verifier.exception
 
-class TooManyFailureChunksException(s: String) : VerifierException(s) {}
+import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
+
+class TooManyFailureChunksException(s: String) : VerifierException(s, ErrorCodes.TooManyFailureChunksException.code)
