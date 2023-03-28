@@ -10,4 +10,8 @@ struct BLEConstants {
     static var seqNumberReservedByteSize = 2
     static var mtuReservedByteSize = 2
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
+    // Set maximum attribute value as defined by spec Core 5.3
+    // ref: https://github.com/dariuszseweryn/RxAndroidBle/pull/808
+    // TODO: decide if this should be bumped up to 512
+    static let MAX_ALLOWED_DATA_LEN = 509
 }
