@@ -10,7 +10,6 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(
@@ -158,8 +157,7 @@ class StateHandler(
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e,
-      ErrorCodes.InternalStateHandlerException.code))
+      peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e))
       Log.d(logTag, "dispatchMessage " + e.message)
     }
   }

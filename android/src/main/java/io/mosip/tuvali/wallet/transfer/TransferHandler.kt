@@ -5,7 +5,6 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
 import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
@@ -175,8 +174,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e,
-        ErrorCodes.InternalTransferHandlerException.code))
+      transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
       Log.d(logTag, "dispatchMessage " + e.message)
     }
   }

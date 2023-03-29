@@ -1,5 +1,5 @@
 package io.mosip.tuvali.wallet.exception
 
-import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
+import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCode
 
-class MTUNegotiationFailedException(s: String) : WalletException(s, ErrorCodes.MTUNegotiationException.code)
+class MTUNegotiationFailedException(s: String) : WalletException(s, ErrorCode.MTUNegotiationException)

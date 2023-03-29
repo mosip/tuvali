@@ -6,6 +6,9 @@ import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEm
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCode
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownException
 import org.json.JSONObject
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
@@ -15,11 +18,11 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var verifier: Verifier? = null
   private var wallet: Wallet? = null
   private val mutex = Object()
-  private var walletExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
+  private var bleExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
 
   init {
     Thread.setDefaultUncaughtExceptionHandler { _, exception ->
-      walletExceptionHandler.handleException(exception)
+      bleExceptionHandler.handleException(UnknownException("Unknown Exception", exception))
     }
   }
 
@@ -64,13 +67,8 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     }
   }
 
-  private fun onException(exception: Throwable){
-    if(exception.cause != null){
-      Log.e(logTag, "Exception: ${exception.message}");
-      walletExceptionHandler.handleException(exception.cause!!)
-    } else {
-      walletExceptionHandler.handleException(exception)
-    }
+  private fun onException(exception: BLEException){
+    bleExceptionHandler.handleException(exception)
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -197,9 +195,10 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     emitEvent("EVENT_NEARBY", writableMap)
   }
 
-  private fun emitNearbyErrorEvent(message: String) {
+  private fun emitNearbyErrorEvent(message: String, errorCode: ErrorCode) {
     val writableMap = Arguments.createMap()
     writableMap.putString("message", message)
+    writableMap.putString("code", errorCode.code.toString())
     writableMap.putString("type", "onError")
     emitEvent("EVENT_NEARBY", writableMap)
   }

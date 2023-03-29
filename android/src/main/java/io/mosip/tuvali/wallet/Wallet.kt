@@ -15,6 +15,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -36,7 +37,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Throwable) -> Unit
+  private val onBLEException: (BLEException) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -303,7 +304,7 @@ class Wallet(
     }
   }
 
-  override fun onException(exception: Throwable) {
+  override fun onException(exception: BLEException) {
     onBLEException(exception)
   }
 

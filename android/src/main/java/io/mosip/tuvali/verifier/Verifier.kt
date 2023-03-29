@@ -11,6 +11,7 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -31,7 +32,7 @@ class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Throwable) -> Unit
+  private val onBLEException: (BLEException) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -200,8 +201,8 @@ class Verifier(
     }
   }
 
-  override fun onException(e: Throwable) {
-    onBLEException(e)
+  override fun onException(exception: BLEException) {
+    onBLEException(exception)
   }
 
   override fun onClosed() {

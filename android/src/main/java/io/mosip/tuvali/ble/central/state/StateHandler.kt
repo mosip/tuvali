@@ -8,7 +8,6 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCodes
 import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
@@ -257,8 +256,7 @@ class StateHandler(
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      listener.onException(StateHandlerException("Exception in Central State Handler", e,
-        ErrorCodes.InternalStateHandlerException.code))
+      listener.onException(StateHandlerException("Exception in Central State Handler", e))
       Log.d(logTag, "dispatchMessage " + e.message)
     }
   }

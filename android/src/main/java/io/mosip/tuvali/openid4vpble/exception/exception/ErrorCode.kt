@@ -1,9 +1,9 @@
 package io.mosip.tuvali.openid4vpble.exception.exception
 
-enum class ErrorCodes(val code: Int) {
-  InternalStateHandlerException(400),
-  InternalTransferHandlerException(401),
-
+enum class ErrorCode(val code: Int) {
+  UnknownException(400),
+  InternalStateHandlerException(401),
+  InternalTransferHandlerException(402),
 
   MTUNegotiationException(300),
   TransferFailedException(301),
