@@ -1,11 +1,11 @@
 import Foundation
 
-enum OpenId4vpError: Error {
+enum walletExceptionHandler: Error {
     case invalidMTUSizeError(mtu: Int)
     case responseTransferFailure
 }
 
-extension OpenId4vpError: CustomStringConvertible {
+extension walletExceptionHandler: CustomStringConvertible {
     public var description: String {
         switch self {
         case .invalidMTUSizeError(let mtu):

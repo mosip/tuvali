@@ -6,11 +6,25 @@ class ErrorHandler {
     
     init() {}
     
+    func handleException(type: exceptionType, error: walletExceptionHandler) {
+        if type == .walletException {
+            handle(error: error)
+        }
+       else if type == .verifierException {
+        //  handleVerifierException(e)
+        }
+        else {
+         // handleUnknownException(e)
+        }
+       // stopBle()
+      }
+     
+    
     func setOnError(onError: @escaping (_ message: String) -> Void) {
         self.onError = onError
     }
     
-    func handle(error: OpenId4vpError) {
+    func handle(error: walletExceptionHandler) {
         os_log(.info, "Error in OpenID4vBLE: %{public}@", error.description)
         
         if let onError = self.onError {
@@ -19,4 +33,10 @@ class ErrorHandler {
             os_log(.info, "Failed to send error event to openId4vp module. OnError callback not found.")
         }
     }
+}
+
+
+enum exceptionType {
+    case walletException
+    case verifierException
 }
