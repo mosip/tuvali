@@ -8,7 +8,7 @@ class ErrorHandler {
     
     func handleException(type: exceptionType, error: walletExceptionHandler) {
         if type == .walletException {
-            handle(error: error)
+          WalletExceptionHandler(exceptionErr: error)
         }
        else if type == .verifierException {
         //  handleVerifierException(e)
@@ -23,7 +23,7 @@ class ErrorHandler {
     func setOnError(onError: @escaping (_ message: String) -> Void) {
         self.onError = onError
     }
-    
+   
     func handle(error: walletExceptionHandler) {
         os_log(.info, "Error in OpenID4vBLE: %{public}@", error.description)
         
