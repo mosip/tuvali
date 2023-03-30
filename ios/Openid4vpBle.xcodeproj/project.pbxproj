@@ -33,6 +33,7 @@
 		8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */; };
 		A7A42E4129A8CCF10026167C /* Wallet+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */; };
 		E223F0322977BE090042F919 /* TransferHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E223F0312977BE090042F919 /* TransferHandler.swift */; };
+		E2399AA329D5ED140017C313 /* VerifierExceptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2399AA229D5ED140017C313 /* VerifierExceptionHandler.swift */; };
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
 		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
@@ -84,6 +85,7 @@
 		A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Wallet+Extension.swift"; sourceTree = "<group>"; };
 		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
 		E223F0312977BE090042F919 /* TransferHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHandler.swift; sourceTree = "<group>"; };
+		E2399AA229D5ED140017C313 /* VerifierExceptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierExceptionHandler.swift; sourceTree = "<group>"; };
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
 		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 			children = (
 				0D36889629A782AA000B12CD /* ErrorHandler.swift */,
 				0D36889729A782AA000B12CD /* WalletExceptionHandler.swift */,
+				E2399AA229D5ED140017C313 /* VerifierExceptionHandler.swift */,
 			);
 			path = Exception;
 			sourceTree = "<group>";
@@ -340,6 +343,7 @@
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
 				0D36889829A782AA000B12CD /* ErrorHandler.swift in Sources */,
 				8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */,
+				E2399AA329D5ED140017C313 /* VerifierExceptionHandler.swift in Sources */,
 				FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */,
 				8D069F652964466900AB61A9 /* Central.swift in Sources */,
 				FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */,

@@ -14,20 +14,12 @@ class WalletExceptionHandler {
     func handle(error: walletExceptionHandler) {
     os_log(.info, "Error in OpenID4vBLE: %{public}@", error.description)
         handleError(error.description)
-//    if let onError = self.onError {
-//        onError(error.description)
-//        handleError(error.description)
-//    } else {
-//        os_log(.info, "Failed to send error event to openId4vp module. OnError callback not found.")
-//    }
 }
     fileprivate func handleError(_ message: String) {
         wallet?.handleDestroyConnection(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
     }
-
 }
-
 
 enum walletExceptionHandler: Error {
     case invalidMTUSizeError(mtu: Int)
@@ -43,8 +35,4 @@ extension walletExceptionHandler: CustomStringConvertible {
             return "failed to write response"
         }
     }
-}
-
-protocol exceptionProtocol {
-    func setOnError(onError: @escaping (_ message: String) -> Void)
 }
