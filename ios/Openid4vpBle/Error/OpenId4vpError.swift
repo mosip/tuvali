@@ -14,4 +14,13 @@ extension OpenId4vpError: CustomStringConvertible {
             return "failed to write response"
         }
     }
+    
+    public var code: Int {
+        switch self {
+        case .invalidMTUSizeError(let mtu):
+            return 300
+        case .responseTransferFailure:
+            return 301
+        }
+    }
 }

@@ -2,11 +2,11 @@ import Foundation
 
 class ErrorHandler {
     public static var sharedInstance = ErrorHandler()
-    private var onError: ((_ message: String) -> Void)?;
+    private var onError: ((_ message: String, _ code: Int) -> Void)?;
     
     init() {}
     
-    func setOnError(onError: @escaping (_ message: String) -> Void) {
+    func setOnError(onError: @escaping (_ message: String, _ code: Int) -> Void) {
         self.onError = onError
     }
     
@@ -14,7 +14,7 @@ class ErrorHandler {
         os_log(.info, "Error in OpenID4vBLE: %{public}@", error.description)
         
         if let onError = self.onError {
-            onError(error.description)
+            onError(error.description, error.code)
         } else {
             os_log(.info, "Failed to send error event to openId4vp module. OnError callback not found.")
         }
