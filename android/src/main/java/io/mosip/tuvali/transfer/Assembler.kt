@@ -38,8 +38,9 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
-    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
-    chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
+    val seqIndex = seqNumberInMeta - 1
+    System.arraycopy(chunkData, chunkMetaSize, data, seqIndex * effectivePayloadSize, (chunkData.size-chunkMetaSize))
+    chunkReceivedMarker[seqIndex] = chunkReceivedMarkerByte
     //Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
     return seqNumberInMeta
   }
@@ -61,14 +62,15 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
   }
 
   fun getMissedSequenceNumbers(): IntArray {
-    var missedSeqNumbers = intArrayOf()
+    var missedSeqNumberList = intArrayOf()
     chunkReceivedMarker.forEachIndexed() { i, elem ->
       if (elem != chunkReceivedMarkerByte) {
         //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
-        missedSeqNumbers += i
+        val missedSeqNumber = i + 1
+        missedSeqNumberList += missedSeqNumber
       }
     }
-    return missedSeqNumbers
+    return missedSeqNumberList
   }
 
   fun data(): ByteArray {

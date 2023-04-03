@@ -22,23 +22,24 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun next(): ByteArray {
-    val seqNumber = chunksReadCounter
+    val seqIndex = chunksReadCounter
     chunksReadCounter++
-    return preSlicedChunks[seqNumber]!!
+    return preSlicedChunks[seqIndex]!!
+
   }
 
-  fun chunkBySequenceNumber(num: Int): ByteArray {
-    return preSlicedChunks[num]!!
+  fun chunkBySequenceNumber(missedSeqNumber: Int): ByteArray {
+    val missedSeqIndex = missedSeqNumber - 1
+    return preSlicedChunks[missedSeqIndex]!!
   }
 
-  private fun chunk(seqNumber: Int): ByteArray {
-    val fromIndex = seqNumber * effectivePayloadSize
-
-    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
-      Log.d(logTag, "fetching last chunk")
+  private fun chunk(seqIndex: Int): ByteArray {
+    val fromIndex = seqIndex * effectivePayloadSize
+    val seqNumber = seqIndex + 1
+    return if (seqIndex == (totalChunkCount - 1) && lastChunkByteCount > 0) {
       frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
     } else {
-      val toIndex = (seqNumber + 1) * effectivePayloadSize
+      val toIndex = (seqIndex + 1) * effectivePayloadSize
       frameChunk(seqNumber, fromIndex, toIndex)
     }
   }
@@ -61,7 +62,8 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun isComplete(): Boolean {
-    val isComplete = chunksReadCounter > (totalChunkCount - 1).toInt()
+    Log.i(logTag,"chunksReadCounter: $chunksReadCounter")
+    val isComplete = chunksReadCounter > (totalChunkCount - 1)
     if (isComplete) {
       Log.d(
         logTag,

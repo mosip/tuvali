@@ -15,14 +15,6 @@ class Chunker {
         assignPreSlicedChunks()
     }
 
-    func getChunkWithIndex(index: Int) -> Data {
-        if index < self.preSlicedChunks.count {
-            return self.preSlicedChunks[index]
-        }
-        // TODO: Figure out how to throw errors!
-        return Data()
-    }
-
     func getLastChunkByteCount(dataSize: Int) -> Int {
         return dataSize % effectivePayloadSize
     }
@@ -30,7 +22,7 @@ class Chunker {
     func assignPreSlicedChunks(){
         os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
         for i in 0..<totalChunkCount {
-            preSlicedChunks.append(chunk(seqNumber: i))
+            preSlicedChunks.append(chunk(seqIndex: i))
         }
     }
 
@@ -52,10 +44,10 @@ class Chunker {
     }
 
     func next() -> Data {
-        var seqNumber = chunksReadCounter
+        var seqIndex = chunksReadCounter
         chunksReadCounter += 1
-        if seqNumber <= totalChunkCount - 1 {
-            return (preSlicedChunks[seqNumber])
+        if seqIndex <= totalChunkCount - 1 {
+            return (preSlicedChunks[seqIndex])
         }
        else
         {
@@ -63,17 +55,19 @@ class Chunker {
        }
     }
 
-    func chunkBySequenceNumber(num: Int) -> Data {
-        return (preSlicedChunks[num])
+    func chunkBySequenceNumber(missedSeqNumber: Int) -> Data {
+        let missedSeqIndex = missedSeqNumber - 1
+        return (preSlicedChunks[missedSeqIndex])
     }
 
-    private func chunk(seqNumber: Int) -> Data {
-        let fromIndex = seqNumber * effectivePayloadSize
-        if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
+    private func chunk(seqIndex: Int) -> Data {
+        let fromIndex = seqIndex * effectivePayloadSize
+        let seqNumber = seqIndex + 1
+        if (seqIndex == (totalChunkCount - 1) && lastChunkByteCount > 0) {
             let chunkLength = lastChunkByteCount + chunkMetaSize
             return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
-            let toIndex = (seqNumber + 1) * effectivePayloadSize
+            let toIndex = (seqIndex + 1) * effectivePayloadSize
             return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
     }
