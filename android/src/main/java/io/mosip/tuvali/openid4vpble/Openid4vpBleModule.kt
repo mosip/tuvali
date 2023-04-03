@@ -3,11 +3,12 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import io.mosip.tuvali.verifier.Verifier
-import io.mosip.tuvali.wallet.Wallet
+import io.mosip.tuvali.common.safeExecute.SafeExecute
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 import org.json.JSONObject
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.verifier.Verifier
+import io.mosip.tuvali.wallet.Wallet
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -15,13 +16,8 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var verifier: Verifier? = null
   private var wallet: Wallet? = null
   private val mutex = Object()
-  private var walletExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
-
-  init {
-    Thread.setDefaultUncaughtExceptionHandler { _, exception ->
-      walletExceptionHandler.handleException(exception)
-    }
-  }
+  private var bleExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
+  private val safeExecute = SafeExecute(bleExceptionHandler);
 
   //Inji contract requires double quotes around the states.
   enum class VCResponseStates(val value: String) {
@@ -49,27 +45,30 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun getConnectionParameters(): String {
     Log.d(logTag, "getConnectionParameters new verifier object at ${System.nanoTime()}")
-    synchronized(mutex) {
+
+    return safeExecute.run {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
         verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
         verifier?.generateKeyPair()
       }
+
       val payload = verifier?.getAdvIdentifier("OVPMOSIP")
       Log.d(
         logTag,
         "synchronized getConnectionParameters called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}"
       )
-      return "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
-    }
+
+      return@run "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
+    }.orEmpty()
   }
 
   private fun onException(exception: Throwable){
     if(exception.cause != null){
       Log.e(logTag, "Exception: ${exception.message}");
-      walletExceptionHandler.handleException(exception.cause!!)
+      bleExceptionHandler.handleException(exception.cause!!)
     } else {
-      walletExceptionHandler.handleException(exception)
+      bleExceptionHandler.handleException(exception)
     }
   }
 
@@ -81,7 +80,8 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun setConnectionParameters(params: String) {
     Log.d(logTag, "setConnectionParameters at ${System.nanoTime()}")
-    synchronized(mutex) {
+
+    safeExecute.run {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
         wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
@@ -99,8 +99,9 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun createConnection(mode: String, callback: Callback) {
     Log.d(logTag, "createConnection: received request with mode $mode at ${System.nanoTime()}")
-    synchronized(mutex) {
-      Log.d(logTag, "synchronized createConnection: received request with mode $mode at ${System.nanoTime()}")
+
+    safeExecute.run {
+    Log.d(logTag, "synchronized createConnection: received request with mode $mode at ${System.nanoTime()}")
       when (mode) {
         "advertiser" -> {
           verifier?.startAdvertisement("OVPMOSIP", callback)
@@ -119,13 +120,14 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun destroyConnection(callback: Callback) {
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
-
-    stopBLE(callback)
+    safeExecute.run {
+      stopBLE(callback)
+    }
   }
 
   private fun stopBLE(callback: Callback) {
-    synchronized(mutex) {
-      if (wallet == null && verifier == null) {
+    safeExecute.run {
+    if (wallet == null && verifier == null) {
         callback()
       } else {
         if (wallet != null) {
@@ -165,21 +167,25 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   @ReactMethod
   fun send(message: String, callback: Callback) {
     Log.d(logTag, "send: message $message at ${System.nanoTime()}")
-    val messageSplits = message.split("\n", limit = 2)
-    when (messageSplits[0]) {
-      NearbyEvents.EXCHANGE_RECEIVER_INFO.value -> {
-        callback()
-      }
-      NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
-        callback()
-        wallet?.writeToIdentifyRequest()
-      }
-      NearbyEvents.SEND_VC.value -> {
-        callback()
-        wallet?.sendData(messageSplits[1])
-      }
-      NearbyEvents.SEND_VC_RESPONSE.value -> {
-        verifier?.notifyVerificationStatus(messageSplits[1] == VCResponseStates.ACCEPTED.value)
+
+    safeExecute.run {
+      val messageSplits = message.split("\n", limit = 2)
+      when (messageSplits[0]) {
+        NearbyEvents.EXCHANGE_RECEIVER_INFO.value -> {
+          callback()
+        }
+        NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
+          callback()
+          wallet?.writeToIdentifyRequest()
+        }
+        NearbyEvents.SEND_VC.value -> {
+          callback()
+          wallet?.sendData(messageSplits[1])
+        }
+        NearbyEvents.SEND_VC_RESPONSE.value -> {
+          verifier?.notifyVerificationStatus(messageSplits[1] == VCResponseStates.ACCEPTED.value)
+        }
+        else -> {}
       }
     }
   }
