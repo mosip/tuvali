@@ -61,7 +61,7 @@ class TransferHandler {
             sendMessage(message: imessage(msgType: .READ_TRANSMISSION_REPORT))
         } else if msg.msgType == .RESPONSE_TRANSFER_FAILED {
             currentState = States.ResponseWriteFailed
-            ErrorHandler.sharedInstance.handleException(type: .walletException, error: WalletErrorEnum.responseTransferFailure)
+            ErrorHandler.sharedInstance.handleException(type: .WalletException, error: WalletErrorEnum.responseTransferFailure)
         } else {
             os_log(.error, "Out of scope")
         }
