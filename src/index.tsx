@@ -37,21 +37,21 @@ if (Platform.OS === 'ios') {
   Openid4vpBle.handleLogEvents = (callback) =>
     eventEmitter.addListener('EVENT_LOG', callback);
 }
-
-ErrorUtils.setGlobalHandler((error, isFatal) => {
-  const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
-
-  console.error(
-    `Exception in Tuvali: isFatal: ${isFatal}, error: ${JSON.stringify(
-      error,
-      null,
-      4
-    )}`
-  );
-
-  eventEmitter.emit('EVENT_NEARBY', { type: 'onError', message: '' });
-  Openid4vpBle.destroyConnection(() => {});
-});
+//
+// ErrorUtils.setGlobalHandler((error, isFatal) => {
+//   const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
+//
+//   console.error(
+//     `Exception in Tuvali: isFatal: ${isFatal}, error: ${JSON.stringify(
+//       error,
+//       null,
+//       4
+//     )}`
+//   );
+//
+//   eventEmitter.emit('EVENT_NEARBY', { type: 'onError', message: '' });
+//   Openid4vpBle.destroyConnection(() => {});
+// });
 
 export default {
   Openid4vpBle,
