@@ -4,13 +4,13 @@ class ErrorHandler {
     public static var sharedInstance = ErrorHandler()
     private var onError: ((_ message: String) -> Void)?;
 
-    init() {}
+   private init() {}
 
-    func handleException(type: exceptionType, error: walletExceptionHandler) {
-        if type == .walletException {
+    func handleException(type: exceptionType, error: WalletErrorEnum) {
+        if type == .WalletException {
           WalletExceptionHandler(exceptionErr: error)
         }
-       else if type == .verifierException {}
+       else if type == .VerifierException {}
         else {
             handleUnknownException()
         }
@@ -27,6 +27,6 @@ class ErrorHandler {
 
 
 enum exceptionType {
-    case walletException
-    case verifierException
+    case WalletException
+    case VerifierException
 }

@@ -2,16 +2,16 @@ import Foundation
 
 class WalletExceptionHandler {
 
-    var exceptionErr: walletExceptionHandler? = .none
+    var exceptionErr: WalletErrorEnum? = .none
     private var onError: ((_ message: String) -> Void)?;
     var wallet: Wallet?
     
-    init(exceptionErr: walletExceptionHandler){
+    init(exceptionErr: WalletErrorEnum){
         self.exceptionErr = exceptionErr
         handle(error: exceptionErr)
     }
 
-    func handle(error: walletExceptionHandler) {
+    func handle(error: WalletErrorEnum) {
     os_log(.info, "Error in OpenID4vBLE: %{public}@", error.description)
         handleError(error.description)
 }
@@ -21,12 +21,12 @@ class WalletExceptionHandler {
     }
 }
 
-enum walletExceptionHandler: Error {
+enum WalletErrorEnum: Error {
     case invalidMTUSizeError(mtu: Int)
     case responseTransferFailure
 }
 
-extension walletExceptionHandler: CustomStringConvertible {
+extension WalletErrorEnum: CustomStringConvertible {
     public var description: String {
         switch self {
         case .invalidMTUSizeError(let mtu):

@@ -1,12 +1,12 @@
 import Foundation
 
-enum VerifierExceptionHandler: Error {
+enum verifierErrorEnum: Error {
     case corruptedChunkReceived
     case tooManyFailureChunks
     case UnsupportedMTUSizeException
 }
 
-extension VerifierExceptionHandler: CustomStringConvertible {
+extension verifierErrorEnum: CustomStringConvertible {
     public var description: String {
         switch self {
         case .corruptedChunkReceived:
