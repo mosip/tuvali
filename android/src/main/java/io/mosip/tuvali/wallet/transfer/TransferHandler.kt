@@ -5,7 +5,8 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownTransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -174,8 +175,14 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      var bleException: BLEException = UnknownTransferHandlerException("Exception in Central transfer Handler", e);
+
+      if(e is BLEException) {
+        bleException = e;
+      }
+
+      transferListener.onException(bleException)
+      Log.d(logTag, "dispatchMessage " + bleException.message)
     }
   }
 

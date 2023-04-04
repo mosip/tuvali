@@ -5,7 +5,8 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
-import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownTransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
@@ -130,8 +131,14 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      var bleException: BLEException = UnknownTransferHandlerException("Exception in Verifier Transfer Handler", e);
+
+      if(e is BLEException) {
+        bleException = e;
+      }
+
+      transferListener.onException(bleException)
+      Log.d(logTag, "dispatchMessage " + bleException.message)
     }
   }
 

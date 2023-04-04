@@ -8,7 +8,8 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownStateHandlerException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(
@@ -256,8 +257,14 @@ class StateHandler(
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      listener.onException(StateHandlerException("Exception in Central State Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      var bleException: BLEException = UnknownStateHandlerException("Exception in Central State Handler", e);
+
+      if(e is BLEException) {
+        bleException = e;
+      }
+
+      listener.onException(bleException)
+      Log.d(logTag, "dispatchMessage " + bleException.message)
     }
   }
 
