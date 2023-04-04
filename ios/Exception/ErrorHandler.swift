@@ -21,7 +21,7 @@ class ErrorHandler {
     }
     
     private func handleUnknownException() {
-       os_log(.info, "Error in OpenID4vBLE: %{public}@")
+       os_log(.error, "Error in OpenID4vBLE: %{public}@")
     }
 }
 
