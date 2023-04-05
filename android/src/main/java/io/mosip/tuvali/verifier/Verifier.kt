@@ -228,7 +228,7 @@ class Verifier(
   }
 
   override fun onMTUChanged(mtu: Int) {
-    Log.d(logTag, "onMTUChanged: $mtu bytes")
+    Log.d(logTag, "maxDataBytes: $mtu bytes")
 
     if(mtu < MIN_MTU_REQUIRED){
       throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")

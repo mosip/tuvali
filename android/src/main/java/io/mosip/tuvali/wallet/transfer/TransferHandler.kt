@@ -13,7 +13,7 @@ import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-const val MAX_FAILURE_FRAME_RETRY_LIMIT = 5;
+const val MAX_FAILURE_FRAME_RETRY_LIMIT = 15
 
 class TransferHandler(looper: Looper, private val central: Central, val serviceUUID: UUID, private val transferListener: ITransferListener) :
   Handler(looper) {

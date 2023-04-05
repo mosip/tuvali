@@ -17,6 +17,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
   init {
     Log.i(logTag, "expected total chunk size: $totalSize")
     if (totalSize == 0) {
+      //Todo: The exception name and the parameter doesn't makes sense
       throw CorruptedChunkReceivedException(0, 0, 0)
     }
   }

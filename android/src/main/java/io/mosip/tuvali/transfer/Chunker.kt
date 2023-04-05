@@ -58,7 +58,9 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
 
+
     return intToByteArray(seqNumber, TwoBytes) + intToByteArray(crc.toInt(), TwoBytes) + dataChunk
+
   }
 
   fun isComplete(): Boolean {
