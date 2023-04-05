@@ -6,16 +6,16 @@ import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
-import io.mosip.tuvali.openid4vpble.exception.exception.UnknownTransferHandlerException
 import io.mosip.tuvali.transfer.Assembler
-import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.TransferReport
+import io.mosip.tuvali.transfer.TransferReportRequest
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
+import io.mosip.tuvali.verifier.exception.VerifierTransferHandlerException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
-import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = getLogTag(javaClass.simpleName)
@@ -131,7 +131,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     try {
       super.dispatchMessage(msg)
     } catch (e: Throwable) {
-      var bleException: BLEException = UnknownTransferHandlerException("Exception in Verifier Transfer Handler", e);
+      var bleException: BLEException = VerifierTransferHandlerException("Exception in Verifier Transfer Handler", e);
 
       if(e is BLEException) {
         bleException = e;
