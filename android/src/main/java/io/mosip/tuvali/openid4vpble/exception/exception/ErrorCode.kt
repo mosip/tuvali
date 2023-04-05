@@ -1,28 +1,27 @@
 package io.mosip.tuvali.openid4vpble.exception.exception
 
-
 // Error Code format
-// <Role>(3char)_<Stage>(3char)_<Number>(3char) Eg: WAL-CON-001
+// <Component(2)+Role(1)>(3char)_<Stage>(3char)_<Number>(3char) Eg: TVW-CON-001
 // Stage --> CON(Connection) | KEX(Key Exchange) | ENC(Encryption) | TRA(Transfer) | REP(Report) | DEC(Decryption)
-// ROLE --> VER | WAL
+// ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier)
 // UNK --> If role or stage is not known
 
 enum class ErrorCode(val code: String) {
-  UnknownException("UNK_UNK_100"),
+  UnknownException("UNK_UNK_001"),
 
-  WalletStateHandlerException("WAL_UNK_101"),
-  WalletTransferHandlerException("WAL_UNK_102"),
+  WalletStateHandlerException("TVW_UNK_001"),
+  WalletTransferHandlerException("TVW_UNK_002"),
 
-  VerifierStateHandlerException("VER_UNK_101"),
-  VerifierTransferHandlerException("VER_UNK_102"),
+  VerifierStateHandlerException("TVV_UNK_001"),
+  VerifierTransferHandlerException("TVV_UNK_002"),
 
-  MTUNegotiationException("WAL_CON_001"),
+  MTUNegotiationException("TVW_CON_001"),
   //TODO: Create specific error codes for the below exception
-  TransferFailedException("WAL_REP_001"),
+  TransferFailedException("TVW_REP_001"),
 
-  UnsupportedMTUSizeException("VER_CON_001"),
-  CorruptedChunkReceivedException("VER_TRA_001"),
-  TooManyFailureChunksException("VER_TRA_002"),
+  UnsupportedMTUSizeException("TVV_CON_001"),
+  CorruptedChunkReceivedException("TVV_TRA_001"),
+  TooManyFailureChunksException("TVV_TRA_002"),
 }
 
 
