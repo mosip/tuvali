@@ -17,7 +17,8 @@ enum class ErrorCode(val code: String) {
   VerifierTransferHandlerException("VER_UNK_102"),
 
   MTUNegotiationException("WAL_CON_001"),
-  TransferFailedOnVerifierException("WAL_REP_001"),
+  //TODO: Create specific error codes for the below exception
+  TransferFailedException("WAL_REP_001"),
 
   UnsupportedMTUSizeException("VER_CON_001"),
   CorruptedChunkReceivedException("VER_TRA_001"),

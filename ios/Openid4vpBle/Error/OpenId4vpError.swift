@@ -15,12 +15,12 @@ extension OpenId4vpError: CustomStringConvertible {
         }
     }
     
-    public var code: Int {
+    public var code: String {
         switch self {
         case .invalidMTUSizeError(let mtu):
-            return 300
+            return "WAL_CON_001"
         case .responseTransferFailure:
-            return 301
+            return "WAL_REP_001"
         }
     }
 }
