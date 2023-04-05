@@ -3,7 +3,7 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
-import io.mosip.tuvali.common.safeExecute.SafeExecute
+import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 import org.json.JSONObject
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -15,9 +15,8 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private val logTag = getLogTag(javaClass.simpleName)
   private var verifier: Verifier? = null
   private var wallet: Wallet? = null
-  private val mutex = Object()
   private var bleExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
-  private val safeExecute = SafeExecute(bleExceptionHandler);
+  private val tryExecuteSync = TryExecuteSync(bleExceptionHandler);
 
   //Inji contract requires double quotes around the states.
   enum class VCResponseStates(val value: String) {
@@ -46,7 +45,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun getConnectionParameters(): String {
     Log.d(logTag, "getConnectionParameters new verifier object at ${System.nanoTime()}")
 
-    return safeExecute.run {
+    return tryExecuteSync.run {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
         verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
@@ -81,7 +80,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun setConnectionParameters(params: String) {
     Log.d(logTag, "setConnectionParameters at ${System.nanoTime()}")
 
-    safeExecute.run {
+    tryExecuteSync.run {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
         wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
@@ -100,7 +99,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun createConnection(mode: String, callback: Callback) {
     Log.d(logTag, "createConnection: received request with mode $mode at ${System.nanoTime()}")
 
-    safeExecute.run {
+    tryExecuteSync.run {
     Log.d(logTag, "synchronized createConnection: received request with mode $mode at ${System.nanoTime()}")
       when (mode) {
         "advertiser" -> {
@@ -120,16 +119,15 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun destroyConnection(callback: Callback) {
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
-    safeExecute.run {
+    tryExecuteSync.run {
       stopBLE(callback)
     }
   }
 
   private fun stopBLE(callback: Callback) {
-    safeExecute.run {
     if (wallet == null && verifier == null) {
         callback()
-      } else {
+    } else {
         if (wallet != null) {
           Log.d(logTag, "synchronized destroyConnection called for wallet at ${System.nanoTime()}")
           stopWallet { callback() }
@@ -139,7 +137,6 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
           stopVerifier { callback() }
         }
       }
-    }
   }
 
   private fun stopVerifier(onDestroy: Callback) {
@@ -168,7 +165,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   fun send(message: String, callback: Callback) {
     Log.d(logTag, "send: message $message at ${System.nanoTime()}")
 
-    safeExecute.run {
+    tryExecuteSync.run {
       val messageSplits = message.split("\n", limit = 2)
       when (messageSplits[0]) {
         NearbyEvents.EXCHANGE_RECEIVER_INFO.value -> {
@@ -185,7 +182,9 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
         NearbyEvents.SEND_VC_RESPONSE.value -> {
           verifier?.notifyVerificationStatus(messageSplits[1] == VCResponseStates.ACCEPTED.value)
         }
-        else -> {}
+        else -> {
+          Log.d(logTag, "send: received send with unrecognized event")
+        }
       }
     }
   }

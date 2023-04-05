@@ -272,7 +272,7 @@ class Wallet(
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
-      throw TransferFailedException(errorMsg)
+    throw TransferFailedException(errorMsg)
   }
 
   override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {

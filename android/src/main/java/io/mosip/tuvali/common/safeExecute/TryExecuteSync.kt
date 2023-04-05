@@ -2,7 +2,7 @@ package io.mosip.tuvali.common.safeExecute
 
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
 
-class SafeExecute(private val bleExceptionHandler: OpenIdBLEExceptionHandler) {
+class TryExecuteSync(private val bleExceptionHandler: OpenIdBLEExceptionHandler) {
   private val mutex = Object()
 
   fun <T> run(fn: () -> T): T? {
