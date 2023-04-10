@@ -4,6 +4,10 @@ import CryptoKit
 
 @available(iOS 13.0, *)
 struct Utils {
+    enum ByteCount: Int{
+        case FourBytes = 4
+        case TwoBytes = 2
+    }
     static func createCBMutableCharacteristics() -> [CBMutableCharacteristic] {
         return characteristicsMap.map {key, chrTuple in
             let keyUUID = CBUUID(string: key)
@@ -24,13 +28,21 @@ struct Utils {
         return hexKey
     }
 
-    static func twoBytesToIntBigEndian(num: Data) -> Int {
+    static func networkOrderedByteArrayToInt(num: Data) -> Int {
         let value = UInt16(bigEndian: num.withUnsafeBytes { $0.pointee })
         return Int(value)
     }
 
-    static func intToBytes(num: Int) -> Data {
-      return withUnsafeBytes(of: UInt32(num).bigEndian) { Data($0) }
+  static func intToNetworkOrderedByteArray(num: Int, byteCount: ByteCount) -> Data {
+      switch byteCount{
+      case .FourBytes :
+          return withUnsafeBytes(of: UInt32(num).bigEndian) { Data($0) }
+
+      case .TwoBytes :
+          return withUnsafeBytes(of: UInt16(num).bigEndian) { Data($0) }
+
+      }
+
     }
 
 }

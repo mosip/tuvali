@@ -111,7 +111,7 @@ class TransferHandler {
     }
 
     private func sendResponseSize(size: Int) {
-        let sizeByteArray = Utils.intToBytes(num: size)
+        let sizeByteArray = Utils.intToNetworkOrderedByteArray(num: size, byteCount: Utils.ByteCount.FourBytes)
         delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: sizeByteArray, withResponse: true)
 
     }

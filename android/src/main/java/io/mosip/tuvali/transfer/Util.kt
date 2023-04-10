@@ -9,13 +9,13 @@ import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.transfer.ArraySize.FourBytes
-import io.mosip.tuvali.transfer.ArraySize.TwoBytes
+import io.mosip.tuvali.transfer.ByteCount.FourBytes
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
 import java.nio.ByteBuffer
 
-enum class ArraySize {
-  FourBytes,
-  TwoBytes
+enum class ByteCount(val size: Int) {
+  FourBytes(4),
+  TwoBytes(2)
 }
 class Util {
   companion object {
@@ -35,10 +35,10 @@ class Util {
            +------------+-------------+
    */
 
-    fun intToByteArray(num: Int, size: ArraySize): ByteArray {
-      val capacity = if (size == TwoBytes) 2 else 4
+    fun intToNetworkOrderedByteArray(num: Int, byteCount: ByteCount): ByteArray {
+      val capacity = if (byteCount == TwoBytes) byteCount.size else byteCount.size
       val byteBuffer = ByteBuffer.allocate(capacity)
-      val byteArray = when (size) {
+      val byteArray = when (byteCount) {
         FourBytes -> {
           byteBuffer.putInt(num)
           byteBuffer.array()
@@ -53,9 +53,9 @@ class Util {
 
     }
 
-   fun byteArrayToInt(num: ByteArray, size: ArraySize): Int{
+   fun networkOrderedByteArrayToInt(num: ByteArray, byteCount: ByteCount): Int{
      val byteBuffer = ByteBuffer.wrap(num)
-     var intValue = when (size){
+     var intValue = when (byteCount){
        FourBytes -> {
          byteBuffer.int
        }
