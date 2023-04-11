@@ -3,7 +3,7 @@ import CoreBluetooth
 import CryptoKit
 
 @available(iOS 13.0, *)
-struct Utils {
+struct Util {
     enum ByteCount: Int{
         case FourBytes = 4
         case TwoBytes = 2

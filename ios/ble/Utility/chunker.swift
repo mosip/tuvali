@@ -92,7 +92,7 @@ class Chunker {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            return Utils.intToNetworkOrderedByteArray(num: seqNumber, byteCount: Utils.ByteCount.TwoBytes) + Utils.intToNetworkOrderedByteArray(num: Int(payloadCRC), byteCount: Utils.ByteCount.TwoBytes) + payload
+            return Util.intToNetworkOrderedByteArray(num: seqNumber, byteCount: Util.ByteCount.TwoBytes) + Util.intToNetworkOrderedByteArray(num: Int(payloadCRC), byteCount: Util.ByteCount.TwoBytes) + payload
         }
         return Data() //
     }

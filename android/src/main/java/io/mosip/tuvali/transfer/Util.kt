@@ -36,8 +36,7 @@ class Util {
    */
 
     fun intToNetworkOrderedByteArray(num: Int, byteCount: ByteCount): ByteArray {
-      val capacity = if (byteCount == TwoBytes) byteCount.size else byteCount.size
-      val byteBuffer = ByteBuffer.allocate(capacity)
+      val byteBuffer = ByteBuffer.allocate(byteCount.size)
       val byteArray = when (byteCount) {
         FourBytes -> {
           byteBuffer.putInt(num)

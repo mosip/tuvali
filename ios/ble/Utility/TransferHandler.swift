@@ -35,7 +35,7 @@ class TransferHandler {
             sendResponseSize(size: msg.dataSize!)
         }
         else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
-            responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
+            responseStartTimeInMillis = Util.currentTimeInMilliSeconds()
             currentState = States.ResponseSizeWriteSuccess
             initResponseChunkSend()
         } else if msg.msgType == .RESPONSE_SIZE_WRITE_FAILED {
@@ -111,7 +111,7 @@ class TransferHandler {
     }
 
     private func sendResponseSize(size: Int) {
-        let sizeByteArray = Utils.intToNetworkOrderedByteArray(num: size, byteCount: Utils.ByteCount.FourBytes)
+        let sizeByteArray = Util.intToNetworkOrderedByteArray(num: size, byteCount: Util.ByteCount.FourBytes)
         delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: sizeByteArray, withResponse: true)
 
     }
