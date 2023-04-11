@@ -2,12 +2,10 @@ import Foundation
 
 class WalletExceptionHandler {
 
-    var exceptionErr: WalletErrorEnum? = .none
     private var onError: ((_ message: String) -> Void)?;
     var wallet: Wallet?
     
     init(exceptionErr: WalletErrorEnum){
-        self.exceptionErr = exceptionErr
         handle(error: exceptionErr)
     }
 
@@ -22,16 +20,16 @@ class WalletExceptionHandler {
 }
 
 enum WalletErrorEnum: Error {
-    case invalidMTUSizeError(mtu: Int)
-    case responseTransferFailure
+    case InvalidMTUSizeError(mtu: Int)
+    case ResponseTransferFailure
 }
 
 extension WalletErrorEnum: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .invalidMTUSizeError(let mtu):
+        case .InvalidMTUSizeError(let mtu):
             return "Negotiated MTU: \(mtu) is too low."
-        case .responseTransferFailure:
+        case .ResponseTransferFailure:
             return "failed to write response"
         }
     }
