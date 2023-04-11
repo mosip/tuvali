@@ -1,9 +1,24 @@
 import Foundation
 
+typealias ChunkSeqIndex = Int
+typealias ChunkSeqNumber = Int
+
+extension ChunkSeqIndex {
+    func toSeqNumber() -> ChunkSeqNumber {
+        return self + 1
+    }
+}
+
+extension ChunkSeqNumber {
+    func toSeqIndex() -> ChunkSeqIndex {
+        return self - 1
+    }
+}
+
 class Chunker {
 
     private var logTag = "Chunker"
-    private var chunksReadCounter: Int = 0
+    private var chunksReadIndex: Int = 0
     private var preSlicedChunks: [Data] = []
     private var chunkData: Data?
     private var mtuSize: Int = BLEConstants.DEFAULT_CHUNK_SIZE
@@ -21,7 +36,7 @@ class Chunker {
 
     func assignPreSlicedChunks(){
         os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
-        for i in 0..<totalChunkCount {
+        for i: ChunkSeqIndex in 0..<totalChunkCount {
             preSlicedChunks.append(chunk(seqIndex: i))
         }
     }
@@ -44,32 +59,30 @@ class Chunker {
     }
 
     func next() -> Data {
-        var seqIndex = chunksReadCounter
-        chunksReadCounter += 1
-        if seqIndex <= totalChunkCount - 1 {
-            return (preSlicedChunks[seqIndex])
-        }
-       else
-        {
-           return Data()
-       }
+       return preSlicedChunks[chunksReadIndex++]
     }
 
-    func chunkBySequenceNumber(missedSeqNumber: Int) -> Data {
-        let missedSeqIndex = missedSeqNumber - 1
-        return (preSlicedChunks[missedSeqIndex])
+    func chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber) -> Data {
+        return (preSlicedChunks[missedSeqNumber.toSeqIndex()])
     }
 
-    private func chunk(seqIndex: Int) -> Data {
+    private func chunk(seqIndex: ChunkSeqIndex) -> Data {
         let fromIndex = seqIndex * effectivePayloadSize
-        let seqNumber = seqIndex + 1
-        if (seqIndex == (totalChunkCount - 1) && lastChunkByteCount > 0) {
+        if isLastChunkSmallerSize(seqIndex) {
             let chunkLength = lastChunkByteCount + chunkMetaSize
-            return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
+            return frameChunk(seqNumber: seqIndex.toSeqNumber(), chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
-            let toIndex = (seqIndex + 1) * effectivePayloadSize
-            return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
+            let toIndex = fromIndex + effectivePayloadSize
+            return frameChunk(seqNumber: seqIndex.toSeqNumber(), chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
+    }
+
+    private func isLastChunkSmallerSize(seqIndex: Int) -> Bool {
+        return isLastChunkIndex(seqIndex) && lastChunkByteCount > 0
+    }
+
+    private func isLastChunkIndex(seqIndex: Int) -> Bool {
+        return seqIndex == (totalChunkCount - 1)
     }
 
     /*
@@ -82,7 +95,7 @@ class Chunker {
      +-----------------------+-----------------------------+-------------------------------------------------------------------------+
      */
 
-    private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
+    private func frameChunk(seqNumber: ChunkSeqNumber, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
@@ -92,9 +105,9 @@ class Chunker {
     }
 
     func isComplete() -> Bool {
-        let isComplete = chunksReadCounter > (totalChunkCount - 1)
+        let isComplete = chunksReadIndex > (totalChunkCount - 1)
         if isComplete {
-            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadCounter)
+            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadIndex)
         }
        return isComplete
     }

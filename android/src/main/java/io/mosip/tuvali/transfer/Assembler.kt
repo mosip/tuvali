@@ -5,7 +5,7 @@ import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {
+class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {
   private val logTag = getLogTag(javaClass.simpleName)
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
@@ -25,7 +25,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
       return 0
     }
-    val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
+    val seqNumberInMeta: ChunkSeqNumber = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
     val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
@@ -38,7 +38,7 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
-    val seqIndex = seqNumberInMeta - 1
+    val seqIndex = seqNumberInMeta.toSeqIndex()
     System.arraycopy(chunkData, chunkMetaSize, data, seqIndex * effectivePayloadSize, (chunkData.size-chunkMetaSize))
     chunkReceivedMarker[seqIndex] = chunkReceivedMarkerByte
     //Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
@@ -63,11 +63,10 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
 
   fun getMissedSequenceNumbers(): IntArray {
     var missedSeqNumberList = intArrayOf()
-    chunkReceivedMarker.forEachIndexed() { i, elem ->
+    chunkReceivedMarker.forEachIndexed() { missedChunkSeqIndex: ChunkSeqIndex, elem ->
       if (elem != chunkReceivedMarkerByte) {
-        //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
-        val missedSeqNumber = i + 1
-        missedSeqNumberList += missedSeqNumber
+        //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $missedChunkSeqIndex")
+        missedSeqNumberList += missedChunkSeqIndex.toSeqNumber()
       }
     }
     return missedSeqNumberList
