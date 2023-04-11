@@ -11,6 +11,7 @@ class TransferHandler {
     private var failureFrameRetryCounter = 0
     private let MAX_FAILURE_FRAME_RETRY_LIMIT = 15
 
+
     func initialize(initdData: Data) {
         data = initdData
     }
@@ -34,7 +35,7 @@ class TransferHandler {
             sendResponseSize(size: msg.dataSize!)
         }
         else if msg.msgType == .RESPONSE_SIZE_WRITE_SUCCESS {
-            responseStartTimeInMillis = Utils.currentTimeInMilliSeconds()
+            responseStartTimeInMillis = Util.currentTimeInMilliSeconds()
             currentState = States.ResponseSizeWriteSuccess
             initResponseChunkSend()
         } else if msg.msgType == .RESPONSE_SIZE_WRITE_FAILED {
@@ -79,7 +80,8 @@ class TransferHandler {
 
     private func requestTransmissionReport() {
         var notifyObj: Data
-        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: withUnsafeBytes(of: 1.littleEndian) { Data($0) }, withResponse: true)
+        let data  = Data([UInt8(clamping: 1)])
+        delegate?.write(serviceUuid: BLEConstants.SERVICE_UUID, charUUID: NetworkCharNums.TRANSFER_REPORT_REQUEST_CHAR_UUID, data: data, withResponse: true)
         os_log(.info, "transmission report requested")
     }
 
@@ -109,10 +111,9 @@ class TransferHandler {
     }
 
     private func sendResponseSize(size: Int) {
-        let decimalString = String(size)
-        if let data = decimalString.data(using: .utf8) {
-            delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: data, withResponse: true)
-        }
+        let sizeByteArray = Util.intToNetworkOrderedByteArray(num: size, byteCount: Util.ByteCount.FourBytes)
+        delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.RESPONSE_SIZE_CHAR_UUID, data: sizeByteArray, withResponse: true)
+
     }
 
     private func initResponseChunkSend() {

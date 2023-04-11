@@ -11,6 +11,7 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
+import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -168,8 +169,7 @@ class Verifier(
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         value?.let {
-          //Log.d(logTag, "received response size on characteristic value: ${String(value)}")
-          val responseSize: Int = String(value).toInt()
+          val responseSize: Int = Util.networkOrderedByteArrayToInt(value, FourBytes)
           Log.d(logTag, "received response size on characteristic: $responseSize")
           val responseSizeReadSuccessMessage = ResponseSizeReadSuccessMessage(responseSize, maxDataBytes)
           transferHandler.sendMessage(responseSizeReadSuccessMessage)

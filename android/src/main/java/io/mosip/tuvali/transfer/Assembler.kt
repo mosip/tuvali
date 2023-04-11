@@ -1,7 +1,8 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
-import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
+import io.mosip.tuvali.transfer.Util.Companion.networkOrderedByteArrayToInt
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
@@ -26,8 +27,8 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
       return 0
     }
-    val seqNumberInMeta = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
-    val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
+    val seqNumberInMeta = networkOrderedByteArrayToInt(chunkData.copyOfRange(0, 2), TwoBytes)
+    val crcReceived = networkOrderedByteArrayToInt(chunkData.copyOfRange(2,4), TwoBytes).toUShort()
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
 

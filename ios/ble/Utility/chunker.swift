@@ -92,7 +92,7 @@ class Chunker {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
+            return Util.intToNetworkOrderedByteArray(num: seqNumber, byteCount: Util.ByteCount.TwoBytes) + Util.intToNetworkOrderedByteArray(num: Int(payloadCRC), byteCount: Util.ByteCount.TwoBytes) + payload
         }
         return Data() //
     }
@@ -105,8 +105,4 @@ class Chunker {
        return isComplete
     }
 
-    func intToBytes(_ value: UInt16) -> Data {
-        var value = value.bigEndian
-        return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
-    }
 }
