@@ -7,7 +7,7 @@ import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   ChunkerBase(maxDataBytes) {
   private val logTag = getLogTag(javaClass.simpleName)
-  private var chunksReadIndex: Int = 0
+  private var chunksReadCounter: Int = 0
   private val lastChunkByteCount = getLastChunkByteCount(data.size)
   private val totalChunkCount = getTotalChunkCount(data.size).toInt()
   private val preSlicedChunks: Array<ByteArray?> = Array(totalChunkCount) { null }
@@ -22,7 +22,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun next(): ByteArray {
-    return preSlicedChunks[chunksReadIndex++]!!
+    return preSlicedChunks[chunksReadCounter++]!!
   }
 
   fun chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber): ByteArray {
@@ -62,12 +62,12 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun isComplete(): Boolean {
-    Log.i(logTag,"chunksReadCounter: $chunksReadIndex")
-    val isComplete = chunksReadIndex > (totalChunkCount - 1)
+    Log.i(logTag,"chunksReadCounter: $chunksReadCounter")
+    val isComplete = chunksReadCounter >= totalChunkCount
     if (isComplete) {
       Log.d(
         logTag,
-        "isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadIndex"
+        "isComplete: true, totalChunks: $totalChunkCount , chunkReadCounter(1-indexed): $chunksReadCounter"
       )
     }
     return isComplete

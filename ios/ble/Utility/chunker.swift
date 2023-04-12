@@ -18,7 +18,7 @@ extension ChunkSeqNumber {
 class Chunker {
 
     private var logTag = "Chunker"
-    private var chunksReadIndex: Int = 0
+    private var chunksReadCounter: Int = 0
     private var preSlicedChunks: [Data] = []
     private var chunkData: Data?
     private var mtuSize: Int = BLEConstants.DEFAULT_CHUNK_SIZE
@@ -59,7 +59,7 @@ class Chunker {
     }
 
     func next() -> Data {
-       return preSlicedChunks[chunksReadIndex++]
+       return preSlicedChunks[chunksReadCounter++]
     }
 
     func chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber) -> Data {
@@ -105,9 +105,9 @@ class Chunker {
     }
 
     func isComplete() -> Bool {
-        let isComplete = chunksReadIndex > (totalChunkCount - 1)
+        let isComplete = chunksReadCounter >= totalChunkCount
         if isComplete {
-            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadIndex)
+            os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadCounter)
         }
        return isComplete
     }
