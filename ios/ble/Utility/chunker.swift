@@ -59,7 +59,9 @@ class Chunker {
     }
 
     func next() -> Data {
-       return preSlicedChunks[chunksReadCounter++]
+        let chunkIndex = chunksReadCounter
+        chunksReadCounter += 1
+       return preSlicedChunks[chunkIndex]
     }
 
     func chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber) -> Data {
@@ -68,7 +70,7 @@ class Chunker {
 
     private func chunk(seqIndex: ChunkSeqIndex) -> Data {
         let fromIndex = seqIndex * effectivePayloadSize
-        if isLastChunkSmallerSize(seqIndex) {
+        if isLastChunkSmallerSize(seqIndex: seqIndex) {
             let chunkLength = lastChunkByteCount + chunkMetaSize
             return frameChunk(seqNumber: seqIndex.toSeqNumber(), chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
@@ -78,7 +80,7 @@ class Chunker {
     }
 
     private func isLastChunkSmallerSize(seqIndex: Int) -> Bool {
-        return isLastChunkIndex(seqIndex) && lastChunkByteCount > 0
+        return isLastChunkIndex(seqIndex: seqIndex) && lastChunkByteCount > 0
     }
 
     private func isLastChunkIndex(seqIndex: Int) -> Bool {
