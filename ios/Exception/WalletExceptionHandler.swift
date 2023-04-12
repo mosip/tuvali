@@ -6,7 +6,7 @@ class WalletExceptionHandler {
     var wallet: Wallet?
     
     init(error: (@escaping (String) -> Void)) {
-        self.onError = err
+        self.onError = error
     }
 
     func handle(error: WalletErrorEnum) {
