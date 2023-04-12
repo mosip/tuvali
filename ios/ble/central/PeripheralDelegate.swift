@@ -43,7 +43,7 @@ extension Central: CBPeripheralDelegate {
         let mtu = peripheral.maximumWriteValueLength(for: .withoutResponse);
 
         if mtu < 64 {
-            ErrorHandler.sharedInstance.handleException(type: .WalletException, error: WalletErrorEnum.InvalidMTUSizeError(mtu: mtu))
+            ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidMTUSizeError(mtu: mtu))
             return
         }
 

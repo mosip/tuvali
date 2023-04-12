@@ -1,19 +1,19 @@
 import Foundation
 
-enum verifierErrorEnum: Error {
-    case CorruptedChunkReceived
-    case TooManyFailureChunks
-    case UnsupportedMTUSizeException
+enum VerifierErrorEnum: Error {
+    case corruptedChunkReceived
+    case tooManyFailureChunks
+    case unsupportedMTUSizeException
 }
 
-extension verifierErrorEnum: CustomStringConvertible {
+extension VerifierErrorEnum: CustomStringConvertible {
     public var description: String {
         switch self {
-        case .CorruptedChunkReceived:
+        case .corruptedChunkReceived:
             return "Received corrupted chunks from the wallet"
-        case .TooManyFailureChunks:
+        case .tooManyFailureChunks:
             return "Failing VC transfer as failure chunks are more than 70% of total chunks"
-        case .UnsupportedMTUSizeException:
+        case .unsupportedMTUSizeException:
             return "Minimum 512 MTU is required for VC transfer"
         }
     }
