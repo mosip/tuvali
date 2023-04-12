@@ -5,13 +5,13 @@ class WalletExceptionHandler {
     private var onError: ((_ message: String) -> Void)?
     var wallet: Wallet?
     
-    init(err: (@escaping (String) -> Void)) {
+    init(error: (@escaping (String) -> Void)) {
         self.onError = err
     }
 
     func handle(error: WalletErrorEnum) {
         os_log(.error, "Error in OpenID4vBLE: %{public}@", error.description)
-        self.onError(description: error.description)
+        self.onError!(error.description)
     }
 }
 
