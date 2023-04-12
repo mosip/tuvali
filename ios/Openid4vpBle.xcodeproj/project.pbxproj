@@ -9,7 +9,7 @@
 /* Begin PBXBuildFile section */
 		0A62BB712938C1EC0092E47D /* Wallet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62BB702938C1EC0092E47D /* Wallet.swift */; };
 		0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0A62BB722938C1FA0092E47D /* Verifier.swift */; };
-		0ACACE8A2966D8C800DABDFE /* Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACACE892966D8C800DABDFE /* Utils.swift */; };
+		0ACACE8A2966D8C800DABDFE /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACACE892966D8C800DABDFE /* Util.swift */; };
 		0D36889829A782AA000B12CD /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D36889629A782AA000B12CD /* ErrorHandler.swift */; };
 		0D36889929A782AA000B12CD /* OpenId4vpError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D36889729A782AA000B12CD /* OpenId4vpError.swift */; };
 		8D069F652964466900AB61A9 /* Central.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F642964466900AB61A9 /* Central.swift */; };
@@ -58,7 +58,7 @@
 /* Begin PBXFileReference section */
 		0A62BB702938C1EC0092E47D /* Wallet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Wallet.swift; sourceTree = "<group>"; };
 		0A62BB722938C1FA0092E47D /* Verifier.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Verifier.swift; sourceTree = "<group>"; };
-		0ACACE892966D8C800DABDFE /* Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utils.swift; sourceTree = "<group>"; };
+		0ACACE892966D8C800DABDFE /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		0D36889629A782AA000B12CD /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		0D36889729A782AA000B12CD /* OpenId4vpError.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenId4vpError.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -194,7 +194,7 @@
 				8D069F68296447D000AB61A9 /* Peripheral.swift */,
 				8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */,
 				8D069F6C2964724700AB61A9 /* Characteristics.swift */,
-				0ACACE892966D8C800DABDFE /* Utils.swift */,
+				0ACACE892966D8C800DABDFE /* Util.swift */,
 				E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */,
 			);
 			path = peripheral;
@@ -365,7 +365,7 @@
 				8D179C892954871400017EE5 /* CipherBox.swift in Sources */,
 				8D31C3F62956AF460073B710 /* CryptoConstants.swift in Sources */,
 				8D179C9129548B9A00017EE5 /* CipherPackage.swift in Sources */,
-				0ACACE8A2966D8C800DABDFE /* Utils.swift in Sources */,
+				0ACACE8A2966D8C800DABDFE /* Util.swift in Sources */,
 				F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */,
 				E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */,
 				8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */,

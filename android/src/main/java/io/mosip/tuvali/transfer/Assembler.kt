@@ -1,7 +1,8 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
-import io.mosip.tuvali.transfer.Util.Companion.twoBytesToIntBigEndian
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
+import io.mosip.tuvali.transfer.Util.Companion.networkOrderedByteArrayToInt
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
@@ -16,6 +17,7 @@ class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(max
   init {
     Log.i(logTag, "expected total chunk size: $totalSize")
     if (totalSize == 0) {
+      //Todo: The exception name and the parameter doesn't makes sense
       throw CorruptedChunkReceivedException(0, 0, 0)
     }
   }
@@ -25,8 +27,9 @@ class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(max
       Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
       return 0
     }
-    val seqNumberInMeta: ChunkSeqNumber = twoBytesToIntBigEndian(chunkData.copyOfRange(0, 2))
-    val crcReceived = twoBytesToIntBigEndian(chunkData.copyOfRange(2,4)).toUShort()
+
+    val seqNumberInMeta: ChunkSeqNumber = networkOrderedByteArrayToInt(chunkData.copyOfRange(0, 2), TwoBytes)
+    val crcReceived = networkOrderedByteArrayToInt(chunkData.copyOfRange(2,4), TwoBytes).toUShort()
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
 

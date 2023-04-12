@@ -31,6 +31,7 @@ While Packet logger provides good packet capture details. You can always export 
 6. Find adb from your ANDROID_HOME directory
 7. If your device is properly connected via cable, adb devices should give list of devices
 8. Run -> ${ANDROID_HOME}/platform-tools/adb bugreport report
+    - If there are multiple devices connected. We identify specific device using adb devices -l and run the above command with -s <device ID> to get bug report for that particular device.
 9. unzip report.zip
 10. Find the BLE capture file inside the extracted content using a find command from terminal. This will give you possible location for snoop log.
 ```
