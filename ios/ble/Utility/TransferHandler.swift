@@ -69,8 +69,8 @@ class TransferHandler {
     }
 
     private func sendRetryRespChunk(missingChunks: [Int]) {
-        for chunkIndex in missingChunks {
-            if let chunk = chunker?.getChunkWithIndex(index: chunkIndex) {
+        for missedSeqNumber in missingChunks {
+            if let chunk = chunker?.chunkBySequenceNumber(missedSeqNumber: missedSeqNumber) {
                 delegate?.write(serviceUuid: Peripheral.SERVICE_UUID, charUUID: NetworkCharNums.SUBMIT_RESPONSE_CHAR_UUID, data: chunk, withResponse: true)
             }
             // checks if no more missing chunks exist on verifier

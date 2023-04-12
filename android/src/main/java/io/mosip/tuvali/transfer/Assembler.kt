@@ -6,7 +6,7 @@ import io.mosip.tuvali.transfer.Util.Companion.networkOrderedByteArrayToInt
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {
+class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {
   private val logTag = getLogTag(javaClass.simpleName)
   private var data: ByteArray = ByteArray(totalSize)
   private var lastReadSeqNumber: Int? = null
@@ -27,7 +27,8 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       Log.e(logTag, "received invalid chunk chunkSize: ${chunkData.size}, lastReadSeqNumber: $lastReadSeqNumber")
       return 0
     }
-    val seqNumberInMeta = networkOrderedByteArrayToInt(chunkData.copyOfRange(0, 2), TwoBytes)
+
+    val seqNumberInMeta: ChunkSeqNumber = networkOrderedByteArrayToInt(chunkData.copyOfRange(0, 2), TwoBytes)
     val crcReceived = networkOrderedByteArrayToInt(chunkData.copyOfRange(2,4), TwoBytes).toUShort()
 
     //Log.d(logTag, "received add chunk received chunkSize: ${chunkData.size}, seqNumberInMeta: $seqNumberInMeta")
@@ -40,8 +41,9 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
-    System.arraycopy(chunkData, chunkMetaSize, data, seqNumberInMeta * effectivePayloadSize, (chunkData.size-chunkMetaSize))
-    chunkReceivedMarker[seqNumberInMeta] = chunkReceivedMarkerByte
+    val seqIndex = seqNumberInMeta.toSeqIndex()
+    System.arraycopy(chunkData, chunkMetaSize, data, seqIndex * effectivePayloadSize, (chunkData.size-chunkMetaSize))
+    chunkReceivedMarker[seqIndex] = chunkReceivedMarkerByte
     //Log.d(logTag, "adding chunk complete at index(0-based): ${seqNumberInMeta}, received chunkSize: ${chunkData.size}")
     return seqNumberInMeta
   }
@@ -63,14 +65,14 @@ class Assembler(private val totalSize: Int, private val maxDataBytes: Int ): Chu
   }
 
   fun getMissedSequenceNumbers(): IntArray {
-    var missedSeqNumbers = intArrayOf()
-    chunkReceivedMarker.forEachIndexed() { i, elem ->
+    var missedSeqNumberList = intArrayOf()
+    chunkReceivedMarker.forEachIndexed() { missedChunkSeqIndex: ChunkSeqIndex, elem ->
       if (elem != chunkReceivedMarkerByte) {
-        //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $i")
-        missedSeqNumbers += i
+        //Log.d(logTag, "getMissedSequenceNumbers: adding missed sequence number $missedChunkSeqIndex")
+        missedSeqNumberList += missedChunkSeqIndex.toSeqNumber()
       }
     }
-    return missedSeqNumbers
+    return missedSeqNumberList
   }
 
   fun data(): ByteArray {
