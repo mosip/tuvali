@@ -1,6 +1,8 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
+import io.mosip.tuvali.transfer.Util.Companion.networkOrderedByteArrayToInt
 import kotlin.math.ceil
 import kotlin.math.min
 
@@ -31,7 +33,7 @@ class TransferReport  {
 
   constructor(bytes: ByteArray){
     this.type = ReportType.values()[bytes[0].toInt()]
-    this.totalPages = Util.twoBytesToIntBigEndian(byteArrayOf(bytes[1], bytes[2]))
+    this.totalPages = networkOrderedByteArrayToInt(byteArrayOf(bytes[1], bytes[2]), TwoBytes)
     val sequenceNumberByteArray = bytes.drop(PAGE_NUMBER_SIZE_IN_BYTES + TYPE_SIZE_IN_BYTES)
     this.missingSequences = sequenceNumberByteArray.chunked(2)
       .fold(intArrayOf())
@@ -39,7 +41,7 @@ class TransferReport  {
         if (twoBytes.size != 2) {
           acc
         } else {
-          acc + Util.twoBytesToIntBigEndian(twoBytes.toByteArray())
+          acc + networkOrderedByteArrayToInt(twoBytes.toByteArray(),TwoBytes)
         }
       }
   }
@@ -52,8 +54,8 @@ class TransferReport  {
   +---------+------------------+---------------------+-------------------+-------------------+-------------------+
   */
   fun toByteArray(): ByteArray {
-    val missingSeqBytes = missingSequences?.fold(byteArrayOf()) { acc, sNo -> acc + Util.intToTwoBytesBigEndian(sNo) }
-    val metadata = byteArrayOf(type.ordinal.toByte()) + Util.intToTwoBytesBigEndian(totalPages)
+    val missingSeqBytes = missingSequences?.fold(byteArrayOf()) { acc, sNo -> acc + Util.intToNetworkOrderedByteArray(sNo, TwoBytes) }
+    val metadata = byteArrayOf(type.ordinal.toByte()) + Util.intToNetworkOrderedByteArray(totalPages, TwoBytes)
 
     return if(missingSeqBytes != null) {
       metadata + missingSeqBytes

@@ -30,6 +30,7 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.TransferFailedException
+import java.lang.Thread.setDefaultUncaughtExceptionHandler
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
@@ -241,6 +242,7 @@ class Wallet(
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+        //TODO: implement a retry strategy similar to ios if the transfer report request write fails
       transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }

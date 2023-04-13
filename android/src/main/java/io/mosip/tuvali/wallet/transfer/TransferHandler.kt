@@ -8,6 +8,7 @@ import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.wallet.exception.WalletTransferHandlerException
 import io.mosip.tuvali.transfer.*
+import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
@@ -198,7 +199,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     central.write(
       serviceUUID,
       GattService.RESPONSE_SIZE_CHAR_UUID,
-      "$size".toByteArray()
+      Util.intToNetworkOrderedByteArray(size, FourBytes)
     )
   }
 

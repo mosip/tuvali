@@ -4,8 +4,8 @@ import Foundation
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
     var wallet: Wallet?
-
     var tuvaliVersion: String = "unknown"
+
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)

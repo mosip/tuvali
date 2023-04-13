@@ -36,7 +36,11 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
       }
     }
 
-    stopBle {}
+    try{
+      stopBle {}
+    } catch (e: Exception) {
+      Log.d(logTag,"Failed to stop BLE connection while handling exception: $e")
+    }
   }
 
   private fun handleUnknownException(e: BLEException) {
