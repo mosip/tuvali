@@ -1,6 +1,7 @@
 package io.mosip.tuvali.common.safeExecute
 
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownException
 
 class TryExecuteSync(private val bleExceptionHandler: OpenIdBLEExceptionHandler) {
   private val mutex = Object()
@@ -12,7 +13,7 @@ class TryExecuteSync(private val bleExceptionHandler: OpenIdBLEExceptionHandler)
       try {
         returnValue = fn()
       } catch (e: Exception) {
-        bleExceptionHandler.handleException(Exception("Unknown Exception", e))
+        bleExceptionHandler.handleException(UnknownException("Caught unknown exception in Try Execute", e))
       }
     }
 

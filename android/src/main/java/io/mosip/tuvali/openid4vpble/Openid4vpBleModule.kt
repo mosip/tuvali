@@ -5,6 +5,7 @@ import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCode
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.Verifier
@@ -63,10 +64,10 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     }.orEmpty()
   }
 
-  private fun onException(exception: Throwable){
+  private fun onException(exception: BLEException){
     if(exception.cause != null){
       Log.e(logTag, "Exception: ${exception.message}");
-      bleExceptionHandler.handleException(exception.cause!!)
+      bleExceptionHandler.handleException(exception)
     } else {
       bleExceptionHandler.handleException(exception)
     }
