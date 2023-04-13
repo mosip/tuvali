@@ -16,10 +16,10 @@ const val MTU_HEADER_SIZE = 3
 const val REQUEST_MTU_TIME_OUT = -1
 
 class Controller(val context: Context) {
-  private lateinit var scanner: Scanner
   private val logTag = getLogTag(javaClass.simpleName)
 
   private var gattClient: GattClient? = null
+  private var scanner: Scanner? = null
   private lateinit var messageSender: IMessageSender
   private var requestedMTUValue = -1
   private lateinit var mtuValues : Array<Int>
@@ -34,7 +34,7 @@ class Controller(val context: Context) {
 
   fun scan(scanStartMessage: ScanStartMessage) {
     scanner = Scanner(context)
-    scanner.start(
+    scanner?.start(
       scanStartMessage.serviceUUID,
       scanStartMessage.advPayload,
       this::onDeviceFound,
@@ -43,7 +43,7 @@ class Controller(val context: Context) {
   }
 
   fun stopScan() {
-    scanner.stopScan()
+    scanner?.stopScan()
   }
 
   @SuppressLint("MissingPermission")
