@@ -3,7 +3,6 @@ import Foundation
 class WalletExceptionHandler {
 
     private var onError: ((_ message: String) -> Void)?
-    var wallet: Wallet?
     
     init(error: (@escaping (String) -> Void)) {
         self.onError = error
@@ -11,7 +10,7 @@ class WalletExceptionHandler {
 
     func handle(error: WalletErrorEnum) {
         os_log(.error, "Error in OpenID4vBLE: %{public}@", error.description)
-        self.onError!(error.description)
+        self.onError?(error.description)
     }
 }
 
