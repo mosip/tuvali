@@ -8,7 +8,7 @@ import android.util.Log
 import com.facebook.common.util.Hex
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
-import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
+import io.mosip.tuvali.openid4vpble.exception.StateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 

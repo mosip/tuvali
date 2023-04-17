@@ -7,12 +7,12 @@ import android.os.HandlerThread
 import android.os.ParcelUuid
 import android.os.Process
 import android.util.Log
+import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
-import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.transfer.TransferReport
@@ -21,6 +21,7 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
+import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -29,7 +30,6 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.TransferFailedException
-import java.lang.Thread.setDefaultUncaughtExceptionHandler
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
@@ -339,7 +339,7 @@ class Wallet(
           logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
         )
       }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }

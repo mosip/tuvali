@@ -2,7 +2,6 @@ package io.mosip.tuvali.openid4vpble.exception
 
 import android.util.Log
 import com.facebook.react.bridge.Callback
-import com.facebook.react.bridge.CallbackImpl
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.verifier.exception.VerifierExceptionHandler
@@ -37,7 +36,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String) -> Unit, private
 
     try{
       stopBle {}
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       Log.d(logTag,"Failed to stop BLE connection while handling exception: $e")
     }
   }
