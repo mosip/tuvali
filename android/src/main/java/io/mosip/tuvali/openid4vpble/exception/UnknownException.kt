@@ -1,4 +1,4 @@
 package io.mosip.tuvali.openid4vpble.exception
 
-class UnknownException(message: String, cause: Throwable): Throwable(message, cause) {
+class UnknownException(message: String, cause: Throwable): Exception(message, cause) {
 }

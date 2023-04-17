@@ -37,7 +37,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Throwable) -> Unit
+  private val onBLEException: (Exception) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -305,7 +305,7 @@ class Wallet(
     }
   }
 
-  override fun onException(exception: Throwable) {
+  override fun onException(exception: Exception) {
     onBLEException(exception)
   }
 
@@ -340,7 +340,7 @@ class Wallet(
           logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
         )
       }
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
         Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }

@@ -12,7 +12,7 @@ class TryExecuteSync(private val bleExceptionHandler: OpenIdBLEExceptionHandler)
     synchronized(mutex) {
       try {
         returnValue = fn()
-      } catch (e: Throwable) {
+      } catch (e: Exception) {
         bleExceptionHandler.handleException(UnknownException("Caught unknown exception in Try Execute", e))
       }
     }

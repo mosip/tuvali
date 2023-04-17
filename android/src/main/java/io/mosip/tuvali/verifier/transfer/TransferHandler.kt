@@ -127,7 +127,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
       transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
       Log.d(logTag, "dispatchMessage " + e.message)
     }
