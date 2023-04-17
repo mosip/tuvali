@@ -30,11 +30,9 @@
     "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
-    "prepare": "bob build",
     "release": "release-it",
-    "example": "yarn --cwd example",
-    "clean": "del-cli android/build example/android/build example/android/app/build example/ios/build",
-    "bootstrap": "yarn example && yarn install && yarn example pods"
+    "clean": "del-cli android/build",
+    "bootstrap": "yarn install"
   },
   "keywords": [
     "react-native",
