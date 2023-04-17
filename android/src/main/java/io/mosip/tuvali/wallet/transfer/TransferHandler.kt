@@ -173,7 +173,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
       transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
       Log.d(logTag, "dispatchMessage " + e.message)
     }

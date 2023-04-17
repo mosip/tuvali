@@ -11,5 +11,5 @@ interface IPeripheralListener {
   fun onSendDataNotified(uuid: UUID, isSent: Boolean)
   fun onClosed()
   fun onMTUChanged(mtu: Int)
-  fun onException(exception: Throwable)
+  fun onException(exception: Exception)
 }

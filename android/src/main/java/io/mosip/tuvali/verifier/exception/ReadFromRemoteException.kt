@@ -1,4 +1,4 @@
 package io.mosip.tuvali.verifier.exception
 
-class ReadFromRemoteException: Throwable() {
+class ReadFromRemoteException: Exception() {
 }

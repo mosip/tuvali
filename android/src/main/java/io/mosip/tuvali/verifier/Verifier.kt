@@ -31,7 +31,7 @@ class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Throwable) -> Unit
+  private val onBLEException: (Exception) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -200,7 +200,7 @@ class Verifier(
     }
   }
 
-  override fun onException(e: Throwable) {
+  override fun onException(e: Exception) {
     onBLEException(e)
   }
 
@@ -256,7 +256,7 @@ class Verifier(
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error
       }
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
         Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
         //Re-Throwing for the exception handler to handle this again and let Higher layer know.
         throw e;
