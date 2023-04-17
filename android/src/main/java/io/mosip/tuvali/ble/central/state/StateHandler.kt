@@ -257,7 +257,7 @@ class StateHandler(
       super.dispatchMessage(msg)
     } catch (e: Exception) {
       listener.onException(StateHandlerException("Exception in Central State Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

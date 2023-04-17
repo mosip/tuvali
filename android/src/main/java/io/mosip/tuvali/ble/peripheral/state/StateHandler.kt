@@ -158,7 +158,7 @@ class StateHandler(
       super.dispatchMessage(msg)
     } catch (e: Exception) {
       peripheralListener.onException(StateHandlerException("Exception in Peripheral State Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

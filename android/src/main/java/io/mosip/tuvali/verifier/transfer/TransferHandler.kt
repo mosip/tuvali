@@ -132,7 +132,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       super.dispatchMessage(msg)
     } catch (e: Exception) {
       transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 
