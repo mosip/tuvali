@@ -151,7 +151,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private fun stopWallet(onDestroy: Callback) {
     try {
       wallet?.stop(onDestroy)
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
       Log.e(logTag, "stopWallet: exception: ${e.message}")
       Log.e(logTag, "stopWallet: exception: ${e.stackTrace}")
       Log.e(logTag, "stopWallet: exception: $e")

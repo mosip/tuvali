@@ -339,7 +339,7 @@ class Wallet(
           logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
         )
       }
-    } catch (e: Exception) {
+    } catch (e: Throwable) {
         Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
