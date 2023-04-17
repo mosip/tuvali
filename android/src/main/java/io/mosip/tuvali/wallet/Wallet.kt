@@ -30,14 +30,14 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.TransferFailedException
+import io.mosip.tuvali.wallet.exception.WalletException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
 class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Exception) -> Unit
+  private val eventResponseListener: (String) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -306,7 +306,7 @@ class Wallet(
   }
 
   override fun onException(exception: Exception) {
-    onBLEException(exception)
+    throw WalletException("Exception in Wallet", exception)
   }
 
   override fun onClosed() {

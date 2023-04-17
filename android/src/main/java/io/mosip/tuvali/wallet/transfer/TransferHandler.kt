@@ -176,7 +176,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       super.dispatchMessage(msg)
     } catch (e: Exception) {
       transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 
