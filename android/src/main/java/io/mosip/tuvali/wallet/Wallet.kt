@@ -241,6 +241,7 @@ class Wallet(
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+        //TODO: implement a retry strategy similar to ios if the transfer report request write fails
       transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
