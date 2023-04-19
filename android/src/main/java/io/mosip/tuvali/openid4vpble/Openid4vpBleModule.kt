@@ -62,7 +62,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     }.orEmpty()
   }
 
-  private fun onException(exception: Throwable){
+  private fun onException(exception: Exception){
     if(exception.cause != null){
       Log.e(logTag, "Exception: ${exception.message}");
       bleExceptionHandler.handleException(exception.cause!!)
