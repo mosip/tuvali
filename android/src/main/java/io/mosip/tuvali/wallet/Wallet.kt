@@ -21,7 +21,6 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
-import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -37,7 +36,8 @@ private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val handleException: (Throwable) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -306,7 +306,7 @@ class Wallet(
   }
 
   override fun onException(exception: Exception) {
-    throw WalletException("Exception in Wallet", exception)
+    handleException(WalletException("Exception in Wallet", exception))
   }
 
   override fun onClosed() {
