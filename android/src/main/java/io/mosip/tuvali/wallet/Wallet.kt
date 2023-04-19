@@ -29,6 +29,7 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.TransferFailedException
+import io.mosip.tuvali.wallet.exception.WalletException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
@@ -36,7 +37,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Throwable) -> Unit
+  private val handleException: (Exception) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -240,6 +241,7 @@ class Wallet(
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
+        //TODO: implement a retry strategy similar to ios if the transfer report request write fails
       transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
@@ -303,8 +305,8 @@ class Wallet(
     }
   }
 
-  override fun onException(exception: Throwable) {
-    onBLEException(exception)
+  override fun onException(exception: Exception) {
+    handleException(WalletException("Exception in Wallet", exception))
   }
 
   override fun onClosed() {
