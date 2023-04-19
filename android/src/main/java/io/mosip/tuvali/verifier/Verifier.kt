@@ -31,7 +31,8 @@ private const val MIN_MTU_REQUIRED = 64
 class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit
+  private val eventResponseListener: (String) -> Unit,
+  private val handleException: (Throwable) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -201,7 +202,7 @@ class Verifier(
   }
 
   override fun onException(exception: Exception) {
-    throw VerifierException("Exception in Verifier", exception)
+    handleException(VerifierException("Exception in Verifier", exception))
   }
 
   override fun onClosed() {

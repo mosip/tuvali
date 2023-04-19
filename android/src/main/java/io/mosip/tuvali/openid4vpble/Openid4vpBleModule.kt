@@ -48,7 +48,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     return tryExecuteSync.run {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
-        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
+        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, bleExceptionHandler::handleException)
         verifier?.generateKeyPair()
       }
 
@@ -74,7 +74,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     tryExecuteSync.run {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent)
+        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, bleExceptionHandler::handleException)
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")
