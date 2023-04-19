@@ -5,7 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
+import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*

@@ -37,7 +37,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val handleException: (Throwable) -> Unit
+  private val handleException: (Exception) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
