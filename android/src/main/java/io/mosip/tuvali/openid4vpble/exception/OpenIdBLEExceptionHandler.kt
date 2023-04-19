@@ -2,7 +2,6 @@ package io.mosip.tuvali.openid4vpble.exception
 
 import android.util.Log
 import com.facebook.react.bridge.Callback
-import com.facebook.react.bridge.CallbackImpl
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.verifier.exception.VerifierExceptionHandler

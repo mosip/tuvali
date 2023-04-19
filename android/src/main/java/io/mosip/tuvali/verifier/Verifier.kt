@@ -15,6 +15,7 @@ import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
+import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage
@@ -31,7 +32,7 @@ class Verifier(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (Exception) -> Unit
+  private val handleException: (Exception) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null;
@@ -200,8 +201,8 @@ class Verifier(
     }
   }
 
-  override fun onException(e: Exception) {
-    onBLEException(e)
+  override fun onException(exception: Exception) {
+    handleException(VerifierException("Exception in Verifier", exception))
   }
 
   override fun onClosed() {
