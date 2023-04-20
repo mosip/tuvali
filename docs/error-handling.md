@@ -1,0 +1,49 @@
+# Error Handling
+ Tuvali might fail to perform BLE connection or transfer due to device issues or hardware issues.
+ Whenever Tuvali faces these issue, `OnError` event will be sent with following structure.
+
+
+`
+{
+  type: 'onError',
+  message: string,
+  code: string
+}
+`
+
+* message - Short description of the error
+* code - Three part error code with format of `[COMPONENT]_[STAGE]_[NUMBER]`. Each part is 3 character length.
+  * Eg: `TVW_CON_001`
+  * Component can be either
+    * `TVW`(Tuvali Wallet)
+    * `TVV`(Tuvali Verifier)
+    * `Tuvali`(Tuvali without specific role)
+  * Stage can be either
+    * `CON`(Connection)
+    * `KEX`(Key Exchange)
+    * `ENC`(Encryption)
+    * `TRA`(Transfer)
+    * `REP`(Transfer Report)
+    * `DEC`(Decryption)
+
+
+## Error Codes
+  Following are the list of error codes that are reported by Tuvali
+
+### Known Stage Error Codes
+  These Errors code gets reported when a known error case happens where Tuvali can't proceed.
+1. `TVW_CON_001` - Wallet failed negotiate MTU with a Verifier.
+2. `TVW_REP_001` - Wallet received a failure report or failed to receive transfer report from Verifier.
+3. `TVV_CON_001` - MTU negotiated is not supported by the Verifier.
+4. `TVV_TRA_001` - Verifier received a corrupted chunk from wallet.
+5. `TVV_TRA_002` - Verifier received too many missing chunks from the wallet.
+
+### Unknown Stage Error Codes
+  These Errors code gets reported when internal exception is thrown by the platform
+1. `TUV_UNK_001` - Tuvali Unknown Exception. This can be due to internal exception which is not caught.
+2. `TVW_UNK_001` - Wallet's Unknown Exception. Uncaught internal exception within Wallet.
+3. `TVW_UNK_002` - Wallet's State Handler Exception. Uncaught internal exception within Wallet's state handler or Central BLE layer.
+4. `TVW_UNK_003` - Wallet's Transfer Handler Exception. Uncaught internal exception within Wallet's transfer handler or decryption layer.
+5. `TVV_UNK_001` - Verifier's Unknown Exception. Uncaught internal exception within Verifier.
+6. `TVV_UNK_002` - Verifier's State Handler Exception. Uncaught internal exception within Verifier's state handler or Peripheral BLE layer.
+7. `TVV_UNK_003` - Wallet's Transfer Handler Exception. Uncaught internal exception within Wallet's transfer handler or decryption layer.

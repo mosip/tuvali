@@ -3,11 +3,11 @@ package io.mosip.tuvali.openid4vpble.exception
 // Error Code format
 // <Component(2)+Role(1)>(3char)_<Stage>(3char)_<Number>(3char) Eg: TVW-CON-001
 // Stage --> CON(Connection) | KEX(Key Exchange) | ENC(Encryption) | TRA(Transfer) | REP(Report) | DEC(Decryption)
-// ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier)
-// UNK --> If role or stage is not known
+// Component+ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier) | TUV(Tuvali where role is unknown)
+// UNK --> If stage is not known
 
 enum class ErrorCode(val code: String) {
-  UnknownException("UNK_UNK_001"),
+  UnknownException("TUV_UNK_001"),
 
   WalletUnknownException("TVW_UNK_001"),
   WalletStateHandlerException("TVW_UNK_002"),

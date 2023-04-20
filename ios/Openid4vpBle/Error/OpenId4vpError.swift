@@ -14,7 +14,7 @@ extension OpenId4vpError: CustomStringConvertible {
             return "failed to write response"
         }
     }
-    
+
     public var code: String {
         switch self {
         case .invalidMTUSizeError(let mtu):
@@ -28,5 +28,5 @@ extension OpenId4vpError: CustomStringConvertible {
 // Error Code format
 // <Component(2)+Role(1)>(3char)_<Stage>(3char)_<Number>(3char) Eg: TVW-CON-001
 // Stage --> CON(Connection) | KEX(Key Exchange) | ENC(Encryption) | TRA(Transfer) | REP(Report) | DEC(Decryption)
-// ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier)
-// UNK --> If role or stage is not known
+// Component+ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier) | TUV(Tuvali where role is unknown)
+// UNK --> If stage is not known
