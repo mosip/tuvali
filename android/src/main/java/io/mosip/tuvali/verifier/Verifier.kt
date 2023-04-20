@@ -11,7 +11,7 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
-import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.BLEException
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
@@ -37,7 +37,7 @@ class Verifier(
   private val handleException: (BLEException) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
-  private var secretsTranslator: SecretsTranslator? = null;
+  private var secretsTranslator: SecretsTranslator? = null
   private val logTag = getLogTag(javaClass.simpleName)
   private var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
@@ -261,7 +261,7 @@ class Verifier(
     } catch (e: Exception) {
         Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
         //Re-Throwing for the exception handler to handle this again and let Higher layer know.
-        throw e;
+        throw e
     }
   }
 

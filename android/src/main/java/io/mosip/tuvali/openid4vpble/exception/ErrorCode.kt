@@ -1,4 +1,4 @@
-package io.mosip.tuvali.openid4vpble.exception.exception
+package io.mosip.tuvali.openid4vpble.exception
 
 // Error Code format
 // <Component(2)+Role(1)>(3char)_<Stage>(3char)_<Number>(3char) Eg: TVW-CON-001

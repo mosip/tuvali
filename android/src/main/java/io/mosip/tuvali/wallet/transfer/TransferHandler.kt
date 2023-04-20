@@ -6,7 +6,6 @@ import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
 
-import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.verifier.GattService
@@ -21,8 +20,8 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   Handler(looper) {
   private lateinit var retryChunker: RetryChunker
   private val logTag = getLogTag(javaClass.simpleName)
-  private var chunkCounter = 0;
-  private var failureFrameRetryCounter = 0;
+  private var chunkCounter = 0
+  private var failureFrameRetryCounter = 0
 
   enum class States {
     UnInitialised,
@@ -109,7 +108,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
         val initRetryTransferMessage = msg.obj as InitRetryTransferMessage
-        failureFrameRetryCounter++;
+        failureFrameRetryCounter++
         retryChunker = RetryChunker(chunker!!, initRetryTransferMessage.missedSequences)
         sendRetryResponseChunk()
       }

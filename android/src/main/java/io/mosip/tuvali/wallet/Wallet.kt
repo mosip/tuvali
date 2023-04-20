@@ -15,7 +15,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
-import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
+import io.mosip.tuvali.openid4vpble.exception.BLEException
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService

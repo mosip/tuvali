@@ -6,7 +6,6 @@ import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
