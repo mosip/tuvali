@@ -11,8 +11,7 @@ class WalletExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
   fun handleException(e: WalletException) {
     val rootCause = ExceptionUtils.getRootBLECause(e)
 
-    Log.e(logTag, "Wallet Exception: $e with root cause $rootCause")
-    e.printStackTrace()
+    Log.e(logTag, "Handling Wallet Exception: ", e)
     sendError(e.message ?: "Something went wrong in Wallet: $rootCause", rootCause.errorCode)
   }
 }

@@ -11,8 +11,7 @@ class VerifierExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
   fun handleException(e: VerifierException){
     val rootCause = ExceptionUtils.getRootBLECause(e)
 
-    Log.e(logTag, "Verifier Exception: $e with root cause $rootCause")
-    e.printStackTrace()
+    Log.e(logTag, "Handling Verifier Exception: ", e)
     sendError(e.message ?: "Something went wrong in Verifier: $rootCause", rootCause.errorCode)
   }
 }

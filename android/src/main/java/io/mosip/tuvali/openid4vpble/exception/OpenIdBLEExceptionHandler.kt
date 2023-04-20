@@ -22,7 +22,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
     verifierExceptionHandler.handleException(e)
   }
 
-  fun handleException(e: Throwable) {
+  fun handleException(e: Exception) {
     when (e) {
       is WalletException -> {
         handleWalletException(e)
@@ -45,8 +45,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
   private fun handleUnknownException(e: BLEException) {
     val rootCause = ExceptionUtils.getRootBLECause(e)
 
-    Log.e(logTag, "Unknown Exception: $e with root cause $rootCause")
-    e.printStackTrace()
+    Log.e(logTag, "Handling Unknown Exception: ", e)
     sendError(e.message ?: "Something went wrong in BLE: $rootCause", rootCause.errorCode)
   }
 }
