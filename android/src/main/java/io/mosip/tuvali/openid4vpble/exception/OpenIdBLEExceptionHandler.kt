@@ -2,6 +2,8 @@ package io.mosip.tuvali.openid4vpble.exception
 
 import android.util.Log
 import com.facebook.react.bridge.Callback
+import io.mosip.tuvali.openid4vpble.exception.exception.UnknownException
+
 import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.openid4vpble.exception.exception.ErrorCode
 import io.mosip.tuvali.transfer.Util
@@ -23,7 +25,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
     verifierExceptionHandler.handleException(e)
   }
 
-  fun handleException(e: BLEException) {
+  fun handleException(e: Throwable) {
     when (e) {
       is WalletException -> {
         handleWalletException(e)
@@ -32,7 +34,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
         handleVerifierException(e)
       }
       else -> {
-        handleUnknownException(e)
+        handleUnknownException(UnknownException("Unknown Exception", e))
       }
     }
 

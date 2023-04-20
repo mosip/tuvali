@@ -50,7 +50,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     return tryExecuteSync.run {
       if (verifier == null) {
         Log.d(logTag, "synchronized getConnectionParameters new verifier object at ${System.nanoTime()}")
-        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
+        verifier = Verifier(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, bleExceptionHandler::handleException)
         verifier?.generateKeyPair()
       }
 
@@ -62,15 +62,6 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
 
       return@run "{\"cid\":\"ilB8l\",\"pk\":\"${payload}\"}"
     }.orEmpty()
-  }
-
-  private fun onException(exception: BLEException){
-    if(exception.cause != null){
-      Log.e(logTag, "Exception: ${exception.message}");
-      bleExceptionHandler.handleException(exception)
-    } else {
-      bleExceptionHandler.handleException(exception)
-    }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -85,7 +76,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     tryExecuteSync.run {
       if (wallet == null) {
         Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, this::onException)
+        wallet = Wallet(reactContext, this::emitNearbyMessage, this::emitNearbyEvent, bleExceptionHandler::handleException)
       }
       val paramsObj = JSONObject(params)
       val firstPartOfPk = paramsObj.getString("pk")

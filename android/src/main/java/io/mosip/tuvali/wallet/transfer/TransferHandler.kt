@@ -5,14 +5,15 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
-import io.mosip.tuvali.wallet.exception.WalletTransferHandlerException
+
+import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.wallet.exception.WalletTransferHandlerException
 
 const val MAX_FAILURE_FRAME_RETRY_LIMIT = 15
 
@@ -175,15 +176,9 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      var bleException: BLEException = WalletTransferHandlerException("Exception in Central transfer Handler", e);
-
-      if(e is BLEException) {
-        bleException = e;
-      }
-
-      transferListener.onException(bleException)
-      Log.d(logTag, "dispatchMessage " + bleException.message)
+    } catch (e: Exception) {
+      transferListener.onException(WalletTransferHandlerException("Exception in Central transfer Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

@@ -9,11 +9,13 @@ package io.mosip.tuvali.openid4vpble.exception.exception
 enum class ErrorCode(val code: String) {
   UnknownException("UNK_UNK_001"),
 
-  WalletStateHandlerException("TVW_UNK_001"),
-  WalletTransferHandlerException("TVW_UNK_002"),
+  WalletUnknownException("TVW_UNK_001"),
+  WalletStateHandlerException("TVW_UNK_002"),
+  WalletTransferHandlerException("TVW_UNK_003"),
 
-  VerifierStateHandlerException("TVV_UNK_001"),
-  VerifierTransferHandlerException("TVV_UNK_002"),
+  VerifierUnknownException("TVV_UNK_001"),
+  VerifierStateHandlerException("TVV_UNK_002"),
+  VerifierTransferHandlerException("TVV_UNK_003"),
 
   MTUNegotiationException("TVW_CON_001"),
   //TODO: Create specific error codes for the below exception

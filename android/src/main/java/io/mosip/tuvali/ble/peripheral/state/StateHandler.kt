@@ -8,10 +8,9 @@ import android.util.Log
 import com.facebook.common.util.Hex
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
-import io.mosip.tuvali.wallet.exception.WalletStateHandlerException
 import io.mosip.tuvali.ble.peripheral.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.verifier.exception.VerifierStateHandlerException
 
 class StateHandler(
   looper: Looper,
@@ -157,15 +156,9 @@ class StateHandler(
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      var bleException: BLEException = WalletStateHandlerException("Exception in Central State Handler", e);
-
-      if(e is BLEException) {
-        bleException = e;
-      }
-
-      peripheralListener.onException(bleException)
-      Log.d(logTag, "dispatchMessage " + e.message)
+    } catch (e: Exception) {
+      peripheralListener.onException(VerifierStateHandlerException("Exception in Peripheral State Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

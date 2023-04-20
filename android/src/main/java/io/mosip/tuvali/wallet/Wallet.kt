@@ -7,12 +7,12 @@ import android.os.HandlerThread
 import android.os.ParcelUuid
 import android.os.Process
 import android.util.Log
+import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
-import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
@@ -30,7 +30,7 @@ import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.TransferFailedException
-import java.lang.Thread.setDefaultUncaughtExceptionHandler
+import io.mosip.tuvali.wallet.exception.WalletException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
@@ -38,7 +38,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val onBLEException: (BLEException) -> Unit
+  private val handleException: (BLEException) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -307,7 +307,7 @@ class Wallet(
   }
 
   override fun onException(exception: BLEException) {
-    onBLEException(exception)
+    handleException(WalletException("Exception in Wallet", exception))
   }
 
   override fun onClosed() {

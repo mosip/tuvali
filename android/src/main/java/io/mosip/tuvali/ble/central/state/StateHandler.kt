@@ -256,15 +256,9 @@ class StateHandler(
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      var bleException: BLEException = WalletStateHandlerException("Exception in Central State Handler", e);
-
-      if(e is BLEException) {
-        bleException = e;
-      }
-
-      listener.onException(bleException)
-      Log.d(logTag, "dispatchMessage " + bleException.message)
+    } catch (e: Exception) {
+      listener.onException(WalletStateHandlerException("Exception in Central State Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

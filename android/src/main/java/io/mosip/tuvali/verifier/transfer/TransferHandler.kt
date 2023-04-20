@@ -5,11 +5,9 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
-import io.mosip.tuvali.openid4vpble.exception.exception.BLEException
-import io.mosip.tuvali.transfer.Assembler
-import io.mosip.tuvali.transfer.TransferReport
-import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
+import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
@@ -130,15 +128,9 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      var bleException: BLEException = VerifierTransferHandlerException("Exception in Verifier Transfer Handler", e);
-
-      if(e is BLEException) {
-        bleException = e;
-      }
-
-      transferListener.onException(bleException)
-      Log.d(logTag, "dispatchMessage " + bleException.message)
+    } catch (e: Exception) {
+      transferListener.onException(VerifierTransferHandlerException("Exception in Verifier Transfer Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 
