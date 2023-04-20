@@ -2,17 +2,17 @@ package io.mosip.tuvali.verifier.exception
 
 import android.util.Log
 import io.mosip.tuvali.openid4vpble.exception.ErrorCode
+import io.mosip.tuvali.openid4vpble.exception.ExceptionUtils
 import io.mosip.tuvali.transfer.Util
 
 class VerifierExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)
 
   fun handleException(e: VerifierException){
-    when (e.cause?.javaClass?.simpleName) {
-      VerifierStateHandlerException::class.simpleName -> Log.e(logTag, "Verifier State Handler Exception: ${e.cause}")
-      VerifierTransferHandlerException::class.simpleName -> Log.e(logTag, "Verifier Transfer Handler Exception: ${e.cause}")
-      else -> Log.e(logTag, "Verifier Exception: $e")
-    }
-    sendError(e.message ?: "Something went wrong in Verifier: ${e.cause}", e.errorCode)
+    val rootCause = ExceptionUtils.getRootBLECause(e)
+
+    Log.e(logTag, "Verifier Exception: $e with root cause $rootCause")
+    e.printStackTrace()
+    sendError(e.message ?: "Something went wrong in Verifier: $rootCause", rootCause.errorCode)
   }
 }

@@ -31,7 +31,7 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
         handleVerifierException(e)
       }
       else -> {
-        handleUnknownException(UnknownException("Unknown Exception", e))
+        handleUnknownException(UnknownException("Unknown Exception in Tuvali", e))
       }
     }
 
@@ -43,8 +43,10 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
   }
 
   private fun handleUnknownException(e: BLEException) {
-    Log.e(logTag, "Unknown exception: $e")
-    Log.e(logTag, "${e.stackTrace}")
-    sendError(e.message ?: "Something went wrong in BLE: ${e.cause}", e.errorCode)
+    val rootCause = ExceptionUtils.getRootBLECause(e)
+
+    Log.e(logTag, "Unknown Exception: $e with root cause $rootCause")
+    e.printStackTrace()
+    sendError(e.message ?: "Something went wrong in BLE: $rootCause", rootCause.errorCode)
   }
 }

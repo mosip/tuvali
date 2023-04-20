@@ -6,6 +6,7 @@ import android.util.Log
 import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+
 const val MTU_HEADER_SIZE = 3
 
 class Controller(val context: Context) {
