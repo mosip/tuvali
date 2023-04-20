@@ -5,7 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
-import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
+import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
@@ -127,9 +127,9 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
+    } catch (e: Exception) {
       transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 
