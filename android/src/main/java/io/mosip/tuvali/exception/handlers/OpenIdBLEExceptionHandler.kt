@@ -8,8 +8,8 @@ import io.mosip.tuvali.exception.ExceptionUtils
 import io.mosip.tuvali.exception.UnknownException
 
 import io.mosip.tuvali.transfer.Util
-import io.mosip.tuvali.exception.verifier.VerifierException
-import io.mosip.tuvali.exception.wallet.WalletException
+import io.mosip.tuvali.verifier.exception.VerifierException
+import io.mosip.tuvali.wallet.exception.WalletException
 
 class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Unit, private val stopBle: (Callback) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)

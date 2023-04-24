@@ -3,7 +3,7 @@ package io.mosip.tuvali.transfer
 import android.util.Log
 import io.mosip.tuvali.transfer.ByteCount.TwoBytes
 import io.mosip.tuvali.transfer.Util.Companion.networkOrderedByteArrayToInt
-import io.mosip.tuvali.exception.verifier.CorruptedChunkReceivedException
+import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(maxDataBytes) {

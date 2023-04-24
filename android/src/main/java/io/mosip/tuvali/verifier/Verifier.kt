@@ -16,8 +16,8 @@ import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.exception.verifier.UnsupportedMTUSizeException
-import io.mosip.tuvali.exception.verifier.VerifierException
+import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
+import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
 import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage

@@ -1,4 +1,4 @@
-package io.mosip.tuvali.exception.verifier
+package io.mosip.tuvali.verifier.exception
 
 import io.mosip.tuvali.exception.BLEException
 import io.mosip.tuvali.exception.ErrorCode

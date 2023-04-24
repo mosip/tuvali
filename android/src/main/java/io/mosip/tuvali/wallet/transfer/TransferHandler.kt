@@ -12,7 +12,7 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.exception.wallet.WalletTransferHandlerException
+import io.mosip.tuvali.wallet.exception.WalletTransferHandlerException
 
 const val MAX_FAILURE_FRAME_RETRY_LIMIT = 15
 

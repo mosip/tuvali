@@ -4,7 +4,7 @@ import android.util.Log
 import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.exception.ExceptionUtils
 import io.mosip.tuvali.transfer.Util
-import io.mosip.tuvali.exception.verifier.VerifierException
+import io.mosip.tuvali.verifier.exception.VerifierException
 
 class VerifierExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)
