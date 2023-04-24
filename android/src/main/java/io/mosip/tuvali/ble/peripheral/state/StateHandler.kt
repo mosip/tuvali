@@ -10,7 +10,7 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.verifier.exception.VerifierStateHandlerException
+import io.mosip.tuvali.ble.peripheral.exception.PeripheralStateHandlerException
 
 class StateHandler(
   looper: Looper,
@@ -157,7 +157,7 @@ class StateHandler(
     try {
       super.dispatchMessage(msg)
     } catch (e: Exception) {
-      peripheralListener.onException(VerifierStateHandlerException("Exception in Peripheral State Handler", e))
+      peripheralListener.onException(PeripheralStateHandlerException("Exception in Peripheral State Handler", e))
       Log.e(logTag, "dispatchMessage " + e.message)
     }
   }

@@ -10,11 +10,11 @@ enum class ErrorCode(val code: String) {
   UnknownException("TUV_UNK_001"),
 
   WalletUnknownException("TVW_UNK_001"),
-  WalletStateHandlerException("TVW_UNK_002"),
+  CentralStateHandlerException("TVW_UNK_002"),
   WalletTransferHandlerException("TVW_UNK_003"),
 
   VerifierUnknownException("TVV_UNK_001"),
-  VerifierStateHandlerException("TVV_UNK_002"),
+  PeripheralStateHandlerException("TVV_UNK_002"),
   VerifierTransferHandlerException("TVV_UNK_003"),
 
   MTUNegotiationException("TVW_CON_001"),
