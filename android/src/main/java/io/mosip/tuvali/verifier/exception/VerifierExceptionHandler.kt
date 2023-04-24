@@ -10,9 +10,9 @@ class VerifierExceptionHandler(val sendError: (String) -> Unit) {
 
   fun handleException(e: VerifierException){
     when (e.cause?.javaClass?.simpleName) {
-      StateHandlerException::class.simpleName -> Log.e(logTag, "Verifier State Handler Exception: ${e.cause}")
-      TransferHandlerException::class.simpleName -> Log.e(logTag, "Verifier Transfer Handler Exception: ${e.cause}")
-      else -> Log.e(logTag, "Verifier Exception: $e")
+      StateHandlerException::class.simpleName -> Log.e(logTag, "Verifier State Handler Exception: ", e)
+      TransferHandlerException::class.simpleName -> Log.e(logTag, "Verifier Transfer Handler Exception: ", e)
+      else -> Log.e(logTag, "Verifier Exception: ", e)
     }
     sendError(e.message ?: "Something went wrong in Verifier: ${e.cause}")
   }
