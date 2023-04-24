@@ -1,3 +1,6 @@
 package io.mosip.tuvali.verifier.exception
 
-open class VerifierException(message: String, cause: Throwable? = null): Exception(message, cause)
+import io.mosip.tuvali.exception.BLEException
+import io.mosip.tuvali.exception.ErrorCode
+
+open class VerifierException(message: String,  cause: Exception? = null): BLEException(message, cause, errorCode = ErrorCode.VerifierUnknownException)

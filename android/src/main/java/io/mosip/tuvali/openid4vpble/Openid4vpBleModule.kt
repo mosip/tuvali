@@ -4,11 +4,12 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
-import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
-import org.json.JSONObject
+import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
+import org.json.JSONObject
 
 class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -16,7 +17,7 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
   private var verifier: Verifier? = null
   private var wallet: Wallet? = null
   private var bleExceptionHandler = OpenIdBLEExceptionHandler(this::emitNearbyErrorEvent, this::stopBLE)
-  private val tryExecuteSync = TryExecuteSync(bleExceptionHandler);
+  private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
   //Inji contract requires double quotes around the states.
   enum class VCResponseStates(val value: String) {
@@ -193,9 +194,10 @@ class Openid4vpBleModule(private val reactContext: ReactApplicationContext) :
     emitEvent("EVENT_NEARBY", writableMap)
   }
 
-  private fun emitNearbyErrorEvent(message: String) {
+  private fun emitNearbyErrorEvent(message: String, errorCode: ErrorCode) {
     val writableMap = Arguments.createMap()
     writableMap.putString("message", message)
+    writableMap.putString("code", errorCode.code.toString())
     writableMap.putString("type", "onError")
     emitEvent("EVENT_NEARBY", writableMap)
   }

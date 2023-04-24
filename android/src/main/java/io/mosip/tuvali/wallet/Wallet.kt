@@ -15,6 +15,7 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
+import io.mosip.tuvali.exception.BLEException
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -37,7 +38,7 @@ class Wallet(
   context: Context,
   private val messageResponseListener: (String, String) -> Unit,
   private val eventResponseListener: (String) -> Unit,
-  private val handleException: (Throwable) -> Unit
+  private val handleException: (BLEException) -> Unit
 ) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
@@ -305,7 +306,7 @@ class Wallet(
     }
   }
 
-  override fun onException(exception: Exception) {
+  override fun onException(exception: BLEException) {
     handleException(WalletException("Exception in Wallet", exception))
   }
 

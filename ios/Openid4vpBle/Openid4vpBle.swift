@@ -112,9 +112,9 @@ class Openid4vpBle: RCTEventEmitter {
         return false
     }
 
-    fileprivate func handleError(_ message: String) {
+    fileprivate func handleError(_ message: String, _ code: Int) {
         wallet?.handleDestroyConnection(isSelfDisconnect: false)
-        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message, code: code)
     }
 
 }

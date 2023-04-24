@@ -5,13 +5,14 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.openid4vpble.exception.TransferHandlerException
+
 import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.wallet.transfer.message.*
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.wallet.exception.WalletTransferHandlerException
 
 const val MAX_FAILURE_FRAME_RETRY_LIMIT = 15
 
@@ -19,8 +20,8 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
   Handler(looper) {
   private lateinit var retryChunker: RetryChunker
   private val logTag = getLogTag(javaClass.simpleName)
-  private var chunkCounter = 0;
-  private var failureFrameRetryCounter = 0;
+  private var chunkCounter = 0
+  private var failureFrameRetryCounter = 0
 
   enum class States {
     UnInitialised,
@@ -107,7 +108,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
       }
       IMessage.TransferMessageTypes.INIT_RETRY_TRANSFER.ordinal -> {
         val initRetryTransferMessage = msg.obj as InitRetryTransferMessage
-        failureFrameRetryCounter++;
+        failureFrameRetryCounter++
         retryChunker = RetryChunker(chunker!!, initRetryTransferMessage.missedSequences)
         sendRetryResponseChunk()
       }
@@ -175,7 +176,7 @@ class TransferHandler(looper: Looper, private val central: Central, val serviceU
     try {
       super.dispatchMessage(msg)
     } catch (e: Exception) {
-      transferListener.onException(TransferHandlerException("Exception in Central transfer Handler", e))
+      transferListener.onException(WalletTransferHandlerException("Exception in Central transfer Handler", e))
       Log.e(logTag, "dispatchMessage " + e.message)
     }
   }

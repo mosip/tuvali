@@ -2,6 +2,7 @@ package io.mosip.tuvali.ble.central
 
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.le.ScanRecord
+import io.mosip.tuvali.exception.BLEException
 import java.util.*
 
 interface ICentralListener {
@@ -21,5 +22,5 @@ interface ICentralListener {
   fun onSubscriptionFailure(charUUID: UUID, err: Int)
   fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
   fun onClosed()
-  fun onException(exception: Exception)
+  fun onException(exception: BLEException)
 }
