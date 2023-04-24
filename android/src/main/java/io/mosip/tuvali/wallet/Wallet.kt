@@ -15,13 +15,13 @@ import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
-import io.mosip.tuvali.openid4vpble.exception.BLEException
+import io.mosip.tuvali.exception.BLEException
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
-import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
+import io.mosip.tuvali.exception.wallet.MTUNegotiationFailedException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
 import io.mosip.tuvali.wallet.transfer.TransferHandler
 import io.mosip.tuvali.wallet.transfer.message.*
@@ -29,8 +29,8 @@ import org.bouncycastle.util.encoders.Hex
 import java.security.SecureRandom
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.wallet.exception.TransferFailedException
-import io.mosip.tuvali.wallet.exception.WalletException
+import io.mosip.tuvali.exception.wallet.TransferFailedException
+import io.mosip.tuvali.exception.wallet.WalletException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 

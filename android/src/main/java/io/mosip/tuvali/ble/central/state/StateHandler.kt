@@ -8,7 +8,7 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
-import io.mosip.tuvali.ble.central.exception.CentralStateHandlerException
+import io.mosip.tuvali.exception.ble.CentralStateHandlerException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(

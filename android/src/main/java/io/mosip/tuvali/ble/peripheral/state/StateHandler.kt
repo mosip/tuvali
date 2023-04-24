@@ -10,7 +10,7 @@ import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.impl.Controller
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.ble.peripheral.exception.PeripheralStateHandlerException
+import io.mosip.tuvali.exception.ble.PeripheralStateHandlerException
 
 class StateHandler(
   looper: Looper,

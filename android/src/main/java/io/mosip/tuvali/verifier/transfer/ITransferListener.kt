@@ -1,6 +1,6 @@
 package io.mosip.tuvali.verifier.transfer
 
-import io.mosip.tuvali.openid4vpble.exception.BLEException
+import io.mosip.tuvali.exception.BLEException
 import java.util.UUID
 
 interface ITransferListener {

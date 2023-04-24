@@ -4,8 +4,8 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
-import io.mosip.tuvali.openid4vpble.exception.OpenIdBLEExceptionHandler
-import io.mosip.tuvali.openid4vpble.exception.ErrorCode
+import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet

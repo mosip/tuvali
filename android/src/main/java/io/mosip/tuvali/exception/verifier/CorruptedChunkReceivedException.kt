@@ -1,7 +1,7 @@
-package io.mosip.tuvali.verifier.exception
+package io.mosip.tuvali.exception.verifier
 
-import io.mosip.tuvali.openid4vpble.exception.BLEException
-import io.mosip.tuvali.openid4vpble.exception.ErrorCode
+import io.mosip.tuvali.exception.BLEException
+import io.mosip.tuvali.exception.ErrorCode
 
 class CorruptedChunkReceivedException(size: Int, receivedSeqNumber: Int, receivedMtuSize: Int) : BLEException(
   "size: $size, receivedSeqNumber: $receivedSeqNumber, receivedMtuSize: $receivedMtuSize",

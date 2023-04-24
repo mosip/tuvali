@@ -1,4 +1,4 @@
-package io.mosip.tuvali.openid4vpble.exception
+package io.mosip.tuvali.exception
 
 class UnknownException(message: String, cause: Exception): BLEException(message, cause, ErrorCode.UnknownException) {
 }
