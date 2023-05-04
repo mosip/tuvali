@@ -1,11 +1,8 @@
 import type { EmitterSubscription } from 'react-native';
 
-export interface OpenIDBLEShare {
+interface TuvaliModule {
   noop: () => void;
-  getConnectionParameters: () => string;
-  setConnectionParameters: (params: string) => void;
-  getConnectionParametersDebug: () => string;
-  createConnection: (mode: ConnectionMode, callback: () => void) => void;
+  createConnection: (callback: () => void) => void;
   destroyConnection: (callback: () => void) => void;
   send: (message: string, callback: () => void) => void;
   handleNearbyEvents: (
@@ -15,6 +12,14 @@ export interface OpenIDBLEShare {
     callback: (event: NearbyLog) => void
   ) => EmitterSubscription;
   setTuvaliVersion: (version: string) => void;
+}
+
+export interface Verifier extends TuvaliModule {
+  getConnectionParameters: () => string;
+}
+
+export interface Wallet extends TuvaliModule {
+  setConnectionParameters: (params: string) => void;
 }
 
 export type ConnectionMode = 'dual' | 'advertiser' | 'discoverer';
