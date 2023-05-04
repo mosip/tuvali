@@ -9,7 +9,8 @@ import com.facebook.react.uimanager.ViewManager
 class Openid4vpBlePackage : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
     return listOf(
-      Openid4vpBleModule(reactContext),
+      WalletModule(reactContext),
+      VerifierModule(reactContext),
     )
   }
 
