@@ -32,7 +32,8 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "release": "release-it",
     "clean": "del-cli android/build",
-    "bootstrap": "yarn install"
+    "bootstrap": "yarn install",
+    "prepare": "bob build"
   },
   "keywords": [
     "react-native",
