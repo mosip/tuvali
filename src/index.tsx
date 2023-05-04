@@ -8,7 +8,7 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-const Wallet: Wallet = NativeModules.WalletModule
+const wallet: Wallet = NativeModules.WalletModule
   ? NativeModules.WalletModule
   : new Proxy(
       {},
@@ -19,7 +19,7 @@ const Wallet: Wallet = NativeModules.WalletModule
       }
     );
 
-const Verifier: Verifier = NativeModules.VerifierModule
+const verifier: Verifier = NativeModules.VerifierModule
   ? NativeModules.VerifierModule
   : new Proxy(
       {},
@@ -30,8 +30,8 @@ const Verifier: Verifier = NativeModules.VerifierModule
       }
     );
 
-setupModule(Verifier);
-setupModule(Wallet);
+setupModule(verifier);
+setupModule(wallet);
 
 //
 // ErrorUtils.setGlobalHandler((error, isFatal) => {
@@ -71,6 +71,6 @@ function setupModule(module: any) {
 }
 
 export default {
-  Verifier,
-  Wallet,
+  verifier,
+  wallet,
 };
