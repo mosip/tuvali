@@ -128,6 +128,6 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
 
   companion object {
     var tuvaliVersion: String = "unknown"
-    const val NAME = "Verifier"
+    const val NAME = "VerifierModule"
   }
 }

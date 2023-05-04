@@ -128,6 +128,6 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
 
   companion object {
     var tuvaliVersion: String = "unknown"
-    const val NAME = "Wallet"
+    const val NAME = "WalletModule"
   }
 }
