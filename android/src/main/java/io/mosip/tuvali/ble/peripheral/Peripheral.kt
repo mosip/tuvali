@@ -88,4 +88,8 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   private fun disconnectAndClose(delay: Long) {
     messageSender.sendMessageDelayed(DisconnectAndCloseMessage(), delay)
   }
+
+  fun isAdvertisementStarted(): Boolean {
+    return messageSender.getCurrentState() > StateHandler.States.Advertising
+  }
 }
