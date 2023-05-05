@@ -6,7 +6,7 @@ package io.mosip.tuvali.exception
 // Component+ROLE --> TVW(Tuvali+Wallet) | TVV(Tuvali+Verifier) | TUV(Tuvali where role is unknown)
 // UNK --> If stage is not known
 
-enum class ErrorCode(val code: String) {
+enum class ErrorCode(val value: String) {
   UnknownException("TUV_UNK_001"),
 
   WalletUnknownException("TVW_UNK_001"),

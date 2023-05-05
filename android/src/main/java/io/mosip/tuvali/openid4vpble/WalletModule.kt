@@ -2,37 +2,20 @@ package io.mosip.tuvali.openid4vpble
 
 import android.util.Log
 import com.facebook.react.bridge.*
-import com.facebook.react.modules.core.DeviceEventManagerModule.RCTDeviceEventEmitter
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
-import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.verifier.Verifier
 import io.mosip.tuvali.wallet.Wallet
-import org.json.JSONObject
 
 class WalletModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
-  private val reactUtils = ReactUtils(reactContext)
+  private val eventEmitter = EventEmitter(reactContext)
   private val logTag = getLogTag(javaClass.simpleName)
   private var wallet: Wallet? = null
-  private var bleExceptionHandler = OpenIdBLEExceptionHandler(reactUtils::emitNearbyErrorEvent, this::stopBLE)
+  private var bleExceptionHandler = OpenIdBLEExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
-  //Inji contract requires double quotes around the states.
-  enum class VCResponseStates(val value: String) {
-    RECEIVED("\"RECEIVED\""),
-    ACCEPTED("\"ACCEPTED\""),
-    REJECTED("\"REJECTED\"")
-  }
-
-  enum class NearbyEvents(val value: String) {
-    EXCHANGE_RECEIVER_INFO("exchange-receiver-info"),
-    EXCHANGE_SENDER_INFO("exchange-sender-info"),
-    SEND_VC("send-vc"),
-    SEND_VC_RESPONSE("send-vc:response")
-  }
 
   override fun getName(): String {
     return NAME
@@ -45,44 +28,32 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
 
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun setConnectionParameters(params: String) {
-    Log.d(logTag, "setConnectionParameters at ${System.nanoTime()}")
+  fun startConnection(advIdentifier: String, advPayload: String) {
+    Log.d(logTag, "startConnection with advIdentifier $advIdentifier , firstPartOfVerifierPK $advPayload at ${System.nanoTime()}")
 
     tryExecuteSync.run {
       if (wallet == null) {
-        Log.d(logTag, "synchronized setConnectionParameters new wallet object at ${System.nanoTime()}")
-        wallet = Wallet(reactContext, reactUtils::emitNearbyMessage, reactUtils::emitNearbyEvent, bleExceptionHandler::handleException)
+        Log.d(logTag, "synchronized startConnection new wallet object with advIdentifier $advIdentifier , firstPartOfVerifierPK $advPayload at ${System.nanoTime()}")
+        wallet = Wallet(reactContext, eventEmitter, bleExceptionHandler::handleException)
       }
-      val paramsObj = JSONObject(params)
-      val firstPartOfPk = paramsObj.getString("pk")
-      Log.d(
-        logTag,
-        "synchronized setConnectionParameters called with $params and $firstPartOfPk at ${System.nanoTime()}"
-      )
-      wallet?.setAdvIdentifier(firstPartOfPk)
-    }
-  }
 
-  @ReactMethod
-  fun createConnection(callback: Callback) {
-    Log.d(logTag, "createConnection: received request at ${System.nanoTime()}")
-
-    tryExecuteSync.run {
-      Log.d(logTag, "synchronized createConnection: received request at ${System.nanoTime()}")
-      wallet?.startScanning("OVPMOSIP", callback)
+      wallet?.setAdvPayload(advPayload)
+      wallet?.startScanning(advIdentifier)
     }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun destroyConnection(callback: Callback) {
+  fun disconnect() {
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
-      stopBLE(callback)
+      stopBLE {
+        eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.DISCONNECTED)
+      }
     }
   }
 
-  private fun stopBLE(callback: Callback) {
+  private fun stopBLE(callback: () -> Unit) {
     if (wallet == null) {
       callback()
     } else {
@@ -91,7 +62,7 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
     }
   }
 
-  private fun stopWallet(onDestroy: Callback) {
+  private fun stopWallet(onDestroy: () -> Unit) {
     try {
       wallet?.stop(onDestroy)
     } catch (e: Exception) {
@@ -105,24 +76,10 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun send(message: String, callback: Callback) {
-    Log.d(logTag, "send: message $message at ${System.nanoTime()}")
-
+  fun sendData(vc: String) {
+    Log.d(logTag, "send: message $vc at ${System.nanoTime()}")
     tryExecuteSync.run {
-      val messageSplits = message.split("\n", limit = 2)
-      when (messageSplits[0]) {
-        NearbyEvents.EXCHANGE_SENDER_INFO.value -> {
-          callback()
-          wallet?.writeToIdentifyRequest()
-        }
-        NearbyEvents.SEND_VC.value -> {
-          callback()
-          wallet?.sendData(messageSplits[1])
-        }
-        else -> {
-          Log.d(logTag, "send: received send with unrecognized event")
-        }
-      }
+      wallet?.sendData(vc)
     }
   }
 

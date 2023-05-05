@@ -2,27 +2,25 @@ import type { EmitterSubscription } from 'react-native';
 
 interface TuvaliModule {
   noop: () => void;
-  createConnection: (callback: () => void) => void;
-  destroyConnection: (callback: () => void) => void;
-  send: (message: string, callback: () => void) => void;
-  handleNearbyEvents: (
-    callback: (events: NearbyEvent) => void
-  ) => EmitterSubscription;
-  handleLogEvents: (
-    callback: (event: NearbyLog) => void
-  ) => EmitterSubscription;
+  disconnect: () => void;
+  send: (message: string) => void;
   setTuvaliVersion: (version: string) => void;
 }
 
 export interface Verifier extends TuvaliModule {
-  getConnectionParameters: () => string;
+  startAdvertisement: (advIdentifier: String) => string;
+  sendVerificationStatus: (status: String) => void;
+  handleDataEvents: (
+    callback: (events: VerifierDataEvent) => void
+  ) => EmitterSubscription;
 }
 
 export interface Wallet extends TuvaliModule {
-  setConnectionParameters: (params: string) => void;
+  startConnection: (advIdentifier: String, advPayload: String) => void;
+  handleDataEvents: (
+    callback: (events: WalletDataEvent) => void
+  ) => EmitterSubscription;
 }
-
-export type ConnectionMode = 'dual' | 'advertiser' | 'discoverer';
 
 export type TransferUpdateStatus =
   | 'SUCCESS'
@@ -30,11 +28,46 @@ export type TransferUpdateStatus =
   | 'IN_PROGRESS'
   | 'CANCELLED';
 
-export type NearbyEvent =
-  | { type: 'msg'; data: string }
-  | { type: 'transferupdate'; data: TransferUpdateStatus }
-  | { type: 'onDisconnected'; data: string }
-  | { type: 'onError'; message: string; code: string };
+export type VerificationStatus = 'APPROVED' | 'REJECTED';
+
+export type ConnectedEvent = { type: 'onConnected' };
+
+export type KeyExchangeSuccess = { type: 'onKeyExchangeSuccess' };
+
+export type TransferStatusUpdateEvent = {
+  type: 'onTransferStatusUpdate';
+  status: TransferUpdateStatus;
+};
+
+export type VCReceivedEvent = {
+  type: 'onVCReceived';
+  vc: string;
+};
+
+export type VerificationStatusEvent = {
+  type: 'onVerificationStatusReceived';
+  status: VerificationStatus;
+};
+
+export type DisconnectedEvent = {
+  type: 'onDisconnected';
+};
+
+export type ErrorEvent = {
+  type: 'onError';
+  message: string;
+  code: string;
+};
+
+export type CommonDataEvent =
+  | ConnectedEvent
+  | TransferStatusUpdateEvent
+  | DisconnectedEvent
+  | ErrorEvent;
+
+export type WalletDataEvent = CommonDataEvent;
+
+export type VerifierDataEvent = CommonDataEvent | VCReceivedEvent;
 
 export interface NearbyLog {
   log: string;
