@@ -41,7 +41,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
 
       verifier?.startAdvertisement(advIdentifier)
 
-      return@run payload
+      return@run "OPENID4VP://$payload"
     }.orEmpty()
   }
 
