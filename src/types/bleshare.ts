@@ -65,7 +65,7 @@ export type CommonDataEvent =
   | DisconnectedEvent
   | ErrorEvent;
 
-export type WalletDataEvent = CommonDataEvent;
+export type WalletDataEvent = CommonDataEvent | VerificationStatusEvent;
 
 export type VerifierDataEvent = CommonDataEvent | VCReceivedEvent;
 
