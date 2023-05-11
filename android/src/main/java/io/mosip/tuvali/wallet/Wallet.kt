@@ -260,7 +260,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          eventEmitter.emitVerificationStatusEvent(EventEmitter.VerificationStatus.APPROVED)
+          eventEmitter.emitVerificationStatusEvent(EventEmitter.VerificationStatus.ACCEPTED)
         } else {
           eventEmitter.emitVerificationStatusEvent(EventEmitter.VerificationStatus.REJECTED)
         }

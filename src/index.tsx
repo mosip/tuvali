@@ -54,19 +54,15 @@ function setupModule(module: any) {
 
   if (Platform.OS === 'android') {
     const eventEmitter = new NativeEventEmitter();
-    module.handleNearbyEvents = (callback: (event: any) => void) =>
-      eventEmitter.addListener('EVENT_NEARBY', callback);
-    module.handleLogEvents = (callback: (event: any) => void) =>
-      eventEmitter.addListener('EVENT_LOG', callback);
+    module.handleDataEvents = (callback: (event: any) => void) =>
+      eventEmitter.addListener('DATA_EVENT', callback);
   }
 
   if (Platform.OS === 'ios') {
     console.log(`IOS PLATFORM`);
     const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
-    module.handleNearbyEvents = (callback: (event: any) => void) =>
-      eventEmitter.addListener('EVENT_NEARBY', callback);
-    module.handleLogEvents = (callback: (event: any) => void) =>
-      eventEmitter.addListener('EVENT_LOG', callback);
+    module.handleDataEvents = (callback: (event: any) => void) =>
+      eventEmitter.addListener('DATA_EVENT', callback);
   }
 }
 

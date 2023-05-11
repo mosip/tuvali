@@ -67,7 +67,7 @@ class EventEmitter(private val reactContext: ReactApplicationContext) {
   }
 
   enum class VerificationStatus(val value: String) {
-    APPROVED("APPROVED"), REJECTED("REJECTED")
+    ACCEPTED("ACCEPTED"), REJECTED("REJECTED")
   }
 
 }

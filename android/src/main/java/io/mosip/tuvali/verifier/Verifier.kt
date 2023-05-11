@@ -131,6 +131,7 @@ class Verifier(
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPubKey)
           peripheral.enableCommunication()
           peripheral.stopAdvertisement()
+          eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.KEY_EXCHANGE_SUCCESS)
         }
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {

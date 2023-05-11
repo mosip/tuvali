@@ -3,7 +3,6 @@ import type { EmitterSubscription } from 'react-native';
 interface TuvaliModule {
   noop: () => void;
   disconnect: () => void;
-  send: (message: string) => void;
   setTuvaliVersion: (version: string) => void;
 }
 
@@ -17,6 +16,7 @@ export interface Verifier extends TuvaliModule {
 
 export interface Wallet extends TuvaliModule {
   startConnection: (advIdentifier: String, advPayload: String) => void;
+  sendData: (message: string) => void;
   handleDataEvents: (
     callback: (events: WalletDataEvent) => void
   ) => EmitterSubscription;
@@ -28,7 +28,7 @@ export type TransferUpdateStatus =
   | 'IN_PROGRESS'
   | 'CANCELLED';
 
-export type VerificationStatus = 'APPROVED' | 'REJECTED';
+export type VerificationStatus = 'ACCEPTED' | 'REJECTED';
 
 export type ConnectedEvent = { type: 'onConnected' };
 
@@ -63,17 +63,9 @@ export type CommonDataEvent =
   | ConnectedEvent
   | TransferStatusUpdateEvent
   | DisconnectedEvent
-  | ErrorEvent;
+  | ErrorEvent
+  | KeyExchangeSuccess;
 
 export type WalletDataEvent = CommonDataEvent | VerificationStatusEvent;
 
 export type VerifierDataEvent = CommonDataEvent | VCReceivedEvent;
-
-export interface NearbyLog {
-  log: string;
-}
-
-export interface ConnectionParameters {
-  cid: string;
-  pk: string;
-}
