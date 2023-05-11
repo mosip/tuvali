@@ -83,7 +83,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "sendVerificationStatus status $status at ${System.nanoTime()}")
 
     tryExecuteSync.run {
-          verifier?.notifyVerificationStatus(status == EventEmitter.VerificationStatus.APPROVED.value)
+      verifier?.notifyVerificationStatus(status == EventEmitter.VerificationStatus.ACCEPTED.value)
     }
   }
   companion object {
