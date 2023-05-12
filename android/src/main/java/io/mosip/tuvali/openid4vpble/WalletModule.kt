@@ -28,18 +28,18 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
 
 
   @ReactMethod(isBlockingSynchronousMethod = true)
-  fun startConnection(advIdentifier: String, uri: String) {
-    Log.d(logTag, "startConnection with advIdentifier $advIdentifier , firstPartOfVerifierPK $uri at ${System.nanoTime()}")
+  fun startConnection( uri: String) {
+    Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
     tryExecuteSync.run {
       val advPayload = uri.split("OPENID4VP://")[1]
       if (wallet == null) {
-        Log.d(logTag, "synchronized startConnection new wallet object with advIdentifier $advIdentifier , firstPartOfVerifierPK $advPayload at ${System.nanoTime()}")
+        Log.d(logTag, "synchronized startConnection new wallet object with firstPartOfVerifierPK $advPayload at ${System.nanoTime()}")
         wallet = Wallet(reactContext, eventEmitter, bleExceptionHandler::handleException)
       }
 
       wallet?.setAdvPayload(advPayload)
-      wallet?.startScanning(advIdentifier)
+      wallet?.startScanning()
     }
   }
 
@@ -77,10 +77,10 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun sendData(vc: String) {
-    Log.d(logTag, "send: message $vc at ${System.nanoTime()}")
+  fun sendData(data: String) {
+    Log.d(logTag, "send: message $data at ${System.nanoTime()}")
     tryExecuteSync.run {
-      wallet?.sendData(vc)
+      wallet?.sendData(data)
     }
   }
 

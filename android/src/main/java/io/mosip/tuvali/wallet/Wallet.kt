@@ -71,8 +71,8 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
     handlerThread.quitSafely()
   }
 
-  fun startScanning(advIdentifier: String) {
-    central.scan(Verifier.SERVICE_UUID, advIdentifier)
+  fun startScanning() {
+    central.scan(Verifier.SERVICE_UUID)
   }
 
   fun writeToIdentifyRequest() {

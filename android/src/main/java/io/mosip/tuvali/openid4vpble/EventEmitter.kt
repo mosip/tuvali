@@ -50,7 +50,10 @@ class EventEmitter(private val reactContext: ReactApplicationContext) {
   }
 
   enum class TransferUpdateStatus(val value: String) {
-    SUCCESS("SUCCESS"), FAILURE("FAILURE"), IN_PROGRESS("IN_PROGRESS"), CANCELLED("CANCELLED")
+    SUCCESS("SUCCESS"),
+    FAILURE("FAILURE"),
+    IN_PROGRESS("IN_PROGRESS"),
+    CANCELLED("CANCELLED")
   }
 
   enum class EventTypeWithoutData(val value: String) {
@@ -67,7 +70,8 @@ class EventEmitter(private val reactContext: ReactApplicationContext) {
   }
 
   enum class VerificationStatus(val value: String) {
-    ACCEPTED("ACCEPTED"), REJECTED("REJECTED")
+    ACCEPTED("ACCEPTED"),
+    REJECTED("REJECTED")
   }
 
 }

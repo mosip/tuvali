@@ -37,7 +37,7 @@
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
 		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
-		F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */ = {isa = PBXBuildFile; fileRef = F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */; };
+		E8D889492A0E053A00C250CA /* WalletModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D889482A0E053A00C250CA /* WalletModule.swift */; };
 		FD494F4D29ADBE00002612C1 /* BackOffStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */; };
 		FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA18F3E2977B69A00290433 /* CRC16.swift */; };
 		FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */; };
@@ -89,8 +89,8 @@
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
 		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
+		E8D889482A0E053A00C250CA /* WalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletModule.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
-		F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBle.swift; sourceTree = "<group>"; };
 		FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackOffStrategy.swift; path = ble/Utility/BackOffStrategy.swift; sourceTree = "<group>"; };
 		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
@@ -154,7 +154,7 @@
 			isa = PBXGroup;
 			children = (
 				8D069F742968305A00AB61A9 /* EventEmitter.swift */,
-				F4FF95D6245B92E800C19C63 /* Openid4vpBle.swift */,
+				E8D889482A0E053A00C250CA /* WalletModule.swift */,
 			);
 			path = Openid4vpBle;
 			sourceTree = "<group>";
@@ -341,6 +341,7 @@
 				E223F0322977BE090042F919 /* TransferHandler.swift in Sources */,
 				8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */,
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
+				E8D889492A0E053A00C250CA /* WalletModule.swift in Sources */,
 				0D36889829A782AA000B12CD /* ErrorHandler.swift in Sources */,
 				8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */,
 				E2399AA329D5ED140017C313 /* VerifierExceptionHandler.swift in Sources */,
@@ -368,7 +369,6 @@
 				8D31C3F62956AF460073B710 /* CryptoConstants.swift in Sources */,
 				8D179C9129548B9A00017EE5 /* CipherPackage.swift in Sources */,
 				0ACACE8A2966D8C800DABDFE /* Util.swift in Sources */,
-				F4FF95D7245B92E800C19C63 /* Openid4vpBle.swift in Sources */,
 				E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */,
 				8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */,
 				8D31C3FC2956B20F0073B710 /* WalletCryptoBox.swift in Sources */,

@@ -15,8 +15,8 @@ export interface Verifier extends TuvaliModule {
 }
 
 export interface Wallet extends TuvaliModule {
-  startConnection: (advIdentifier: String, advPayload: String) => void;
-  sendData: (message: string) => void;
+  startConnection: (advPayload: String) => void;
+  sendData: (data: string) => void;
   handleDataEvents: (
     callback: (events: WalletDataEvent) => void
   ) => EmitterSubscription;

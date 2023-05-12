@@ -43,7 +43,7 @@ class Wallet: NSObject {
     }
 
     func onDeviceDisconnected(){
-        EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
+        EventEmitter.sharedInstance.emitDataEvent(eventType: EventEmitter.EventTypeWithoutData.DISCONNECTED)
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
