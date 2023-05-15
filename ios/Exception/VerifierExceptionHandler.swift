@@ -17,4 +17,15 @@ extension VerifierErrorEnum: CustomStringConvertible {
             return "Minimum 512 MTU is required for VC transfer"
         }
     }
+    
+    public var code: String {
+           switch self {
+           case .corruptedChunkReceived:
+               return "TVV_TRA_001"
+           case .tooManyFailureChunks:
+               return "TVV_TRA_002"
+           case .unsupportedMTUSizeException:
+               return "TVV_CON_001"
+           }
+       }
 }

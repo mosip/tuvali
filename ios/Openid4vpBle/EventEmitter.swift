@@ -31,10 +31,10 @@ class EventEmitter {
         dispatch(name: "EVENT_NEARBY", body: eventData)
     }
     
-    func emitNearbyErrorEvent(message: String, code: Int) {
+    func emitNearbyErrorEvent(message: String, code: String) {
         var eventData: [String: String] = [:]
         eventData["message"] = message
-        eventData["code"] = String(code)
+        eventData["code"] = code
         eventData["type"] = "onError"
         
         dispatch(name: "EVENT_NEARBY", body: eventData)
