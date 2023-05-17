@@ -3,7 +3,7 @@ import Foundation
 class ErrorHandler {
     public static var sharedInstance = ErrorHandler()
     private var walletExceptionHandler: WalletExceptionHandler?
-    private var onError: ((_ message: String) -> Void)?
+    private var onError: ((_ message: String, _ code: String) -> Void)?
 
     private init() {}
 
@@ -16,14 +16,14 @@ class ErrorHandler {
         }
     }
 
-    func setOnError(onError: @escaping (_ message: String) -> Void) {
+    func setOnError(onError: @escaping (_ message: String. _ code: String) -> Void) {
         self.onError = onError
         walletExceptionHandler = WalletExceptionHandler(error: self.onError!)
     }
 
     private func handleUnknownException(error: WalletErrorEnum) {
         os_log(.error, "Error in OpenID4vBLE: %{public}@", error.description)
-        self.onError?(error.description)
+        self.onError?(error.description, error.code)
     }
 }
 
