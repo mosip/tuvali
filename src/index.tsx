@@ -8,6 +8,9 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
+const VERIFIER_NOT_IMPLEMENTATED_ERROR = `Verifier is not yet implemented on IOS. Please remove Verifier usage on IOS Platform`;
+const isIOS = Platform.OS === 'ios';
+
 const wallet: Wallet = NativeModules.WalletModule
   ? NativeModules.WalletModule
   : new Proxy(
@@ -19,18 +22,24 @@ const wallet: Wallet = NativeModules.WalletModule
       }
     );
 
-const verifier: Verifier = NativeModules.VerifierModule
+// TODO: Use Actual Verifier module on IOS once Verifier is implemented
+let verifier: Verifier = NativeModules.VerifierModule
   ? NativeModules.VerifierModule
   : new Proxy(
       {},
       {
         get() {
-          throw new Error(LINKING_ERROR);
+          throw new Error(
+            isIOS ? VERIFIER_NOT_IMPLEMENTATED_ERROR : LINKING_ERROR
+          );
         },
       }
     );
 
-setupModule(verifier);
+if (!isIOS) {
+  setupModule(verifier);
+}
+
 setupModule(wallet);
 
 //
@@ -58,9 +67,9 @@ function setupModule(module: any) {
       eventEmitter.addListener('DATA_EVENT', callback);
   }
 
-  if (Platform.OS === 'ios') {
+  if (isIOS) {
     console.log(`IOS PLATFORM`);
-    const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
+    const eventEmitter = new NativeEventEmitter(module);
     module.handleDataEvents = (callback: (event: any) => void) =>
       eventEmitter.addListener('DATA_EVENT', callback);
   }

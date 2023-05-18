@@ -19,7 +19,7 @@ class EventEmitter {
 
     func emitDataEvent(eventType: EventTypeWithoutData) {
         let writableMap = NSMutableDictionary()
-        writableMap["type"] = eventType
+        writableMap["type"] = eventType.rawValue
         dispatch(name: EVENT_NAME, body: writableMap)
     }
 

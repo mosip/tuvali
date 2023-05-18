@@ -16,7 +16,7 @@ class ErrorHandler {
         }
     }
 
-    func setOnError(onError: @escaping (_ message: String. _ code: String) -> Void) {
+    func setOnError(onError: @escaping (_ message: String, _ code: String) -> Void) {
         self.onError = onError
         walletExceptionHandler = WalletExceptionHandler(error: self.onError!)
     }
