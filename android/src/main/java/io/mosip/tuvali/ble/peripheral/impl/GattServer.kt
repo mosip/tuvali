@@ -74,7 +74,6 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
       Log.i(logTag, "Connection initiated to central: $connect with device address: ${device?.address}")
 
       onDeviceConnectedCallback(status, newState)
-      device?.let { setPhy(it) }
       device
     } else {
       Log.i(logTag,"Received disconnect from central with device address: ${device?.address}")
@@ -88,14 +87,6 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     val allowedMTU = min( mtu, MAX_ALLOWED_MTU_VALUE)
     Log.d(logTag, "successfully changed mtu to $allowedMTU")
     onMTUChangedCallback(allowedMTU)
-  }
-
-  private fun setPhy(bluetoothDevice: BluetoothDevice) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      gattServer.readPhy(bluetoothDevice)
-      gattServer.setPreferredPhy(bluetoothDevice, 2, 2, 0)
-      gattServer.readPhy(bluetoothDevice)
-    }
   }
 
   override fun onCharacteristicWriteRequest(
@@ -142,14 +133,6 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     if (responseNeeded) {
       gattServer.sendResponse(device, requestId, BluetoothGatt.GATT_SUCCESS, 0, null)
     }
-  }
-
-  override fun onPhyRead(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
-    Log.d(logTag, "Peripheral onPhyRead: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
-  }
-
-  override fun onPhyUpdate(device: BluetoothDevice?, txPhy: Int, rxPhy: Int, status: Int) {
-    Log.d(logTag, "Peripheral onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
   }
 
   fun disconnect(): Boolean {

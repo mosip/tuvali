@@ -61,14 +61,6 @@ class GattClient(var context: Context) {
       }
     }
 
-    override fun onPhyRead(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
-      Log.d(logTag, "Central onPhyRead: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
-    }
-
-    override fun onPhyUpdate(gatt: BluetoothGatt?, txPhy: Int, rxPhy: Int, status: Int) {
-      Log.d(logTag, "Central onPhyUpdate: txPhy: $txPhy, rxPhy: $rxPhy, status: $status")
-    }
-
     override fun onCharacteristicRead(
       gatt: BluetoothGatt?,
       characteristic: BluetoothGattCharacteristic?,
@@ -177,9 +169,6 @@ class GattClient(var context: Context) {
     // TODO: In case device is never connected, how do we know?
 
     gatt.requestConnectionPriority(CONNECTION_PRIORITY_HIGH)
-    gatt.readPhy()
-    gatt.setPreferredPhy(2, 2, 0)
-    gatt.readPhy()
     this.bluetoothGatt = gatt
   }
 
