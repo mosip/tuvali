@@ -17,64 +17,23 @@ class EventEmitter {
         EventEmitter.eventEmitter.sendEvent(withName: name, body: body)
     }
 
-    func emitDataEvent(eventType: EventTypeWithoutData) {
+    func emitEventWithoutArgs(event: EventWithoutArgs) {
         let writableMap = NSMutableDictionary()
-        writableMap["type"] = eventType.rawValue
+        writableMap["type"] = event.type
         dispatch(name: EVENT_NAME, body: writableMap)
     }
 
-    func emitTransferUpdateEvent(status: TransferUpdateStatus) {
+    func emitEventWithArgs(event: EventWithArgs) {
         let writableMap = NSMutableDictionary()
-        writableMap["type"] = EventTypeWithData.TRANSFER_STATUS_UPDATE.rawValue
-        writableMap["status"] = status.rawValue
+        writableMap["type"] = event.type
+        writableMap.addEntries(from: event.getData())
         dispatch(name: EVENT_NAME, body: writableMap)
     }
 
     func emitErrorEvent(message: String, code: String) {
         var eventData: [String: String] = [:]
         eventData["message"] = message
-        eventData["code"] = String(code)
-        eventData["type"] = EventTypeWithData.ERROR.rawValue
-        dispatch(name: EVENT_NAME, body: eventData)
-    }
-
-    func emitVCReceivedEvent(vc: String) {
-        let writableMap = NSMutableDictionary()
-        writableMap["type"] = EventTypeWithData.VC_RECEIVED.rawValue
-        writableMap["vc"] = vc
-        dispatch(name: EVENT_NAME, body: writableMap)
-    }
-
-    func emitVerificationStatusEvent(status: VerificationStatus) {
-        let writableMap = NSMutableDictionary()
-        writableMap["type"] = EventTypeWithData.VERIFICATION_STATUS.rawValue
-        writableMap["status"] = status.rawValue
-        dispatch(name: EVENT_NAME, body: writableMap)
-    }
-
-    enum TransferUpdateStatus: String {
-        case SUCCESS = "SUCCESS"
-        case FAILURE = "FAILURE"
-        case IN_PROGRESS = "IN_PROGRESS"
-        case CANCELLED = "CANCELLED"
-    }
-
-    enum EventTypeWithoutData: String {
-        case CONNECTED = "onConnected"
-        case KEY_EXCHANGE_SUCCESS = "onKeyExchangeSuccess"
-        case DISCONNECTED = "onDisconnected"
-    }
-
-    enum EventTypeWithData: String {
-        case TRANSFER_STATUS_UPDATE = "onTransferStatusUpdate"
-        case VC_RECEIVED = "onVCReceived"
-        case ERROR = "onError"
-        case VERIFICATION_STATUS = "onVerificationStatusReceived"
-    }
-
-    enum VerificationStatus: String {
-        case ACCEPTED = "ACCEPTED"
-        case REJECTED = "REJECTED"
+        emitEventWithArgs(event: ErrorEvent(message: message, code: code))
     }
 
     lazy var allEvents: [String] = {

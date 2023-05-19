@@ -30,7 +30,7 @@ class WalletModule: RCTEventEmitter {
         wallet?.setAdvIdentifier(identifier: advPayload)
         wallet?.startScanning()
         wallet?.createConnection = {
-            EventEmitter.sharedInstance.emitDataEvent(eventType: EventEmitter.EventTypeWithoutData.CONNECTED)
+            EventEmitter.sharedInstance.emitEventWithoutArgs(event: ConnectedEvent())
             self.wallet?.writeToIdentifyRequest()
         }
     }

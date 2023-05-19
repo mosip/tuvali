@@ -11,6 +11,10 @@ import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.exception.BLEException
 import io.mosip.tuvali.openid4vpble.EventEmitter
+import io.mosip.tuvali.openid4vpble.events.withArgs.DataReceivedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.ConnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.SecureChannelEstablishedEvent
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
@@ -131,7 +135,7 @@ class Verifier(
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPubKey)
           peripheral.enableCommunication()
           peripheral.stopAdvertisement()
-          eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.KEY_EXCHANGE_SUCCESS)
+          eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
         }
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
@@ -202,7 +206,7 @@ class Verifier(
     Log.d(logTag, "onDeviceConnected: sending event")
     // Avoid spurious device connected events to be sent to higher layer before advertisement starts successfully
     if (peripheral.isAdvertisementStarted()) {
-      eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.CONNECTED)
+      eventEmitter.emitEventWithoutArgs(ConnectedEvent())
     }
   }
 
@@ -219,7 +223,7 @@ class Verifier(
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if (!isManualDisconnect && isConnected) {
-      eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.DISCONNECTED)
+      eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
     }
   }
 
@@ -231,7 +235,7 @@ class Verifier(
         Log.d(logTag, "decryptedData size: ${decryptedData.size}")
         val decompressedData = Util.decompress(decryptedData)
         Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-        eventEmitter.emitVCReceivedEvent(String(decompressedData!!))
+        eventEmitter.emitEventWithArgs(DataReceivedEvent(String(decompressedData!!)))
       } else {
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error

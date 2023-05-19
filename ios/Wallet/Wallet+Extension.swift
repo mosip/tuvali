@@ -12,7 +12,7 @@ extension Wallet: WalletProtocol {
     }
 
     func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitDataEvent(eventType: EventEmitter.EventTypeWithoutData.KEY_EXCHANGE_SUCCESS)
+        EventEmitter.sharedInstance.emitEventWithoutArgs(event: SecureChannelEstablishedEvent())
     }
 
     func onDisconnectStatusChange(data: Data?) {

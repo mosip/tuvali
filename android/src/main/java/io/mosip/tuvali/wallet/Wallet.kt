@@ -15,6 +15,11 @@ import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.exception.BLEException
 import io.mosip.tuvali.openid4vpble.EventEmitter
+import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.ConnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DataSentEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.SecureChannelEstablishedEvent
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -175,7 +180,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
     Log.d(logTag, "onRequestMTUSuccess")
     maxDataBytes = mtu
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
-    eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.CONNECTED)
+    eventEmitter.emitEventWithoutArgs(ConnectedEvent())
     writeToIdentifyRequest()
   }
 
@@ -202,7 +207,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
     synchronized(connectionMutex) {
       connectionState = VerifierConnectionState.NOT_CONNECTED
       if (!isManualDisconnect) {
-          eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.DISCONNECTED)
+          eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
       }
     }
   }
@@ -227,7 +232,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.KEY_EXCHANGE_SUCCESS)
+        eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -243,7 +248,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
   }
 
   override fun onResponseSent() {
-    eventEmitter.emitTransferUpdateEvent(EventEmitter.TransferUpdateStatus.SUCCESS)
+    eventEmitter.emitEventWithoutArgs(DataSentEvent())
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -260,9 +265,9 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          eventEmitter.emitVerificationStatusEvent(EventEmitter.VerificationStatus.ACCEPTED)
+          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
         } else {
-          eventEmitter.emitVerificationStatusEvent(EventEmitter.VerificationStatus.REJECTED)
+          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)

@@ -22,26 +22,19 @@ export interface Wallet extends TuvaliModule {
   ) => EmitterSubscription;
 }
 
-export type TransferUpdateStatus =
-  | 'SUCCESS'
-  | 'FAILURE'
-  | 'IN_PROGRESS'
-  | 'CANCELLED';
-
 export type VerificationStatus = 'ACCEPTED' | 'REJECTED';
 
 export type ConnectedEvent = { type: 'onConnected' };
 
-export type KeyExchangeSuccess = { type: 'onKeyExchangeSuccess' };
+export type SecureChannelEstablished = { type: 'onSecureChannelEstablished' };
 
-export type TransferStatusUpdateEvent = {
-  type: 'onTransferStatusUpdate';
-  status: TransferUpdateStatus;
+export type DataReceivedEvent = {
+  type: 'onDataReceived';
+  data: string;
 };
 
-export type VCReceivedEvent = {
-  type: 'onVCReceived';
-  vc: string;
+export type DataSentEvent = {
+  type: 'onDataSent';
 };
 
 export type VerificationStatusEvent = {
@@ -61,11 +54,13 @@ export type ErrorEvent = {
 
 export type CommonDataEvent =
   | ConnectedEvent
-  | TransferStatusUpdateEvent
   | DisconnectedEvent
   | ErrorEvent
-  | KeyExchangeSuccess;
+  | SecureChannelEstablished;
 
-export type WalletDataEvent = CommonDataEvent | VerificationStatusEvent;
+export type WalletDataEvent =
+  | CommonDataEvent
+  | VerificationStatusEvent
+  | DataSentEvent;
 
-export type VerifierDataEvent = CommonDataEvent | VCReceivedEvent;
+export type VerifierDataEvent = CommonDataEvent | DataReceivedEvent;

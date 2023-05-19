@@ -4,6 +4,7 @@ import android.util.Log
 import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.Wallet
 
@@ -13,7 +14,7 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
   private val eventEmitter = EventEmitter(reactContext)
   private val logTag = getLogTag(javaClass.simpleName)
   private var wallet: Wallet? = null
-  private var bleExceptionHandler = OpenIdBLEExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
+  private var bleExceptionHandler = OpenIdBLEExceptionHandler(eventEmitter::emitError, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
 
@@ -49,7 +50,7 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
       stopBLE {
-        eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.DISCONNECTED)
+        eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
       }
     }
   }

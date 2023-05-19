@@ -3,7 +3,11 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
+import io.mosip.tuvali.openid4vpble.events.withArgs.ErrorEvent
+import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.Verifier
 
@@ -13,7 +17,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
   private val eventEmitter = EventEmitter(reactContext)
   private val logTag = getLogTag(javaClass.simpleName)
   private var verifier: Verifier? = null
-  private var bleExceptionHandler = OpenIdBLEExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
+  private var bleExceptionHandler = OpenIdBLEExceptionHandler(eventEmitter::emitError, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
 
@@ -56,7 +60,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
-      stopBLE { eventEmitter.emitDataEvent(EventEmitter.EventTypeWithoutData.DISCONNECTED) }
+      stopBLE { eventEmitter.emitEventWithoutArgs(DisconnectedEvent()) }
     }
   }
 
@@ -83,9 +87,10 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "sendVerificationStatus status $status at ${System.nanoTime()}")
 
     tryExecuteSync.run {
-      verifier?.notifyVerificationStatus(status == EventEmitter.VerificationStatus.ACCEPTED.value)
+      verifier?.notifyVerificationStatus(status == VerificationStatusEvent.VerificationStatus.ACCEPTED.value)
     }
   }
+
   companion object {
     var tuvaliVersion: String = "unknown"
     const val NAME = "VerifierModule"
