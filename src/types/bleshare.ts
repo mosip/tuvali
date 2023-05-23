@@ -1,4 +1,6 @@
 import type { EmitterSubscription } from 'react-native';
+import type { VerifierDataEvent, WalletDataEvent } from './events';
+import type { VerificationStatus } from './events';
 
 interface TuvaliModule {
   noop: () => void;
@@ -8,7 +10,7 @@ interface TuvaliModule {
 
 export interface Verifier extends TuvaliModule {
   startAdvertisement: (advIdentifier: String) => string;
-  sendVerificationStatus: (status: String) => void;
+  sendVerificationStatus: (status: VerificationStatus) => void;
   handleDataEvents: (
     callback: (events: VerifierDataEvent) => void
   ) => EmitterSubscription;
@@ -21,46 +23,3 @@ export interface Wallet extends TuvaliModule {
     callback: (events: WalletDataEvent) => void
   ) => EmitterSubscription;
 }
-
-export type VerificationStatus = 'ACCEPTED' | 'REJECTED';
-
-export type ConnectedEvent = { type: 'onConnected' };
-
-export type SecureChannelEstablished = { type: 'onSecureChannelEstablished' };
-
-export type DataReceivedEvent = {
-  type: 'onDataReceived';
-  data: string;
-};
-
-export type DataSentEvent = {
-  type: 'onDataSent';
-};
-
-export type VerificationStatusEvent = {
-  type: 'onVerificationStatusReceived';
-  status: VerificationStatus;
-};
-
-export type DisconnectedEvent = {
-  type: 'onDisconnected';
-};
-
-export type ErrorEvent = {
-  type: 'onError';
-  message: string;
-  code: string;
-};
-
-export type CommonDataEvent =
-  | ConnectedEvent
-  | DisconnectedEvent
-  | ErrorEvent
-  | SecureChannelEstablished;
-
-export type WalletDataEvent =
-  | CommonDataEvent
-  | VerificationStatusEvent
-  | DataSentEvent;
-
-export type VerifierDataEvent = CommonDataEvent | DataReceivedEvent;
