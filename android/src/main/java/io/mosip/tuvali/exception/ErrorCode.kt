@@ -17,7 +17,8 @@ enum class ErrorCode(val value: String) {
   PeripheralStateHandlerException("TVV_UNK_002"),
   VerifierTransferHandlerException("TVV_UNK_003"),
 
-  MTUNegotiationException("TVW_CON_001"),
+  InvalidURIException("TVW_CON_001"),
+  MTUNegotiationException("TVW_CON_002"),
   //TODO: Create specific error codes for the below exception
   TransferFailedException("TVW_REP_001"),
 

@@ -3,10 +3,12 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.common.uri.URIUtils
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
 import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.Wallet
+import io.mosip.tuvali.wallet.exception.InvalidURIException
 
 class WalletModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -33,13 +35,16 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
     tryExecuteSync.run {
-      val advPayload = uri.split("OPENID4VP://")[1]
+      if(!URIUtils.isValid(uri)) {
+        throw InvalidURIException("Received Invalid URI: $uri")
+      }
+
       if (wallet == null) {
-        Log.d(logTag, "synchronized startConnection new wallet object with firstPartOfVerifierPK $advPayload at ${System.nanoTime()}")
+        Log.d(logTag, "synchronized startConnection new wallet object with uri $uri at ${System.nanoTime()}")
         wallet = Wallet(reactContext, eventEmitter, bleExceptionHandler::handleException)
       }
 
-      wallet?.setAdvPayload(advPayload)
+      wallet?.setAdvPayload(URIUtils.extractPayload(uri))
       wallet?.startScanning()
     }
   }

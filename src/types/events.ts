@@ -42,13 +42,13 @@ export type ErrorEvent = {
 };
 
 export enum EventTypes {
+  onConnected = 'onConnected',
   onSecureChannelEstablished = 'onSecureChannelEstablished',
-  onVerificationStatusReceived = 'onVerificationStatusReceived',
   onDataSent = 'onDataSent',
   onDataReceived = 'onDataReceived',
+  onVerificationStatusReceived = 'onVerificationStatusReceived',
   onError = 'onError',
   onDisconnected = 'onDisconnected',
-  onConnected = 'onConnected',
 }
 
 export enum VerificationStatus {

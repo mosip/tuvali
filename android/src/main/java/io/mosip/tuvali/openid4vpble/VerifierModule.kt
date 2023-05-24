@@ -3,6 +3,7 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.common.uri.URIUtils
 import io.mosip.tuvali.exception.ErrorCode
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
 import io.mosip.tuvali.openid4vpble.events.withArgs.ErrorEvent
@@ -35,17 +36,16 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "startAdvertisement called with advIdentifier $advIdentifier at ${System.nanoTime()}")
 
     return tryExecuteSync.run {
-
       if (verifier == null) {
         initializeVerifier()
       }
 
-      val payload = verifier?.getAdvPayloadInHex(advIdentifier)
+      val payload = verifier!!.getAdvPayloadInHex(advIdentifier)
       Log.d(logTag, "synchronized startAdvertisement called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}")
 
       verifier?.startAdvertisement(advIdentifier)
 
-      return@run "OPENID4VP://$payload"
+      return@run URIUtils.build(payload)
     }.orEmpty()
   }
 
