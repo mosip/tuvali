@@ -1,6 +1,7 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
 import type { Verifier, Wallet } from './types/bleshare';
 import { tuvaliVersion } from './tuvaliVersion';
+import { EventTypes, VerificationStatus } from './types/events';
 
 const LINKING_ERROR =
   `The package 'react-native-openid4vp-ble' doesn't seem to be linked. Make sure: \n\n` +
@@ -78,4 +79,6 @@ function setupModule(module: any) {
 export default {
   verifier,
   wallet,
+  EventTypes,
+  VerificationStatus,
 };
