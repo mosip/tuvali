@@ -12,7 +12,7 @@ class Central: NSObject, CBCentralManagerDelegate {
     var connectedPeripheral: CBPeripheral?
     var cbCharacteristics: [String: CBCharacteristic] = [:]
     var delegate: PeripheralCommunicatorProtocol?
-    var walletDelegate: WalletProtocol?
+    var walletBleCommunicatorDelegate: WalletBleCommunicatorProtocol?
     var createConnection: (() -> Void)?
 
     override init() {

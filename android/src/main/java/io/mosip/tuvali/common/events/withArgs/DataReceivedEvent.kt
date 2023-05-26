@@ -1,6 +1,6 @@
-package io.mosip.tuvali.openid4vpble.events.withArgs
+package io.mosip.tuvali.common.events.withArgs
 
-import io.mosip.tuvali.openid4vpble.events.EventWithArgs
+import io.mosip.tuvali.common.events.EventWithArgs
 
 
 class DataReceivedEvent(val data: String): EventWithArgs {

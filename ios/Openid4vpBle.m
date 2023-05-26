@@ -6,11 +6,15 @@
 
 RCT_EXTERN_METHOD(startConnection:(NSString *) uri)
 
-RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(setTuvaliVersion:(NSString *) version)
-
 RCT_EXTERN_METHOD(sendData:(NSString *) data)
 
 RCT_EXTERN_METHOD(disconnect)
+
+@end
+
+@interface RCT_EXTERN_MODULE(VersionModule, RCTEventEmitter)
+
+RCT_EXTERN__BLOCKING_SYNCHRONOUS_METHOD(setTuvaliVersion:(NSString *) version)
 
 @end
 

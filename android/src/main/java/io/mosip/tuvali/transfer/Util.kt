@@ -1,18 +1,17 @@
 package io.mosip.tuvali.transfer
 
+import io.mosip.tuvali.common.version.VersionDetails
+import io.mosip.tuvali.transfer.ByteCount.FourBytes
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.bouncycastle.util.encoders.Hex
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
 import java.util.zip.GZIPOutputStream
-import io.mosip.tuvali.openid4vpble.WalletModule
-import io.mosip.tuvali.openid4vpble.VerifierModule
-import io.mosip.tuvali.transfer.ByteCount.FourBytes
-import io.mosip.tuvali.transfer.ByteCount.TwoBytes
-import java.nio.ByteBuffer
 
 enum class ByteCount(val size: Int) {
   FourBytes(4), TwoBytes(2)
@@ -95,8 +94,7 @@ class Util {
     }
 
     fun getLogTag(moduleName: String): String {
-      val version = if (VerifierModule.tuvaliVersion == "unknown") WalletModule.tuvaliVersion else VerifierModule.tuvaliVersion;
-      return "$moduleName : v${version}"
+      return "$moduleName : v${VersionDetails.tuvaliVersion}"
     }
   }
 }

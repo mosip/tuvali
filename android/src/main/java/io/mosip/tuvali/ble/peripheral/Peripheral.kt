@@ -10,7 +10,7 @@ import io.mosip.tuvali.ble.peripheral.state.IMessageSender
 import io.mosip.tuvali.ble.peripheral.state.StateHandler
 import io.mosip.tuvali.ble.peripheral.state.message.*
 import io.mosip.tuvali.verifier.GattService
-import io.mosip.tuvali.verifier.Verifier
+import io.mosip.tuvali.verifier.VerifierBleCommunicator
 import java.util.*
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
@@ -36,7 +36,7 @@ class Peripheral(context: Context, peripheralListener: IPeripheralListener) {
   }
 
   private fun notifyDisconnect(serviceUUID: UUID) {
-    sendData(serviceUUID, GattService.DISCONNECT_CHAR_UUID, byteArrayOf(Verifier.DISCONNECT_STATUS.toByte()))
+    sendData(serviceUUID, GattService.DISCONNECT_CHAR_UUID, byteArrayOf(VerifierBleCommunicator.DISCONNECT_STATUS.toByte()))
   }
 
   fun setupService(service: BluetoothGattService) {

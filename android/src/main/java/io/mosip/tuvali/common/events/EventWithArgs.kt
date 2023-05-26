@@ -1,4 +1,4 @@
-package io.mosip.tuvali.openid4vpble.events
+package io.mosip.tuvali.common.events
 
 
 interface EventWithArgs: Event {

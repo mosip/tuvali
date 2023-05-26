@@ -5,16 +5,16 @@ class EventEmitter {
 
     public static var sharedInstance = EventEmitter()
     private var EVENT_NAME = "DATA_EVENT"
-    static var eventEmitter: WalletModule!
+    static var producer: WalletModule!
 
     private  init() {}
 
-    func registerEventEmitter(eventEmitter: WalletModule) {
-        EventEmitter.eventEmitter = eventEmitter
+    func registerEventEmitter(producer: WalletModule) {
+        EventEmitter.producer = producer
     }
 
     func dispatch(name: String, body: Any?) {
-        EventEmitter.eventEmitter.sendEvent(withName: name, body: body)
+        EventEmitter.producer.sendEvent(withName: name, body: body)
     }
 
     func emitEventWithoutArgs(event: EventWithoutArgs) {

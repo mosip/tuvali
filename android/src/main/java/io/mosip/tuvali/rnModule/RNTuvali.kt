@@ -1,4 +1,4 @@
-package io.mosip.tuvali.openid4vpble
+package io.mosip.tuvali.rnModule
 
 import com.facebook.react.ReactPackage
 import com.facebook.react.bridge.NativeModule
@@ -6,11 +6,12 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.uimanager.ViewManager
 
 
-class Openid4vpBlePackage : ReactPackage {
+class RNTuvali : ReactPackage {
   override fun createNativeModules(reactContext: ReactApplicationContext): List<NativeModule> {
     return listOf(
-      WalletModule(reactContext),
-      VerifierModule(reactContext),
+      RNWalletModule(reactContext),
+      RNVerifierModule(reactContext),
+      RNVerifierModule(reactContext)
     )
   }
 
