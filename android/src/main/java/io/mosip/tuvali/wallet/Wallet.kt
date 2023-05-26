@@ -1,7 +1,7 @@
 package io.mosip.tuvali.wallet
 
+import android.content.Context
 import android.util.Log
-import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.common.uri.URIUtils
 import io.mosip.tuvali.exception.handlers.ExceptionHandler
@@ -10,8 +10,7 @@ import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.InvalidURIException
 
-class Wallet(private val eventEmitter: IEventEmitter, private val reactContext: ReactApplicationContext) : IWallet {
-
+class Wallet(private val eventEmitter: IEventEmitter, private val context: Context) : IWallet {
   private val logTag = getLogTag(javaClass.simpleName)
   private var bleCommunicator: WalletBleCommunicator? = null
   private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitError, this::stopBLE)
@@ -28,7 +27,7 @@ class Wallet(private val eventEmitter: IEventEmitter, private val reactContext: 
 
       if (bleCommunicator == null) {
         Log.d(logTag, "synchronized startConnection new wallet object with uri $uri at ${System.nanoTime()}")
-        bleCommunicator = WalletBleCommunicator(reactContext, eventEmitter, bleExceptionHandler::handleException)
+        bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
       }
 
       bleCommunicator?.setAdvPayload(URIUtils.extractPayload(uri))

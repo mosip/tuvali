@@ -11,7 +11,7 @@ class RNTuvali : ReactPackage {
     return listOf(
       RNWalletModule(reactContext),
       RNVerifierModule(reactContext),
-      RNVerifierModule(reactContext)
+      RNVersionModule(reactContext)
     )
   }
 

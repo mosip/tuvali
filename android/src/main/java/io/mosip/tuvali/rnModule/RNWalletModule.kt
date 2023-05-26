@@ -3,11 +3,12 @@ package io.mosip.tuvali.rnModule
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import io.mosip.tuvali.wallet.IWallet
 import io.mosip.tuvali.wallet.Wallet
 
 class RNWalletModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
   private val eventEmitter = EventEmitter(reactContext)
-  private var wallet: Wallet = Wallet(eventEmitter, reactContext)
+  private var wallet: IWallet = Wallet(eventEmitter, reactContext)
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun startConnection(uri: String) {
@@ -29,7 +30,6 @@ class RNWalletModule(reactContext: ReactApplicationContext) : ReactContextBaseJa
   }
 
   companion object {
-    var tuvaliVersion: String = "unknown"
     const val NAME = "WalletModule"
   }
 }

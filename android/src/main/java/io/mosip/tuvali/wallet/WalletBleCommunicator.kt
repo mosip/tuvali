@@ -38,7 +38,9 @@ import java.util.*
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
-class WalletBleCommunicator(context: Context, private val eventEmitter: IEventEmitter, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
+class WalletBleCommunicator(context: Context,
+                            private val eventEmitter: IEventEmitter,
+                            private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
