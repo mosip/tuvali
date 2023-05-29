@@ -1,7 +1,7 @@
 package io.mosip.tuvali.common.events.withoutArgs
 
-import io.mosip.tuvali.common.events.EventWithoutArgs
+import io.mosip.tuvali.common.events.Event
 
-internal class ConnectedEvent: EventWithoutArgs {
+class ConnectedEvent: Event {
   override val type = "onConnected"
 }

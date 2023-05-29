@@ -2,18 +2,20 @@ package io.mosip.tuvali.verifier
 
 import android.content.Context
 import android.util.Log
+import io.mosip.tuvali.common.events.Event
+import io.mosip.tuvali.common.events.EventProducer
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.common.uri.URIUtils
 import io.mosip.tuvali.exception.handlers.ExceptionHandler
-import io.mosip.tuvali.common.events.IEventEmitter
 import io.mosip.tuvali.common.events.withArgs.VerificationStatusEvent
 import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
-class Verifier(private val context: Context, private val eventEmitter: IEventEmitter): IVerifier {
+class Verifier(private val context: Context): IVerifier {
   private val logTag = getLogTag(javaClass.simpleName)
   private var communicator: VerifierBleCommunicator? = null
-  private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitError, this::stopBLE)
+  private var eventProducer: EventProducer = EventProducer()
+  private var bleExceptionHandler = ExceptionHandler(eventProducer::emitErrorEvent, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
   override fun startAdvertisement(advIdentifier: String): String {
@@ -37,7 +39,7 @@ class Verifier(private val context: Context, private val eventEmitter: IEventEmi
     //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
-      stopBLE { eventEmitter.emitEventWithoutArgs(DisconnectedEvent()) }
+      stopBLE { eventProducer.emitEvent(DisconnectedEvent()) }
     }
   }
 
@@ -49,9 +51,23 @@ class Verifier(private val context: Context, private val eventEmitter: IEventEmi
     }
   }
 
+  override fun subscribe(consumer: (Event) -> Unit) {
+    Log.d(logTag, "got subscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventProducer.setConsumer(consumer)
+    }
+  }
+
+  override fun unSubscribe() {
+    Log.d(logTag, "got unsubscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventProducer.removeConsumer()
+    }
+  }
+
   private fun initializeBLECommunicator() {
     Log.d(logTag, "Initializing new verifier object at ${System.nanoTime()}")
-    communicator = VerifierBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
+    communicator = VerifierBleCommunicator(context, eventProducer, bleExceptionHandler::handleException)
     communicator?.generateKeyPair()
   }
 

@@ -1,13 +1,9 @@
 package io.mosip.tuvali.common.events.withArgs
 
-import io.mosip.tuvali.common.events.EventWithArgs
+import io.mosip.tuvali.common.events.Event
 
 
-class DataReceivedEvent(val data: String): EventWithArgs {
+class DataReceivedEvent(val data: String): Event {
   override val type = "onDataReceived"
-
-  override fun getData(): HashMap<String, String> {
-    return hashMapOf("data" to data)
-  }
-
+  override val args = hashMapOf("data" to data)
 }

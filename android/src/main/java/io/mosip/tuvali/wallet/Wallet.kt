@@ -2,18 +2,20 @@ package io.mosip.tuvali.wallet
 
 import android.content.Context
 import android.util.Log
+import io.mosip.tuvali.common.events.Event
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.common.uri.URIUtils
 import io.mosip.tuvali.exception.handlers.ExceptionHandler
-import io.mosip.tuvali.common.events.IEventEmitter
 import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
+import io.mosip.tuvali.common.events.EventProducer
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.InvalidURIException
 
-class Wallet(private val eventEmitter: IEventEmitter, private val context: Context) : IWallet {
+class Wallet(private val context: Context) : IWallet {
   private val logTag = getLogTag(javaClass.simpleName)
   private var bleCommunicator: WalletBleCommunicator? = null
-  private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitError, this::stopBLE)
+  private var eventProducer: EventProducer = EventProducer()
+  private var bleExceptionHandler = ExceptionHandler(eventProducer::emitErrorEvent, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
 
@@ -27,7 +29,7 @@ class Wallet(private val eventEmitter: IEventEmitter, private val context: Conte
 
       if (bleCommunicator == null) {
         Log.d(logTag, "synchronized startConnection new wallet object with uri $uri at ${System.nanoTime()}")
-        bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
+        bleCommunicator = WalletBleCommunicator(context, eventProducer, bleExceptionHandler::handleException)
       }
 
       bleCommunicator?.setAdvPayload(URIUtils.extractPayload(uri))
@@ -47,8 +49,22 @@ class Wallet(private val eventEmitter: IEventEmitter, private val context: Conte
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
       stopBLE {
-        eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
+        eventProducer.emitEvent(DisconnectedEvent())
       }
+    }
+  }
+
+  override fun subscribe(consumer: (Event) -> Unit) {
+    Log.d(logTag, "got subscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventProducer.setConsumer(consumer)
+    }
+  }
+
+  override fun unSubscribe() {
+    Log.d(logTag, "got unsubscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventProducer.removeConsumer()
     }
   }
 

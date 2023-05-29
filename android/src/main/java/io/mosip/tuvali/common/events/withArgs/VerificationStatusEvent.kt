@@ -1,11 +1,9 @@
 package io.mosip.tuvali.common.events.withArgs
 
-import io.mosip.tuvali.common.events.EventWithArgs
+import io.mosip.tuvali.common.events.Event
 
-class VerificationStatusEvent(private val status: VerificationStatus): EventWithArgs {
-  override fun getData(): HashMap<String, String> {
-    return hashMapOf("status" to status.value)
-  }
+class VerificationStatusEvent(private val status: VerificationStatus): Event {
+  override val args = hashMapOf("status" to status.value)
 
   override val type = "onVerificationStatusReceived"
 

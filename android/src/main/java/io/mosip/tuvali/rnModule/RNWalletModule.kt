@@ -7,8 +7,14 @@ import io.mosip.tuvali.wallet.IWallet
 import io.mosip.tuvali.wallet.Wallet
 
 class RNWalletModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-  private val eventEmitter = EventEmitter(reactContext)
-  private var wallet: IWallet = Wallet(eventEmitter, reactContext)
+  private val eventEmitter = RNEventEmitter(reactContext)
+  private var wallet: IWallet = Wallet(reactContext)
+
+  init {
+      wallet.subscribe {
+        eventEmitter.emitEvent(it)
+      }
+  }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun startConnection(uri: String) {

@@ -14,12 +14,12 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.exception.BLEException
-import io.mosip.tuvali.common.events.IEventEmitter
 import io.mosip.tuvali.common.events.withArgs.VerificationStatusEvent
 import io.mosip.tuvali.common.events.withoutArgs.ConnectedEvent
 import io.mosip.tuvali.common.events.withoutArgs.DataSentEvent
 import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.common.events.withoutArgs.SecureChannelEstablishedEvent
+import io.mosip.tuvali.common.events.EventProducer
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -38,9 +38,7 @@ import java.util.*
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
-class WalletBleCommunicator(context: Context,
-                            private val eventEmitter: IEventEmitter,
-                            private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
+class WalletBleCommunicator(context: Context, private val eventProducer: EventProducer, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
@@ -66,6 +64,14 @@ class WalletBleCommunicator(context: Context,
 
   private val callbacks = mutableMapOf<CentralCallbacks, () -> Unit>()
 
+  private val connectionMutex = Object()
+
+  @Volatile
+  private var connectionState = VerifierConnectionState.NOT_CONNECTED
+
+  private enum class VerifierConnectionState {
+    NOT_CONNECTED, CONNECTING, CONNECTED
+  }
   init {
     central = Central(context, this@WalletBleCommunicator)
     handlerThread.start()
@@ -95,15 +101,6 @@ class WalletBleCommunicator(context: Context,
   override fun onScanStartedFailed(errorCode: Int) {
     Log.d(logTag, "onScanStartedFailed: $errorCode")
     //TODO: Handle error
-  }
-
-  private val connectionMutex = Object()
-
-  @Volatile
-  private var connectionState = VerifierConnectionState.NOT_CONNECTED
-
-  private enum class VerifierConnectionState {
-    NOT_CONNECTED, CONNECTING, CONNECTED
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
@@ -182,7 +179,7 @@ class WalletBleCommunicator(context: Context,
     Log.d(logTag, "onRequestMTUSuccess")
     maxDataBytes = mtu
     central.subscribe(VerifierBleCommunicator.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
-    eventEmitter.emitEventWithoutArgs(ConnectedEvent())
+    eventProducer.emitEvent(ConnectedEvent())
     writeToIdentifyRequest()
   }
 
@@ -209,7 +206,7 @@ class WalletBleCommunicator(context: Context,
     synchronized(connectionMutex) {
       connectionState = VerifierConnectionState.NOT_CONNECTED
       if (!isManualDisconnect) {
-          eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
+          eventProducer.emitEvent(DisconnectedEvent())
       }
     }
   }
@@ -234,7 +231,7 @@ class WalletBleCommunicator(context: Context,
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
+        eventProducer.emitEvent(SecureChannelEstablishedEvent())
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -250,7 +247,7 @@ class WalletBleCommunicator(context: Context,
   }
 
   override fun onResponseSent() {
-    eventEmitter.emitEventWithoutArgs(DataSentEvent())
+    eventProducer.emitEvent(DataSentEvent())
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -267,9 +264,9 @@ class WalletBleCommunicator(context: Context,
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
+          eventProducer.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
         } else {
-          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
+          eventProducer.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
         }
 
         central.unsubscribe(VerifierBleCommunicator.SERVICE_UUID, charUUID)

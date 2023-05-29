@@ -1,7 +1,7 @@
 package io.mosip.tuvali.common.events.withoutArgs
 
-import io.mosip.tuvali.common.events.EventWithoutArgs
+import io.mosip.tuvali.common.events.Event
 
-class DisconnectedEvent: EventWithoutArgs {
+class DisconnectedEvent: Event {
   override val type = "onDisconnected"
 }
