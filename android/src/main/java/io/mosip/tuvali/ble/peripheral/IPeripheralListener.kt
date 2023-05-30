@@ -1,5 +1,6 @@
 package io.mosip.tuvali.ble.peripheral
 
+import io.mosip.tuvali.exception.BLEException
 import java.util.UUID
 
 interface IPeripheralListener {
@@ -11,5 +12,5 @@ interface IPeripheralListener {
   fun onSendDataNotified(uuid: UUID, isSent: Boolean)
   fun onClosed()
   fun onMTUChanged(mtu: Int)
-  fun onException(exception: Throwable)
+  fun onException(exception: BLEException)
 }

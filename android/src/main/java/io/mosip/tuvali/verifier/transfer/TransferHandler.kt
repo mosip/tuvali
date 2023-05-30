@@ -5,17 +5,14 @@ import android.os.Looper
 import android.os.Message
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.Peripheral
-import io.mosip.tuvali.openid4vpble.exception.exception.TransferHandlerException
-import io.mosip.tuvali.transfer.Assembler
-import io.mosip.tuvali.transfer.TransferReportRequest
-import io.mosip.tuvali.transfer.TransferReport
+import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import io.mosip.tuvali.transfer.*
 import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.exception.CorruptedChunkReceivedException
 import io.mosip.tuvali.verifier.exception.TooManyFailureChunksException
+import io.mosip.tuvali.verifier.exception.VerifierTransferHandlerException
 import io.mosip.tuvali.verifier.transfer.message.*
 import java.util.*
-import kotlin.math.ceil
-import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class TransferHandler(looper: Looper, private val peripheral: Peripheral, private val transferListener: ITransferListener, val serviceUUID: UUID) : Handler(looper) {
   private val logTag = getLogTag(javaClass.simpleName)
@@ -123,16 +120,16 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     if (assembler?.isComplete() == true) {
       return
     }
-    //Log.d(logTag, "SequenceNumber: ${Util.twoBytesToIntBigEndian(chunkData.copyOfRange(0,2))},  Sha256: ${Util.getSha256(chunkData)}")
+    //Log.d(logTag, "SequenceNumber: ${Util.byteArrayToInt(chunkData.copyOfRange(0,2), TwoBytes)},  Sha256: ${Util.getSha256(chunkData)}")
     assembler?.addChunk(chunkData)
   }
 
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      transferListener.onException(TransferHandlerException("Exception in Verifier Transfer Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+    } catch (e: Exception) {
+      transferListener.onException(VerifierTransferHandlerException("Exception in Verifier Transfer Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 

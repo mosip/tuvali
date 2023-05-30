@@ -15,7 +15,7 @@ class Peripheral: NSObject {
 
     func setupPeripheralsAndStartAdvertising() {
         let bleService = CBMutableService(type: Self.SERVICE_UUID, primary: true)
-        bleService.characteristics = Utils.createCBMutableCharacteristics()
+        bleService.characteristics = Util.createCBMutableCharacteristics()
         peripheralManager.add(bleService)
         peripheralManager.startAdvertising([CBAdvertisementDataServiceUUIDsKey: [Self.SERVICE_UUID, Self.SCAN_RESPONSE_SERVICE_UUID], CBAdvertisementDataLocalNameKey: "verifier"])
     }

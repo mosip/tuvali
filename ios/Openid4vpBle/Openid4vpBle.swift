@@ -4,8 +4,8 @@ import Foundation
 @objc(Openid4vpBle)
 class Openid4vpBle: RCTEventEmitter {
     var wallet: Wallet?
-
     var tuvaliVersion: String = "unknown"
+
     override init() {
         super.init()
         EventEmitter.sharedInstance.registerEventEmitter(eventEmitter: self)
@@ -112,9 +112,9 @@ class Openid4vpBle: RCTEventEmitter {
         return false
     }
 
-    fileprivate func handleError(_ message: String) {
+    fileprivate func handleError(_ message: String, _ code: String) {
         wallet?.handleDestroyConnection(isSelfDisconnect: false)
-        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message)
+        EventEmitter.sharedInstance.emitNearbyErrorEvent(message: message, code: code)
     }
 
 }

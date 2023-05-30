@@ -29,7 +29,7 @@ export type NearbyEvent =
   | { type: 'msg'; data: string }
   | { type: 'transferupdate'; data: TransferUpdateStatus }
   | { type: 'onDisconnected'; data: string }
-  | { type: 'onError'; message: string };
+  | { type: 'onError'; message: string; code: string };
 
 export interface NearbyLog {
   log: string;

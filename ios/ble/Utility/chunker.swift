@@ -1,5 +1,20 @@
 import Foundation
 
+typealias ChunkSeqIndex = Int
+typealias ChunkSeqNumber = Int
+
+extension ChunkSeqIndex {
+    func toSeqNumber() -> ChunkSeqNumber {
+        return self + 1
+    }
+}
+
+extension ChunkSeqNumber {
+    func toSeqIndex() -> ChunkSeqIndex {
+        return self - 1
+    }
+}
+
 class Chunker {
 
     private var logTag = "Chunker"
@@ -15,22 +30,14 @@ class Chunker {
         assignPreSlicedChunks()
     }
 
-    func getChunkWithIndex(index: Int) -> Data {
-        if index < self.preSlicedChunks.count {
-            return self.preSlicedChunks[index]
-        }
-        // TODO: Figure out how to throw errors!
-        return Data()
-    }
-
     func getLastChunkByteCount(dataSize: Int) -> Int {
         return dataSize % effectivePayloadSize
     }
 
     func assignPreSlicedChunks(){
         os_log(.info, "expected total data size: %{public}d and totalChunkCount: %{public}d ", (chunkData?.count)!, totalChunkCount)
-        for i in 0..<totalChunkCount {
-            preSlicedChunks.append(chunk(seqNumber: i))
+        for i: ChunkSeqIndex in 0..<totalChunkCount {
+            preSlicedChunks.append(chunk(seqIndex: i))
         }
     }
 
@@ -52,30 +59,32 @@ class Chunker {
     }
 
     func next() -> Data {
-        var seqNumber = chunksReadCounter
+        let chunkIndex = chunksReadCounter
         chunksReadCounter += 1
-        if seqNumber <= totalChunkCount - 1 {
-            return (preSlicedChunks[seqNumber])
-        }
-       else
-        {
-           return Data()
-       }
+       return preSlicedChunks[chunkIndex]
     }
 
-    func chunkBySequenceNumber(num: Int) -> Data {
-        return (preSlicedChunks[num])
+    func chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber) -> Data {
+        return (preSlicedChunks[missedSeqNumber.toSeqIndex()])
     }
 
-    private func chunk(seqNumber: Int) -> Data {
-        let fromIndex = seqNumber * effectivePayloadSize
-        if (seqNumber == (totalChunkCount - 1) && lastChunkByteCount > 0) {
+    private func chunk(seqIndex: ChunkSeqIndex) -> Data {
+        let fromIndex = seqIndex * effectivePayloadSize
+        if isLastChunkSmallerSize(seqIndex: seqIndex) {
             let chunkLength = lastChunkByteCount + chunkMetaSize
-            return frameChunk(seqNumber: seqNumber, chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
+            return frameChunk(seqNumber: seqIndex.toSeqNumber(), chunkLength: chunkLength, fromIndex: fromIndex, toIndex: fromIndex + lastChunkByteCount)
         } else {
-            let toIndex = (seqNumber + 1) * effectivePayloadSize
-            return frameChunk(seqNumber: seqNumber, chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
+            let toIndex = fromIndex + effectivePayloadSize
+            return frameChunk(seqNumber: seqIndex.toSeqNumber(), chunkLength: mtuSize, fromIndex: fromIndex, toIndex: toIndex)
         }
+    }
+
+    private func isLastChunkSmallerSize(seqIndex: Int) -> Bool {
+        return isLastChunkIndex(seqIndex: seqIndex) && lastChunkByteCount > 0
+    }
+
+    private func isLastChunkIndex(seqIndex: Int) -> Bool {
+        return seqIndex == (totalChunkCount - 1)
     }
 
     /*
@@ -88,25 +97,21 @@ class Chunker {
      +-----------------------+-----------------------------+-------------------------------------------------------------------------+
      */
 
-    private func frameChunk(seqNumber: Int, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
+    private func frameChunk(seqNumber: ChunkSeqNumber, chunkLength: Int, fromIndex: Int, toIndex: Int) -> Data {
         if let chunkData = chunkData {
             let payload = chunkData.subdata(in: fromIndex + chunkData.startIndex..<chunkData.startIndex + toIndex)
             let payloadCRC = CRC.evaluate(d: payload)
-            return intToBytes(UInt16(seqNumber)) + intToBytes(payloadCRC) + payload
+            return Util.intToNetworkOrderedByteArray(num: seqNumber, byteCount: Util.ByteCount.TwoBytes) + Util.intToNetworkOrderedByteArray(num: Int(payloadCRC), byteCount: Util.ByteCount.TwoBytes) + payload
         }
         return Data() //
     }
 
     func isComplete() -> Bool {
-        let isComplete = chunksReadCounter > (totalChunkCount - 1)
+        let isComplete = chunksReadCounter >= totalChunkCount
         if isComplete {
             os_log(.info, "isComplete: true, totalChunks: %{public}d , chunkReadCounter(1-indexed): %{public}d", totalChunkCount, chunksReadCounter)
         }
        return isComplete
     }
 
-    func intToBytes(_ value: UInt16) -> Data {
-        var value = value.bigEndian
-        return Data(bytes: &value, count: MemoryLayout<UInt16>.size)
-    }
 }

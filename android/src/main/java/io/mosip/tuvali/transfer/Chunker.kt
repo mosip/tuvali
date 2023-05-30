@@ -1,7 +1,8 @@
 package io.mosip.tuvali.transfer
 
 import android.util.Log
-import io.mosip.tuvali.transfer.Util.Companion.intToTwoBytesBigEndian
+import io.mosip.tuvali.transfer.ByteCount.TwoBytes
+import io.mosip.tuvali.transfer.Util.Companion.intToNetworkOrderedByteArray
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
@@ -14,7 +15,7 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
 
   init {
     Log.i(logTag, "Total number of chunks calculated: $totalChunkCount")
-    val startTime = System.currentTimeMillis()
+//    val startTime = System.currentTimeMillis()
     for (idx in 0 until totalChunkCount) {
       preSlicedChunks[idx] = chunk(idx)
     }
@@ -22,26 +23,27 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
   }
 
   fun next(): ByteArray {
-    val seqNumber = chunksReadCounter
-    chunksReadCounter++
-    return preSlicedChunks[seqNumber]!!
+    return preSlicedChunks[chunksReadCounter++]!!
   }
 
-  fun chunkBySequenceNumber(num: Int): ByteArray {
-    return preSlicedChunks[num]!!
+  fun chunkBySequenceNumber(missedSeqNumber: ChunkSeqNumber): ByteArray {
+    return preSlicedChunks[missedSeqNumber.toSeqIndex()]!!
   }
 
-  private fun chunk(seqNumber: Int): ByteArray {
-    val fromIndex = seqNumber * effectivePayloadSize
-
-    return if (seqNumber == (totalChunkCount - 1).toInt() && lastChunkByteCount > 0) {
-      Log.d(logTag, "fetching last chunk")
-      frameChunk(seqNumber, fromIndex, fromIndex + lastChunkByteCount)
+  private fun chunk(seqIndex: ChunkSeqIndex): ByteArray {
+    val fromIndex = seqIndex * effectivePayloadSize
+    return if (isLastChunkSmallerSize(seqIndex)) {
+      frameChunk(seqIndex.toSeqNumber(), fromIndex, fromIndex + lastChunkByteCount)
     } else {
-      val toIndex = (seqNumber + 1) * effectivePayloadSize
-      frameChunk(seqNumber, fromIndex, toIndex)
+      val toIndex = fromIndex + effectivePayloadSize
+      frameChunk(seqIndex.toSeqNumber(), fromIndex, toIndex)
     }
   }
+
+  private fun isLastChunkSmallerSize(seqIndex: Int) =
+    isLastChunkIndex(seqIndex) && lastChunkByteCount > 0
+
+  private fun isLastChunkIndex(seqIndex: Int) = seqIndex == (totalChunkCount - 1)
 
   /*
   <--------------------------------------------------Max Data Bytes -------------------------------------------------------------->
@@ -57,11 +59,14 @@ class Chunker(private val data: ByteArray, private val maxDataBytes: Int) :
     val dataChunk = data.copyOfRange(fromIndex, toIndex)
     val crc = CheckValue.get(dataChunk)
 
-    return intToTwoBytesBigEndian(seqNumber) + intToTwoBytesBigEndian(crc.toInt()) + dataChunk
+
+    return intToNetworkOrderedByteArray(seqNumber, TwoBytes) + intToNetworkOrderedByteArray(crc.toInt(), TwoBytes) + dataChunk
+
   }
 
   fun isComplete(): Boolean {
-    val isComplete = chunksReadCounter > (totalChunkCount - 1).toInt()
+    Log.i(logTag,"chunksReadCounter: $chunksReadCounter")
+    val isComplete = chunksReadCounter >= totalChunkCount
     if (isComplete) {
       Log.d(
         logTag,

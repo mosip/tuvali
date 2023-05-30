@@ -8,7 +8,7 @@ import android.util.Log
 import io.mosip.tuvali.ble.central.impl.Controller
 import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
-import io.mosip.tuvali.openid4vpble.exception.exception.StateHandlerException
+import io.mosip.tuvali.ble.exception.CentralStateHandlerException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class StateHandler(
@@ -165,14 +165,14 @@ class StateHandler(
         currentState = States.Writing
       }
       IMessage.CentralStates.WRITE_SUCCESS.ordinal -> {
-        val writeSuccessMessage = msg.obj as WriteSuccessMessage;
+        val writeSuccessMessage = msg.obj as WriteSuccessMessage
         Log.d(logTag, "Completed writing to ${writeSuccessMessage.charUUID} successfully")
 
         listener.onWriteSuccess(writeSuccessMessage.device, writeSuccessMessage.charUUID)
         currentState = States.Connected
       }
       IMessage.CentralStates.WRITE_FAILURE.ordinal -> {
-        val writeFailureMessage = msg.obj as WriteFailureMessage;
+        val writeFailureMessage = msg.obj as WriteFailureMessage
 
         Log.d(logTag, "write failed for ${writeFailureMessage.charUUID} due to ${writeFailureMessage.err}")
         listener.onWriteFailed(writeFailureMessage.device, writeFailureMessage.charUUID, writeFailureMessage.err)
@@ -255,9 +255,9 @@ class StateHandler(
   override fun dispatchMessage(msg: Message) {
     try {
       super.dispatchMessage(msg)
-    } catch (e: Throwable) {
-      listener.onException(StateHandlerException("Exception in Central State Handler", e))
-      Log.d(logTag, "dispatchMessage " + e.message)
+    } catch (e: Exception) {
+      listener.onException(CentralStateHandlerException("Exception in Central State Handler", e))
+      Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
 
