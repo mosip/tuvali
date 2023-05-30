@@ -54,7 +54,7 @@ class Verifier(private val context: Context): IVerifier {
   override fun subscribe(consumer: (Event) -> Unit) {
     Log.d(logTag, "got subscribe at ${System.nanoTime()}")
     tryExecuteSync.run {
-      eventProducer.setConsumer(consumer)
+      eventProducer.addConsumer(consumer)
     }
   }
 

@@ -4,10 +4,10 @@ import io.mosip.tuvali.common.events.withArgs.ErrorEvent
 import io.mosip.tuvali.exception.ErrorCode
 
 class EventProducer {
-  private var consumerCallback: ((Event) -> Unit)? = null;
+  private var consumers = mutableListOf<((Event) -> Unit)>()
 
-  fun setConsumer(consumer: (Event) -> Unit) {
-    consumerCallback = consumer
+  fun addConsumer(consumer: (Event) -> Unit) {
+    consumers.add(consumer)
   }
 
   fun emitErrorEvent(message: String, code: ErrorCode) {
@@ -15,10 +15,10 @@ class EventProducer {
   }
 
   fun emitEvent(event: Event) {
-    consumerCallback?.let { it(event) }
+    consumers.forEach{it(event)}
   }
 
   fun removeConsumer() {
-    consumerCallback = null
+    consumers.clear()
   }
 }

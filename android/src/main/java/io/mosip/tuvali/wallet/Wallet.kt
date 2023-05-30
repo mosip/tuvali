@@ -57,7 +57,7 @@ class Wallet(private val context: Context) : IWallet {
   override fun subscribe(consumer: (Event) -> Unit) {
     Log.d(logTag, "got subscribe at ${System.nanoTime()}")
     tryExecuteSync.run {
-      eventProducer.setConsumer(consumer)
+      eventProducer.addConsumer(consumer)
     }
   }
 
