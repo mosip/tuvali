@@ -52,6 +52,6 @@ export enum EventTypes {
 }
 
 export enum VerificationStatus {
-  ACCEPTED = 'ACCEPTED',
-  REJECTED = 'REJECTED',
+  ACCEPTED = 0,
+  REJECTED = 1,
 }
