@@ -83,7 +83,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun sendVerificationStatus(status: Int){
+  fun sendVerificationStatus(status: String){
     Log.d(logTag, "sendVerificationStatus status $status at ${System.nanoTime()}")
 
     tryExecuteSync.run {
