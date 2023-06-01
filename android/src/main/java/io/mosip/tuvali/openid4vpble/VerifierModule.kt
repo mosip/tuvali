@@ -3,10 +3,8 @@ package io.mosip.tuvali.openid4vpble
 import android.util.Log
 import com.facebook.react.bridge.*
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
-import io.mosip.tuvali.common.uri.URIUtils
-import io.mosip.tuvali.exception.ErrorCode
+import io.mosip.tuvali.common.uri.OpenId4vpURI
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
-import io.mosip.tuvali.openid4vpble.events.withArgs.ErrorEvent
 import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
 import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -45,7 +43,7 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
 
       verifier?.startAdvertisement(advIdentifier)
 
-      return@run URIUtils.build(payload)
+      return@run OpenId4vpURI(payload).toString()
     }.orEmpty()
   }
 

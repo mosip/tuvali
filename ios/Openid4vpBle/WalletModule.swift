@@ -16,17 +16,20 @@ class WalletModule: RCTEventEmitter {
     @objc func noop() -> Void {}
 
     @objc func startConnection(_ uri: String) {
+        let openId4VpURI = OpenId4vpURI(uri: uri)
         print("startConnection->uri::\(uri)")
-        if uri.range(of:"OPENID4VP://") == nil {
-            //Todo: Throw an error if uri doesnt have openid4vp
+        if !openId4VpURI.isValid() {
+            ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidURIException)
             return
         }
-        let advPayload = uri.components(separatedBy: "OPENID4VP://")[1]
-        wallet = Wallet()
+        
+        let advPayload = openId4VpURI.extractPayload()
         if advPayload == "" {
-            //Todo: Throw an error if advpayload is not there
+            ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidURIException)
             return
         }
+        
+        wallet = Wallet()
         wallet?.setAdvIdentifier(identifier: advPayload)
         wallet?.startScanning()
         wallet?.createConnection = {
