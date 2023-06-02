@@ -35,7 +35,7 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
     Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
     tryExecuteSync.run {
-      val openId4vpURI = OpenId4vpURI.fromString(uri);
+      val openId4vpURI = OpenId4vpURI(uri)
 
       if(!openId4vpURI.isValid()) {
         throw InvalidURIException("Received Invalid URI: $uri")
@@ -46,7 +46,7 @@ class WalletModule(private val reactContext: ReactApplicationContext) :
         wallet = Wallet(reactContext, eventEmitter, bleExceptionHandler::handleException)
       }
 
-      wallet?.setAdvPayload(openId4vpURI.extractPayload())
+      wallet?.setAdvPayload(openId4vpURI.getName(), openId4vpURI.getHexPK())
       wallet?.startScanning()
     }
   }

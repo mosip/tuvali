@@ -9,6 +9,7 @@ import android.os.Process
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.ble.central.ICentralListener
+import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
@@ -46,7 +47,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
   private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
   private var secretsTranslator: SecretsTranslator? = null
 
-  private var advPayload: String? = null
+  private var advPayload: ByteArray? = null
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
@@ -132,7 +133,7 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
 
   private fun isSameAdvPayload(advertisementPayload: ByteArray): Boolean {
     this.advPayload?.let {
-      return Hex.decode(it) contentEquals advertisementPayload
+      return it contentEquals advertisementPayload
     }
     return false
   }
@@ -300,8 +301,8 @@ class Wallet(context: Context, private val eventEmitter: EventEmitter, private v
     }
   }
 
-  fun setAdvPayload(advPayload: String) {
-    this.advPayload = advPayload
+  fun setAdvPayload(advIdentifier: String, verifierPK: String) {
+    this.advPayload = AdvertisementPayload.getAdvPayload(advIdentifier, verifierPK)
   }
 
   fun sendData(data: String) {

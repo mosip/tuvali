@@ -1,7 +1,9 @@
 package io.mosip.tuvali.openid4vpble
 
 import android.util.Log
-import com.facebook.react.bridge.*
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
 import io.mosip.tuvali.common.safeExecute.TryExecuteSync
 import io.mosip.tuvali.common.uri.OpenId4vpURI
 import io.mosip.tuvali.exception.handlers.OpenIdBLEExceptionHandler
@@ -9,6 +11,7 @@ import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
 import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.verifier.Verifier
+import org.bouncycastle.util.encoders.Hex.toHexString
 
 class VerifierModule(private val reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -38,12 +41,11 @@ class VerifierModule(private val reactContext: ReactApplicationContext) :
         initializeVerifier()
       }
 
-      val payload = verifier!!.getAdvPayloadInHex(advIdentifier)
-      Log.d(logTag, "synchronized startAdvertisement called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}")
+      Log.d(logTag, "synchronized startAdvertisement called with adv identifier $advIdentifier at ${System.nanoTime()} and verifier hashcode: ${verifier.hashCode()}")
 
       verifier?.startAdvertisement(advIdentifier)
 
-      return@run OpenId4vpURI(payload).toString()
+      return@run OpenId4vpURI(advIdentifier, toHexString(verifier!!.publicKey)).toString()
     }.orEmpty()
   }
 

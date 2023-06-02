@@ -1,25 +1,35 @@
 package io.mosip.tuvali.common.uri
 
-const val URI_IDENTIFIER = "OPENID4VP"
+import android.net.Uri
+import android.text.TextUtils.isEmpty
 
-class OpenId4vpURI private constructor() {
-  private var uri = ""
+private const val URI_IDENTIFIER = "OPENID4VP"
+private const val NAME_QUERY_PARAM_NAME = "name"
+private const val KEY_QUERY_PARAM_NAME = "key"
 
-  constructor(key: String) : this() {
-    uri = "$URI_IDENTIFIER://$key"
+class OpenId4vpURI {
+  private var uri: Uri
+
+  constructor(name: String, hexPK: String) {
+    this.uri = Uri.Builder()
+      .scheme("$URI_IDENTIFIER://connect")
+      .appendQueryParameter(NAME_QUERY_PARAM_NAME, name)
+      .appendQueryParameter(KEY_QUERY_PARAM_NAME, hexPK).build()
   }
 
-  companion object {
-    fun fromString(uri: String): OpenId4vpURI {
-      val openId4vpURI = OpenId4vpURI()
-      openId4vpURI.uri = uri
-      return openId4vpURI
+  constructor(uri: String) {
+    try {
+      this.uri = Uri.parse(uri)
+    } catch (e: Exception) {
+      this.uri = Uri.EMPTY
     }
   }
 
-  fun extractPayload() = uri.split("$URI_IDENTIFIER://")[1]
+  fun getName() = uri.getQueryParameter(NAME_QUERY_PARAM_NAME).orEmpty()
 
-  fun isValid() = uri.contains("$URI_IDENTIFIER://")
+  fun getHexPK() = uri.getQueryParameter(KEY_QUERY_PARAM_NAME).orEmpty()
 
-  override fun toString() = uri
+  fun isValid() = !(isEmpty(getName()) || isEmpty(getHexPK()))
+
+  override fun toString() = uri.toString()
 }
