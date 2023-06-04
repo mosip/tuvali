@@ -2,17 +2,21 @@ import Foundation
 
 class OpenId4vpURI {
     var URI_IDENTIFIER = "OPENID4VP"
-    let uri: String
+    let urlComponents: URLComponents?
     
     init(uri: String) {
-        self.uri = uri
+        self.urlComponents = URLComponents(string: uri)
+    }
+    
+    func getName() -> String? {
+        return self.urlComponents?.queryItems?.first(where: { $0.name == "name" })?.value
+    }
+    
+    func getHexPK() -> String? {
+        return self.urlComponents?.queryItems?.first(where: { $0.name == "key" })?.value
     }
     
     func isValid() -> Bool {
-        return self.uri.range(of: URI_IDENTIFIER + "://") != nil
-    }
-    
-    func extractPayload() -> String {
-        uri.components(separatedBy: "OPENID4VP://")[1]
+        return self.urlComponents?.scheme == URI_IDENTIFIER && getName() != nil && getHexPK() != nil
     }
 }
