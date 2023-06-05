@@ -27,7 +27,7 @@ class RNVerifierModule(reactContext: ReactApplicationContext) :
   }
 
   @ReactMethod
-  fun sendVerificationStatus(status: String){
+  fun sendVerificationStatus(status: Int){
    verifier.sendVerificationStatus(status)
   }
 

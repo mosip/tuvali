@@ -43,7 +43,7 @@ class Verifier(private val context: Context): IVerifier {
     }
   }
 
-  override fun sendVerificationStatus(status: String) {
+  override fun sendVerificationStatus(status: Int) {
     Log.d(logTag, "sendVerificationStatus status $status at ${System.nanoTime()}")
 
     tryExecuteSync.run {

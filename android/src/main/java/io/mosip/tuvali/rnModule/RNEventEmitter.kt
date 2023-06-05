@@ -30,7 +30,13 @@ class RNEventEmitter(private val reactContext: ReactApplicationContext) {
   private fun populateProperties(event: Event, writableMap: WritableMap) {
     event::class.memberProperties.forEach {
       if (it.visibility === KVisibility.PUBLIC) try {
-        writableMap.putString(it.name, it.getter.call(event).toString())
+        val value = it.getter.call(event)
+        if(value is Enum<*>) {
+          writableMap.putInt(it.name, value.ordinal)
+        }
+        else{
+          writableMap.putString(it.name, it.getter.call(event).toString())
+        }
       }
       catch (e: Exception){
         println("unable to populate RN event ${it.name}")
