@@ -1,5 +1,5 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import type { Verifier, VersionModule, Wallet } from './types/bleshare';
+import type { Verifier, VersionModule, Wallet } from './types/interface';
 import { tuvaliVersion } from './tuvaliVersion';
 import { EventTypes, VerificationStatus } from './types/events';
 

@@ -9,16 +9,13 @@ class Wallet: WalletProtocol {
 
     func startConnection(_ uri: String) {
         print("startConnection->uri::\(uri)")
-        if uri.range(of:"OPENID4VP://") == nil {
-            //Todo: Throw an error if uri doesnt have openid4vp
+            
+        guard openId4VpURI.isValid(), let advPayload = getAdvPayload(openId4VpURI) else {
+            ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidURIException)
             return
         }
-        let advPayload = uri.components(separatedBy: "OPENID4VP://")[1]
+        
         bleCommunicator = WalletBleCommunicator()
-        if advPayload == "" {
-            //Todo: Throw an error if advpayload is not there
-            return
-        }
         bleCommunicator?.setAdvIdentifier(identifier: advPayload)
         bleCommunicator?.startScanning()
         bleCommunicator?.createConnection = {
@@ -53,5 +50,11 @@ class Wallet: WalletProtocol {
         bleCommunicator?.handleDestroyConnection(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitErrorEvent(message: message, code: code)
     }
-
+    
+    fileprivate func getAdvPayload(_ openId4VpURI: OpenId4vpURI) -> Data? {
+        guard let name = openId4VpURI.getName(), let data = (name + "_").data(using: .utf8), let hexPublickey = openId4VpURI.getHexPK() else {
+            return nil
+        }
+        return data + hexStringToData(string: String(hexPublickey.prefix(10)))
+    }
 }

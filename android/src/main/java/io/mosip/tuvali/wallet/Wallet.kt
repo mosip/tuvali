@@ -2,12 +2,12 @@ package io.mosip.tuvali.wallet
 
 import android.content.Context
 import android.util.Log
-import io.mosip.tuvali.common.events.Event
-import io.mosip.tuvali.common.safeExecute.TryExecuteSync
-import io.mosip.tuvali.common.uri.URIUtils
-import io.mosip.tuvali.exception.handlers.ExceptionHandler
 import io.mosip.tuvali.common.events.DisconnectedEvent
+import io.mosip.tuvali.common.events.Event
 import io.mosip.tuvali.common.events.EventEmitter
+import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.common.uri.OpenId4vpURI
+import io.mosip.tuvali.exception.handlers.ExceptionHandler
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import io.mosip.tuvali.wallet.exception.InvalidURIException
 
@@ -23,7 +23,9 @@ class Wallet(private val context: Context) : IWallet {
     Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
     tryExecuteSync.run {
-      if(!URIUtils.isValid(uri)) {
+      val openId4vpURI = OpenId4vpURI(uri)
+
+      if(!openId4vpURI.isValid()) {
         throw InvalidURIException("Received Invalid URI: $uri")
       }
 
@@ -32,7 +34,7 @@ class Wallet(private val context: Context) : IWallet {
         bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
       }
 
-      bleCommunicator?.setAdvPayload(URIUtils.extractPayload(uri))
+      bleCommunicator?.setAdvPayload(openId4vpURI.getName(), openId4vpURI.getHexPK())
       bleCommunicator?.startScanning()
     }
   }

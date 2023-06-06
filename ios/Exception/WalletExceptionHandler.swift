@@ -15,6 +15,7 @@ class WalletExceptionHandler {
 }
 
 enum WalletErrorEnum: Error {
+    case invalidURIException
     case invalidMTUSizeError(mtu: Int)
     case responseTransferFailure
 }
@@ -22,6 +23,8 @@ enum WalletErrorEnum: Error {
 extension WalletErrorEnum: CustomStringConvertible {
     public var description: String {
         switch self {
+        case .invalidURIException:
+            return "Received an invalid URI."
         case .invalidMTUSizeError(let mtu):
             return "Negotiated MTU: \(mtu) is too low."
         case .responseTransferFailure:
@@ -31,8 +34,10 @@ extension WalletErrorEnum: CustomStringConvertible {
     
     public var code: String {
            switch self {
-           case .invalidMTUSizeError( _):
+           case .invalidURIException:
                return "TVW_CON_001"
+           case .invalidMTUSizeError( _):
+               return "TVW_CON_002"
            case .responseTransferFailure:
                return "TVW_REP_001"
            }

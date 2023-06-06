@@ -2,14 +2,15 @@ package io.mosip.tuvali.verifier
 
 import android.content.Context
 import android.util.Log
+import io.mosip.tuvali.common.events.DisconnectedEvent
 import io.mosip.tuvali.common.events.Event
 import io.mosip.tuvali.common.events.EventEmitter
-import io.mosip.tuvali.common.safeExecute.TryExecuteSync
-import io.mosip.tuvali.common.uri.URIUtils
-import io.mosip.tuvali.exception.handlers.ExceptionHandler
 import io.mosip.tuvali.common.events.VerificationStatusEvent
-import io.mosip.tuvali.common.events.DisconnectedEvent
+import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.common.uri.OpenId4vpURI
+import io.mosip.tuvali.exception.handlers.ExceptionHandler
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import org.bouncycastle.util.encoders.Hex
 
 class Verifier(private val context: Context): IVerifier {
   private val logTag = getLogTag(javaClass.simpleName)
@@ -26,12 +27,11 @@ class Verifier(private val context: Context): IVerifier {
         initializeBLECommunicator()
       }
 
-      val payload = communicator!!.getAdvPayloadInHex(advIdentifier)
-      Log.d(logTag, "synchronized startAdvertisement called with adv identifier $payload at ${System.nanoTime()} and verifier hashcode: ${communicator.hashCode()}")
+      Log.d(logTag, "synchronized startAdvertisement called with adv identifier $advIdentifier at ${System.nanoTime()} and verifier hashcode: ${communicator.hashCode()}")
 
       communicator?.startAdvertisement(advIdentifier)
 
-      return@run URIUtils.build(payload)
+      return@run OpenId4vpURI(advIdentifier, Hex.toHexString(communicator!!.publicKey)).toString()
     }.orEmpty()
   }
 

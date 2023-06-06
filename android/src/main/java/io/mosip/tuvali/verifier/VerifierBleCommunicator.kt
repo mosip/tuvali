@@ -6,6 +6,7 @@ import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
+import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.common.events.EventEmitter
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
@@ -40,7 +41,7 @@ class VerifierBleCommunicator(
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null
   private val logTag = getLogTag(javaClass.simpleName)
-  private var publicKey: ByteArray = byteArrayOf()
+  var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var nonce: ByteArray
   private var secureRandom: SecureRandom = SecureRandom()
@@ -259,10 +260,10 @@ class VerifierBleCommunicator(
 
   private fun getAdvPayload(advIdentifier: String): ByteArray {
     // Readable Identifier from higher layer + _ + first 5 bytes of public key
-    return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0, 5)
+    return AdvertisementPayload.getAdvPayload(advIdentifier, publicKey)
   }
 
   private fun getScanRespPayload(): ByteArray {
-    return publicKey.copyOfRange(5, 32) // should contain 27 bytes
+    return AdvertisementPayload.getScanRespPayload(publicKey) // should contain 27 bytes
   }
 }

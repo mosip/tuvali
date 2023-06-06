@@ -62,6 +62,16 @@
 		0ACACE892966D8C800DABDFE /* Util.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Util.swift; sourceTree = "<group>"; };
 		0D36889629A782AA000B12CD /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		0D36889729A782AA000B12CD /* WalletExceptionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WalletExceptionHandler.swift; sourceTree = "<group>"; };
+		0DF889412A28B85800E369A4 /* Openid4vpBleURI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBleURI.swift; sourceTree = "<group>"; };
+		0DF889462A28B8A000E369A4 /* SecureChannelEstablishedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureChannelEstablishedEvent.swift; sourceTree = "<group>"; };
+		0DF889472A28B8A000E369A4 /* DisconnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedEvent.swift; sourceTree = "<group>"; };
+		0DF889482A28B8A000E369A4 /* DataSentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSentEvent.swift; sourceTree = "<group>"; };
+		0DF889492A28B8A000E369A4 /* ConnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedEvent.swift; sourceTree = "<group>"; };
+		0DF8894A2A28B8A000E369A4 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		0DF8894B2A28B8A000E369A4 /* EventWithoutArgs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWithoutArgs.swift; sourceTree = "<group>"; };
+		0DF8894C2A28B8A000E369A4 /* EventWithArgs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWithArgs.swift; sourceTree = "<group>"; };
+		0DF8894E2A28B8A000E369A4 /* VerificationStatusEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationStatusEvent.swift; sourceTree = "<group>"; };
+		0DF8894F2A28B8A000E369A4 /* ErrorEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEvent.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D069F642964466900AB61A9 /* Central.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Central.swift; sourceTree = "<group>"; };
 		8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManagerDelegate.swift; sourceTree = "<group>"; };
@@ -108,6 +118,47 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0DF889432A28B86400E369A4 /* common */ = {
+			isa = PBXGroup;
+			children = (
+				0DF889412A28B85800E369A4 /* Openid4vpBleURI.swift */,
+			);
+			path = common;
+			sourceTree = "<group>";
+		};
+		0DF889442A28B8A000E369A4 /* events */ = {
+			isa = PBXGroup;
+			children = (
+				0DF889452A28B8A000E369A4 /* withoutArgs */,
+				0DF8894A2A28B8A000E369A4 /* Event.swift */,
+				0DF8894B2A28B8A000E369A4 /* EventWithoutArgs.swift */,
+				0DF8894C2A28B8A000E369A4 /* EventWithArgs.swift */,
+				0DF8894D2A28B8A000E369A4 /* withArgs */,
+			);
+			name = events;
+			path = Openid4vpBle/events;
+			sourceTree = "<group>";
+		};
+		0DF889452A28B8A000E369A4 /* withoutArgs */ = {
+			isa = PBXGroup;
+			children = (
+				0DF889462A28B8A000E369A4 /* SecureChannelEstablishedEvent.swift */,
+				0DF889472A28B8A000E369A4 /* DisconnectedEvent.swift */,
+				0DF889482A28B8A000E369A4 /* DataSentEvent.swift */,
+				0DF889492A28B8A000E369A4 /* ConnectedEvent.swift */,
+			);
+			path = withoutArgs;
+			sourceTree = "<group>";
+		};
+		0DF8894D2A28B8A000E369A4 /* withArgs */ = {
+			isa = PBXGroup;
+			children = (
+				0DF8894E2A28B8A000E369A4 /* VerificationStatusEvent.swift */,
+				0DF8894F2A28B8A000E369A4 /* ErrorEvent.swift */,
+			);
+			path = withArgs;
+			sourceTree = "<group>";
+		};
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
@@ -119,6 +170,8 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
+				0DF889442A28B8A000E369A4 /* events */,
+				0DF889432A28B86400E369A4 /* common */,
 				E2399AA129D3FECF0017C313 /* Exception */,
 				FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */,
 				FDA18F3D2977B67C00290433 /* crc */,
@@ -357,6 +410,7 @@
 				0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */,
 				8D069F6B29644B7C00AB61A9 /* PeripheralExtension.swift in Sources */,
 				E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */,
+				0DF889422A28B85800E369A4 /* Openid4vpBleURI.swift in Sources */,
 				8D179C8F29548B3A00017EE5 /* CryptoBoxImpl.swift in Sources */,
 				8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */,
 				8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */,

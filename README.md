@@ -26,7 +26,7 @@ For example use QR code generator to visually display URI and QR code scanner to
 ## URI exchange and Establishing connection
 
 ### Verifier
-The Verifier device will be showing a QR code with URI. Verifier can generate URI and start advertisement using startAdvertisement() method. Once advertisement started, `Verifier` will keep on advertising URI and will wait for the `Wallet` to connect.
+The Verifier device can show a QR code with the URI. Verifier can generate URI through startAdvertisement() method. Once advertisement is started, Verifier will keep advertising with an advertisement payload derived from URI.
 
 ```typescript
 import OpenIdBle from 'react-native-openid4vp-ble';
@@ -39,10 +39,10 @@ console.log(uri);
 The URI contains:
 
 ```
-OPENID4VP://4f56504d4f5349505f66b067c008A4484AEC5A769CED2307F59E43DC81A3F768
+OPENID4VP://connect?name=STADONENTRY&key=8520f0098930a754748b7ddcb43ef75a0dbf3a0d26381af4eba4a98eaa9b4e6a
 ```
 
-`OPENID4VP` is used as identifier for URI. The part after the `//` of the data is the same data that will be advertised by the `Verifier` device but in hex encoded form.
+URI structure can be found in the spec --> https://bitbucket.org/openid/connect/src/master/openid-4-verifiable-presentations-over-ble/openid-4-verifiable-presentations-over-ble-1_0.md
 
 E.g: OPENID4VP://OVPMOSIP_<first 5 bytes of public key>
 
@@ -61,12 +61,12 @@ The Wallet device will keep on scanning for a verifier that has same URI in its 
 Once the connection is established, Wallet can send the data by:
 
 ```typescript
-wallet.send(vc);
+wallet.send(data);
 ```
 
-Wallet will start sending VC in a secured way to the Verifier. At the moment, only VC data can be exchanged from Wallet to Verifier instead of VP response mentioned in the specification.
+Wallet will start sending data in a secured way to the Verifier.
 
-Note: Verifier send will be implemented in upcoming versions
+Note: At this moment, we currently support data transfer from Wallet to Verifier only.
 
 ## Verifier Response
 
@@ -81,7 +81,7 @@ Status can be either `ACCEPTED` or `REJECTED`. Sending verification status acts 
 
 ## Events from Tuvali
 
-Tuvali sends multiple events to propagate connection status, received VC data etc. These events can be subscribed to by calling:
+Tuvali sends multiple events to propagate connection status, received data etc. These events can be subscribed to by calling:
 
 on Wallet:
 
@@ -123,7 +123,7 @@ Events which are emitted by both Wallet and Verifier
 
 1. onDataSent
    * `{"type": "onDataSent"}`
-   * on completion of Data(VC) transfer from the Wallet Side
+   * on completion of Data transfer from the Wallet Side
 2. onVerificationStatusReceived
    * `{"type": "onVerificationStatusReceived", "status": "ACCEPTED"}`
    * on received verification status from Verifier
@@ -132,7 +132,7 @@ Events which are emitted by both Wallet and Verifier
 
 1. onDataReceived
   * `{"type": "onDataReceived"}`
-  * on receiving of Data(VC) from the Wallet Side
+  * on receiving data from the Wallet Side
 
 ## Connection closure
 
