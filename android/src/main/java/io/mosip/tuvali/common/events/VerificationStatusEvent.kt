@@ -1,6 +1,4 @@
-package io.mosip.tuvali.common.events.withArgs
-
-import io.mosip.tuvali.common.events.Event
+package io.mosip.tuvali.common.events
 
 data class VerificationStatusEvent(val status: VerificationStatus): Event {
 

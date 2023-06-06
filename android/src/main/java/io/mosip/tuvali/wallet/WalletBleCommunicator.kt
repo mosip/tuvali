@@ -14,12 +14,12 @@ import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
 import io.mosip.tuvali.exception.BLEException
-import io.mosip.tuvali.common.events.withArgs.VerificationStatusEvent
-import io.mosip.tuvali.common.events.withoutArgs.ConnectedEvent
-import io.mosip.tuvali.common.events.withoutArgs.DataSentEvent
-import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
-import io.mosip.tuvali.common.events.withoutArgs.SecureChannelEstablishedEvent
-import io.mosip.tuvali.common.events.EventProducer
+import io.mosip.tuvali.common.events.VerificationStatusEvent
+import io.mosip.tuvali.common.events.ConnectedEvent
+import io.mosip.tuvali.common.events.DataSentEvent
+import io.mosip.tuvali.common.events.DisconnectedEvent
+import io.mosip.tuvali.common.events.SecureChannelEstablishedEvent
+import io.mosip.tuvali.common.events.EventEmitter
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -38,7 +38,7 @@ import java.util.*
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
-class WalletBleCommunicator(context: Context, private val eventProducer: EventProducer, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
+class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmitter, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
@@ -179,7 +179,7 @@ class WalletBleCommunicator(context: Context, private val eventProducer: EventPr
     Log.d(logTag, "onRequestMTUSuccess")
     maxDataBytes = mtu
     central.subscribe(VerifierBleCommunicator.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
-    eventProducer.emitEvent(ConnectedEvent())
+    eventEmitter.emitEvent(ConnectedEvent())
     writeToIdentifyRequest()
   }
 
@@ -206,7 +206,7 @@ class WalletBleCommunicator(context: Context, private val eventProducer: EventPr
     synchronized(connectionMutex) {
       connectionState = VerifierConnectionState.NOT_CONNECTED
       if (!isManualDisconnect) {
-          eventProducer.emitEvent(DisconnectedEvent())
+          eventEmitter.emitEvent(DisconnectedEvent())
       }
     }
   }
@@ -231,7 +231,7 @@ class WalletBleCommunicator(context: Context, private val eventProducer: EventPr
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        eventProducer.emitEvent(SecureChannelEstablishedEvent())
+        eventEmitter.emitEvent(SecureChannelEstablishedEvent())
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -247,7 +247,7 @@ class WalletBleCommunicator(context: Context, private val eventProducer: EventPr
   }
 
   override fun onResponseSent() {
-    eventProducer.emitEvent(DataSentEvent())
+    eventEmitter.emitEvent(DataSentEvent())
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -264,9 +264,9 @@ class WalletBleCommunicator(context: Context, private val eventProducer: EventPr
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
         if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          eventProducer.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
+          eventEmitter.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
         } else {
-          eventProducer.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
+          eventEmitter.emitEvent(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
         }
 
         central.unsubscribe(VerifierBleCommunicator.SERVICE_UUID, charUUID)

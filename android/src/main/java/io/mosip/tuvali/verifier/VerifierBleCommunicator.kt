@@ -6,15 +6,15 @@ import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
-import io.mosip.tuvali.common.events.EventProducer
+import io.mosip.tuvali.common.events.EventEmitter
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
 import io.mosip.tuvali.exception.BLEException
-import io.mosip.tuvali.common.events.withArgs.DataReceivedEvent
-import io.mosip.tuvali.common.events.withoutArgs.ConnectedEvent
-import io.mosip.tuvali.common.events.withoutArgs.DisconnectedEvent
-import io.mosip.tuvali.common.events.withoutArgs.SecureChannelEstablishedEvent
+import io.mosip.tuvali.common.events.DataReceivedEvent
+import io.mosip.tuvali.common.events.ConnectedEvent
+import io.mosip.tuvali.common.events.DisconnectedEvent
+import io.mosip.tuvali.common.events.SecureChannelEstablishedEvent
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
@@ -34,7 +34,7 @@ private const val MIN_MTU_REQUIRED = 64
 
 class VerifierBleCommunicator(
   context: Context,
-  private val eventProducer: EventProducer,
+  private val eventEmitter: EventEmitter,
   private val handleException: (BLEException) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
@@ -135,7 +135,7 @@ class VerifierBleCommunicator(
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPubKey)
           peripheral.enableCommunication()
           peripheral.stopAdvertisement()
-          eventProducer.emitEvent(SecureChannelEstablishedEvent())
+          eventEmitter.emitEvent(SecureChannelEstablishedEvent())
         }
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
@@ -206,7 +206,7 @@ class VerifierBleCommunicator(
     Log.d(logTag, "onDeviceConnected: sending event")
     // Avoid spurious device connected events to be sent to higher layer before advertisement starts successfully
     if (peripheral.isAdvertisementStarted()) {
-      eventProducer.emitEvent(ConnectedEvent())
+      eventEmitter.emitEvent(ConnectedEvent())
     }
   }
 
@@ -223,7 +223,7 @@ class VerifierBleCommunicator(
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if (!isManualDisconnect && isConnected) {
-      eventProducer.emitEvent(DisconnectedEvent())
+      eventEmitter.emitEvent(DisconnectedEvent())
     }
   }
 
@@ -235,7 +235,7 @@ class VerifierBleCommunicator(
         Log.d(logTag, "decryptedData size: ${decryptedData.size}")
         val decompressedData = Util.decompress(decryptedData)
         Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-        eventProducer.emitEvent(DataReceivedEvent(String(decompressedData!!)))
+        eventEmitter.emitEvent(DataReceivedEvent(String(decompressedData!!)))
       } else {
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error

@@ -1,9 +1,8 @@
 package io.mosip.tuvali.common.events
 
-import io.mosip.tuvali.common.events.withArgs.ErrorEvent
 import io.mosip.tuvali.exception.ErrorCode
 
-class EventProducer {
+class EventEmitter {
   private var consumers = mutableListOf<((Event) -> Unit)>()
 
   fun addConsumer(consumer: (Event) -> Unit) {
@@ -18,7 +17,7 @@ class EventProducer {
     consumers.forEach{it(event)}
   }
 
-  fun removeConsumer() {
+  fun removeConsumers() {
     consumers.clear()
   }
 }

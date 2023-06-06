@@ -36,7 +36,6 @@ class RNVerifierModule(reactContext: ReactApplicationContext) :
   }
 
   companion object {
-    var tuvaliVersion: String = "unknown"
     const val NAME = "VerifierModule"
   }
 }
