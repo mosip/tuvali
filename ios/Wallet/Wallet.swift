@@ -1,6 +1,7 @@
 import Foundation
 
 class Wallet: WalletProtocol {
+    
     var bleCommunicator: WalletBleCommunicator?
     
     init() {
@@ -9,6 +10,7 @@ class Wallet: WalletProtocol {
 
     func startConnection(_ uri: String) {
         print("startConnection->uri::\(uri)")
+        let openId4VpURI = OpenId4vpURI(uri: uri)
             
         guard openId4VpURI.isValid(), let advPayload = getAdvPayload(openId4VpURI) else {
             ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidURIException)
@@ -19,21 +21,9 @@ class Wallet: WalletProtocol {
         bleCommunicator?.setAdvIdentifier(identifier: advPayload)
         bleCommunicator?.startScanning()
         bleCommunicator?.createConnection = {
-            EventEmitter.sharedInstance.emitEventWithoutArgs(event: ConnectedEvent())
+            EventEmitter.sharedInstance.emitEvent(ConnectedEvent())
             self.bleCommunicator?.writeToIdentifyRequest()
         }
-    }
-
-    func stringToJson(jsonText: String) -> NSDictionary {
-        var dictonary: NSDictionary?
-        if let data = jsonText.data(using: String.Encoding.utf8) {
-            do {
-                dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
-            } catch let error as NSError {
-                os_log(.error, " %{public}@ ", error)
-            }
-        }
-        return dictonary!
     }
 
     func disconnect(){
@@ -46,6 +36,15 @@ class Wallet: WalletProtocol {
         os_log(.info, ">> raw message size : %{public}d", payload.count)
     }
 
+    func subscribe(_ listener: @escaping (Event) -> Void) {
+        EventEmitter.sharedInstance.addListener(listener: listener)
+    }
+    
+    func unsubscribe() {
+        EventEmitter.sharedInstance.removeListeners()
+    }
+    
+    
     fileprivate func handleError(_ message: String, _ code: String) {
         bleCommunicator?.handleDestroyConnection(isSelfDisconnect: false)
         EventEmitter.sharedInstance.emitErrorEvent(message: message, code: code)
@@ -57,4 +56,17 @@ class Wallet: WalletProtocol {
         }
         return data + hexStringToData(string: String(hexPublickey.prefix(10)))
     }
+    
+    func stringToJson(jsonText: String) -> NSDictionary {
+        var dictonary: NSDictionary?
+        if let data = jsonText.data(using: String.Encoding.utf8) {
+            do {
+                dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
+            } catch let error as NSError {
+                os_log(.error, " %{public}@ ", error)
+            }
+        }
+        return dictonary!
+    }
+
 }

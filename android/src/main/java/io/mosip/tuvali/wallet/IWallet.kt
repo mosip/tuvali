@@ -6,6 +6,6 @@ interface IWallet {
   fun startConnection(uri: String)
   fun sendData(payload: String)
   fun disconnect()
-  fun subscribe(consumer: (Event) -> Unit)
+  fun subscribe(listener: (Event) -> Unit)
   fun unSubscribe()
 }

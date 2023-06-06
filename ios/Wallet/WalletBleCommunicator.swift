@@ -8,7 +8,7 @@ class WalletBleCommunicator: NSObject {
     var central: Central?
     var secretTranslator: SecretTranslator?
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
-    var advIdentifier: String?
+    var advIdentifier: Data?
     var verifierPublicKey: Data?
     var createConnection: (() -> Void)?
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
@@ -23,7 +23,7 @@ class WalletBleCommunicator: NSObject {
         resolve(["iOS Wallet"])
     }
 
-    func setAdvIdentifier(identifier: String) {
+    func setAdvIdentifier(identifier: Data) {
         self.advIdentifier = identifier
     }
 
@@ -32,7 +32,7 @@ class WalletBleCommunicator: NSObject {
     }
 
     func startScanning(){
-        central?.walletDelegate = self
+        central?.walletBleCommunicatorDelegate = self
     }
 
     func handleDestroyConnection(isSelfDisconnect: Bool) {
@@ -43,7 +43,7 @@ class WalletBleCommunicator: NSObject {
     }
 
     func onDeviceDisconnected(){
-        EventEmitter.sharedInstance.emitEventWithoutArgs(event: DisconnectedEvent())
+        EventEmitter.sharedInstance.emitEvent(DisconnectedEvent())
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
@@ -51,7 +51,7 @@ class WalletBleCommunicator: NSObject {
             os_log(.info, "Found NO ADV Identifier")
             return false
         }
-        let advIdentifierData = hexStringToData(string: advIdentifier)
+        let advIdentifierData = advIdentifier
         if advIdentifierData == advertisementPayload {
             return true
         }

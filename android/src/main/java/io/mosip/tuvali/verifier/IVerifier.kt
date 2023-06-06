@@ -6,6 +6,6 @@ interface IVerifier {
   fun startAdvertisement(advIdentifier: String): String
   fun disconnect()
   fun sendVerificationStatus(status: Int)
-  fun subscribe(consumer: (Event) -> Unit)
+  fun subscribe(listener: (Event) -> Unit)
   fun unSubscribe()
 }

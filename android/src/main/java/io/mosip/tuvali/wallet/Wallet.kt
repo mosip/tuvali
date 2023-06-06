@@ -56,17 +56,17 @@ class Wallet(private val context: Context) : IWallet {
     }
   }
 
-  override fun subscribe(consumer: (Event) -> Unit) {
+  override fun subscribe(listener: (Event) -> Unit) {
     Log.d(logTag, "got subscribe at ${System.nanoTime()}")
     tryExecuteSync.run {
-      eventEmitter.addConsumer(consumer)
+      eventEmitter.addListener(listener)
     }
   }
 
   override fun unSubscribe() {
     Log.d(logTag, "got unsubscribe at ${System.nanoTime()}")
     tryExecuteSync.run {
-      eventEmitter.removeConsumers()
+      eventEmitter.removeListeners()
     }
   }
 

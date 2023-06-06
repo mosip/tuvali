@@ -12,7 +12,7 @@ extension WalletBleCommunicator: WalletBleCommunicatorProtocol {
     }
 
     func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitEventWithoutArgs(event: SecureChannelEstablishedEvent())
+        EventEmitter.sharedInstance.emitEvent(SecureChannelEstablishedEvent())
     }
 
     func onDisconnectStatusChange(data: Data?) {

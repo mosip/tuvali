@@ -12,13 +12,15 @@
 		0ACACE8A2966D8C800DABDFE /* Util.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ACACE892966D8C800DABDFE /* Util.swift */; };
 		0D36889829A782AA000B12CD /* ErrorHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D36889629A782AA000B12CD /* ErrorHandler.swift */; };
 		0D36889929A782AA000B12CD /* WalletExceptionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D36889729A782AA000B12CD /* WalletExceptionHandler.swift */; };
+		0DF889722A2F6D1200E369A4 /* HexUtil.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF889712A2F6D1200E369A4 /* HexUtil.swift */; };
+		0DF889752A2F6D4000E369A4 /* WalletBleCommunicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF889732A2F6D4000E369A4 /* WalletBleCommunicator.swift */; };
+		0DF889762A2F6D4000E369A4 /* WalletProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0DF889742A2F6D4000E369A4 /* WalletProtocol.swift */; };
 		8D069F652964466900AB61A9 /* Central.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F642964466900AB61A9 /* Central.swift */; };
 		8D069F672964475A00AB61A9 /* CentralManagerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */; };
 		8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F68296447D000AB61A9 /* Peripheral.swift */; };
 		8D069F6B29644B7C00AB61A9 /* PeripheralExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */; };
 		8D069F6D2964724700AB61A9 /* Characteristics.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F6C2964724700AB61A9 /* Characteristics.swift */; };
 		8D069F732967BEC200AB61A9 /* PeripheralDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F722967BEC200AB61A9 /* PeripheralDelegate.swift */; };
-		8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D069F742968305A00AB61A9 /* EventEmitter.swift */; };
 		8D179C892954871400017EE5 /* CipherBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C882954871400017EE5 /* CipherBox.swift */; };
 		8D179C8B2954874C00017EE5 /* CiperBoxImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */; };
 		8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8D179C8C29548AB400017EE5 /* CryptoBox.swift */; };
@@ -37,7 +39,6 @@
 		E25800A42976BF8700968EA0 /* chunker.swift in Sources */ = {isa = PBXBuildFile; fileRef = E25800A32976BF8700968EA0 /* chunker.swift */; };
 		E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */; };
 		E2F1AFCB297176C200AC3355 /* BLEConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2F1AFCA297176C200AC3355 /* BLEConstants.swift */; };
-		E8D889492A0E053A00C250CA /* WalletModule.swift in Sources */ = {isa = PBXBuildFile; fileRef = E8D889482A0E053A00C250CA /* WalletModule.swift */; };
 		FD494F4D29ADBE00002612C1 /* BackOffStrategy.swift in Sources */ = {isa = PBXBuildFile; fileRef = FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */; };
 		FDA18F3F2977B69A00290433 /* CRC16.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDA18F3E2977B69A00290433 /* CRC16.swift */; };
 		FDD9411E297FAA6B00FBBDD4 /* DataExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */; };
@@ -63,15 +64,21 @@
 		0D36889629A782AA000B12CD /* ErrorHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ErrorHandler.swift; sourceTree = "<group>"; };
 		0D36889729A782AA000B12CD /* WalletExceptionHandler.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WalletExceptionHandler.swift; sourceTree = "<group>"; };
 		0DF889412A28B85800E369A4 /* Openid4vpBleURI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBleURI.swift; sourceTree = "<group>"; };
-		0DF889462A28B8A000E369A4 /* SecureChannelEstablishedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureChannelEstablishedEvent.swift; sourceTree = "<group>"; };
-		0DF889472A28B8A000E369A4 /* DisconnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedEvent.swift; sourceTree = "<group>"; };
-		0DF889482A28B8A000E369A4 /* DataSentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSentEvent.swift; sourceTree = "<group>"; };
-		0DF889492A28B8A000E369A4 /* ConnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedEvent.swift; sourceTree = "<group>"; };
-		0DF8894A2A28B8A000E369A4 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		0DF8894B2A28B8A000E369A4 /* EventWithoutArgs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWithoutArgs.swift; sourceTree = "<group>"; };
-		0DF8894C2A28B8A000E369A4 /* EventWithArgs.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventWithArgs.swift; sourceTree = "<group>"; };
-		0DF8894E2A28B8A000E369A4 /* VerificationStatusEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationStatusEvent.swift; sourceTree = "<group>"; };
-		0DF8894F2A28B8A000E369A4 /* ErrorEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEvent.swift; sourceTree = "<group>"; };
+		0DF889692A2F6CF300E369A4 /* VerificationStatusEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationStatusEvent.swift; sourceTree = "<group>"; };
+		0DF8896A2A2F6CF300E369A4 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
+		0DF8896B2A2F6CF300E369A4 /* SecureChannelEstablishedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureChannelEstablishedEvent.swift; sourceTree = "<group>"; };
+		0DF8896C2A2F6CF300E369A4 /* DisconnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedEvent.swift; sourceTree = "<group>"; };
+		0DF8896D2A2F6CF300E369A4 /* DataSentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSentEvent.swift; sourceTree = "<group>"; };
+		0DF8896E2A2F6CF300E369A4 /* ErrorEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEvent.swift; sourceTree = "<group>"; };
+		0DF8896F2A2F6CF300E369A4 /* ConnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectedEvent.swift; sourceTree = "<group>"; };
+		0DF889702A2F6CF300E369A4 /* EventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEmitter.swift; sourceTree = "<group>"; };
+		0DF889712A2F6D1200E369A4 /* HexUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexUtil.swift; sourceTree = "<group>"; };
+		0DF889732A2F6D4000E369A4 /* WalletBleCommunicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBleCommunicator.swift; sourceTree = "<group>"; };
+		0DF889742A2F6D4000E369A4 /* WalletProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletProtocol.swift; sourceTree = "<group>"; };
+		0DF889782A2F6D6C00E369A4 /* VersionModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionModule.swift; sourceTree = "<group>"; };
+		0DF889792A2F6D6C00E369A4 /* RNEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitter.swift; sourceTree = "<group>"; };
+		0DF8897A2A2F6D6C00E369A4 /* RNEventEmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitterProtocol.swift; sourceTree = "<group>"; };
+		0DF8897B2A2F6D6C00E369A4 /* WalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletModule.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D069F642964466900AB61A9 /* Central.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Central.swift; sourceTree = "<group>"; };
 		8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManagerDelegate.swift; sourceTree = "<group>"; };
@@ -79,7 +86,6 @@
 		8D069F6A29644B7C00AB61A9 /* PeripheralExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralExtension.swift; sourceTree = "<group>"; };
 		8D069F6C2964724700AB61A9 /* Characteristics.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Characteristics.swift; sourceTree = "<group>"; };
 		8D069F722967BEC200AB61A9 /* PeripheralDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralDelegate.swift; sourceTree = "<group>"; };
-		8D069F742968305A00AB61A9 /* EventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EventEmitter.swift; sourceTree = "<group>"; };
 		8D179C882954871400017EE5 /* CipherBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CipherBox.swift; sourceTree = "<group>"; };
 		8D179C8A2954874C00017EE5 /* CiperBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CiperBoxImpl.swift; sourceTree = "<group>"; };
 		8D179C8C29548AB400017EE5 /* CryptoBox.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CryptoBox.swift; sourceTree = "<group>"; };
@@ -99,9 +105,8 @@
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
 		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
-		E8D889482A0E053A00C250CA /* WalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletModule.swift; sourceTree = "<group>"; };
 		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
-		FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = BackOffStrategy.swift; path = ble/Utility/BackOffStrategy.swift; sourceTree = "<group>"; };
+		FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackOffStrategy.swift; sourceTree = "<group>"; };
 		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
 		FDD9411F2980FD2500FBBDD4 /* TransferReport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferReport.swift; sourceTree = "<group>"; };
@@ -121,42 +126,40 @@
 		0DF889432A28B86400E369A4 /* common */ = {
 			isa = PBXGroup;
 			children = (
+				E2399AA129D3FECF0017C313 /* Exception */,
+				FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */,
+				FDA18F3D2977B67C00290433 /* crc */,
+				0DF889682A2F6CF300E369A4 /* events */,
+				0DF889712A2F6D1200E369A4 /* HexUtil.swift */,
 				0DF889412A28B85800E369A4 /* Openid4vpBleURI.swift */,
 			);
 			path = common;
 			sourceTree = "<group>";
 		};
-		0DF889442A28B8A000E369A4 /* events */ = {
+		0DF889682A2F6CF300E369A4 /* events */ = {
 			isa = PBXGroup;
 			children = (
-				0DF889452A28B8A000E369A4 /* withoutArgs */,
-				0DF8894A2A28B8A000E369A4 /* Event.swift */,
-				0DF8894B2A28B8A000E369A4 /* EventWithoutArgs.swift */,
-				0DF8894C2A28B8A000E369A4 /* EventWithArgs.swift */,
-				0DF8894D2A28B8A000E369A4 /* withArgs */,
+				0DF889692A2F6CF300E369A4 /* VerificationStatusEvent.swift */,
+				0DF8896A2A2F6CF300E369A4 /* Event.swift */,
+				0DF8896B2A2F6CF300E369A4 /* SecureChannelEstablishedEvent.swift */,
+				0DF8896C2A2F6CF300E369A4 /* DisconnectedEvent.swift */,
+				0DF8896D2A2F6CF300E369A4 /* DataSentEvent.swift */,
+				0DF8896E2A2F6CF300E369A4 /* ErrorEvent.swift */,
+				0DF8896F2A2F6CF300E369A4 /* ConnectedEvent.swift */,
+				0DF889702A2F6CF300E369A4 /* EventEmitter.swift */,
 			);
-			name = events;
-			path = Openid4vpBle/events;
+			path = events;
 			sourceTree = "<group>";
 		};
-		0DF889452A28B8A000E369A4 /* withoutArgs */ = {
+		0DF889772A2F6D6C00E369A4 /* RNModules */ = {
 			isa = PBXGroup;
 			children = (
-				0DF889462A28B8A000E369A4 /* SecureChannelEstablishedEvent.swift */,
-				0DF889472A28B8A000E369A4 /* DisconnectedEvent.swift */,
-				0DF889482A28B8A000E369A4 /* DataSentEvent.swift */,
-				0DF889492A28B8A000E369A4 /* ConnectedEvent.swift */,
+				0DF889782A2F6D6C00E369A4 /* VersionModule.swift */,
+				0DF889792A2F6D6C00E369A4 /* RNEventEmitter.swift */,
+				0DF8897A2A2F6D6C00E369A4 /* RNEventEmitterProtocol.swift */,
+				0DF8897B2A2F6D6C00E369A4 /* WalletModule.swift */,
 			);
-			path = withoutArgs;
-			sourceTree = "<group>";
-		};
-		0DF8894D2A28B8A000E369A4 /* withArgs */ = {
-			isa = PBXGroup;
-			children = (
-				0DF8894E2A28B8A000E369A4 /* VerificationStatusEvent.swift */,
-				0DF8894F2A28B8A000E369A4 /* ErrorEvent.swift */,
-			);
-			path = withArgs;
+			path = RNModules;
 			sourceTree = "<group>";
 		};
 		134814211AA4EA7D00B7C361 /* Products */ = {
@@ -170,14 +173,10 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				0DF889442A28B8A000E369A4 /* events */,
+				0DF889772A2F6D6C00E369A4 /* RNModules */,
 				0DF889432A28B86400E369A4 /* common */,
-				E2399AA129D3FECF0017C313 /* Exception */,
-				FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */,
-				FDA18F3D2977B67C00290433 /* crc */,
 				8D069F612964454700AB61A9 /* ble */,
 				8D179C82295486B500017EE5 /* crypto */,
-				8D069F60296436C400AB61A9 /* Openid4vpBle */,
 				8D069F5E2964369000AB61A9 /* Wallet */,
 				8D069F5F296436AD00AB61A9 /* Verifier */,
 				B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */,
@@ -189,6 +188,8 @@
 		8D069F5E2964369000AB61A9 /* Wallet */ = {
 			isa = PBXGroup;
 			children = (
+				0DF889732A2F6D4000E369A4 /* WalletBleCommunicator.swift */,
+				0DF889742A2F6D4000E369A4 /* WalletProtocol.swift */,
 				0A62BB702938C1EC0092E47D /* Wallet.swift */,
 				A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */,
 			);
@@ -201,15 +202,6 @@
 				0A62BB722938C1FA0092E47D /* Verifier.swift */,
 			);
 			path = Verifier;
-			sourceTree = "<group>";
-		};
-		8D069F60296436C400AB61A9 /* Openid4vpBle */ = {
-			isa = PBXGroup;
-			children = (
-				8D069F742968305A00AB61A9 /* EventEmitter.swift */,
-				E8D889482A0E053A00C250CA /* WalletModule.swift */,
-			);
-			path = Openid4vpBle;
 			sourceTree = "<group>";
 		};
 		8D069F612964454700AB61A9 /* ble */ = {
@@ -390,11 +382,12 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				0DF889752A2F6D4000E369A4 /* WalletBleCommunicator.swift in Sources */,
+				0DF889762A2F6D4000E369A4 /* WalletProtocol.swift in Sources */,
+				0DF889722A2F6D1200E369A4 /* HexUtil.swift in Sources */,
 				FD494F4D29ADBE00002612C1 /* BackOffStrategy.swift in Sources */,
 				E223F0322977BE090042F919 /* TransferHandler.swift in Sources */,
-				8D069F752968305B00AB61A9 /* EventEmitter.swift in Sources */,
 				8D31C3F82956B0B30073B710 /* SecretTranslator.swift in Sources */,
-				E8D889492A0E053A00C250CA /* WalletModule.swift in Sources */,
 				0D36889829A782AA000B12CD /* ErrorHandler.swift in Sources */,
 				8D069F69296447D000AB61A9 /* Peripheral.swift in Sources */,
 				E2399AA329D5ED140017C313 /* VerifierExceptionHandler.swift in Sources */,
@@ -410,7 +403,6 @@
 				0A62BB732938C1FB0092E47D /* Verifier.swift in Sources */,
 				8D069F6B29644B7C00AB61A9 /* PeripheralExtension.swift in Sources */,
 				E2D682D429A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift in Sources */,
-				0DF889422A28B85800E369A4 /* Openid4vpBleURI.swift in Sources */,
 				8D179C8F29548B3A00017EE5 /* CryptoBoxImpl.swift in Sources */,
 				8D179C8D29548AB400017EE5 /* CryptoBox.swift in Sources */,
 				8D31C4022956B3EF0073B710 /* WalletCryptoBoxImpl.swift in Sources */,

@@ -1,6 +1,6 @@
 import Foundation
 
-struct VerificationStatusEvent: EventWithArgs {
+struct VerificationStatusEvent: Event {
     var type: String { return "onVerificationStatusReceived" }
     var status: VerificationStatus
 

@@ -1,6 +1,6 @@
 import Foundation
 
-struct ErrorEvent: EventWithArgs {
+struct ErrorEvent: Event {
     var type: String { return "onError" }
     var message: String
     var code: String

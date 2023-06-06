@@ -3,10 +3,10 @@ package io.mosip.tuvali.common.events
 import io.mosip.tuvali.exception.ErrorCode
 
 class EventEmitter {
-  private var consumers = mutableListOf<((Event) -> Unit)>()
+  private var listeners = mutableListOf<((Event) -> Unit)>()
 
-  fun addConsumer(consumer: (Event) -> Unit) {
-    consumers.add(consumer)
+  fun addListener(listener: (Event) -> Unit) {
+    listeners.add(listener)
   }
 
   fun emitErrorEvent(message: String, code: ErrorCode) {
@@ -14,10 +14,10 @@ class EventEmitter {
   }
 
   fun emitEvent(event: Event) {
-    consumers.forEach{it(event)}
+    listeners.forEach{it(event)}
   }
 
-  fun removeConsumers() {
-    consumers.clear()
+  fun removeListeners() {
+    listeners.clear()
   }
 }
