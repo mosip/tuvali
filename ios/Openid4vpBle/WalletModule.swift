@@ -18,12 +18,11 @@ class WalletModule: RCTEventEmitter {
     @objc func startConnection(_ uri: String) {
         let openId4VpURI = OpenId4vpURI(uri: uri)
         print("startConnection->uri::\(uri)")
-        if !openId4VpURI.isValid() {
+        
+        guard openId4VpURI.isValid(), let advPayload = getAdvPayload(openId4VpURI) else {
             ErrorHandler.sharedInstance.handleException(type: .walletException, error: .invalidURIException)
             return
         }
-        
-        let advPayload = getAdvPayload(openId4VpURI)
         wallet = Wallet()
         wallet?.setAdvIdentifier(identifier: advPayload)
         wallet?.startScanning()
@@ -76,8 +75,10 @@ class WalletModule: RCTEventEmitter {
     }
     
     
-    fileprivate func getAdvPayload(_ openId4VpURI: OpenId4vpURI) -> Data {
-        return (openId4VpURI.getName()! + "_").data(using: .utf8)!
-        + hexStringToData(string: String(openId4VpURI.getHexPK()!.prefix(10)))
+    fileprivate func getAdvPayload(_ openId4VpURI: OpenId4vpURI) -> Data? {
+        guard let name = openId4VpURI.getName(), let data = (name + "_").data(using: .utf8), let hexPublickey = openId4VpURI.getHexPK() else {
+            return nil
+        }
+        return data + hexStringToData(string: String(hexPublickey.prefix(10)))
     }
 }
