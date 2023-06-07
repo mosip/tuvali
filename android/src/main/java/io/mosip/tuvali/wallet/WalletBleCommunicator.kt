@@ -132,7 +132,7 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
 
   private fun isSameAdvPayload(advertisementPayload: ByteArray): Boolean {
     this.advPayload?.let {
-      return Hex.decode(it) contentEquals advertisementPayload
+      return it contentEquals advertisementPayload
     }
     return false
   }
