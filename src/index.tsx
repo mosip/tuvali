@@ -4,7 +4,7 @@ import { tuvaliVersion } from './tuvaliVersion';
 import { EventTypes, VerificationStatus } from './types/events';
 
 const LINKING_ERROR =
-  `The package 'react-native-openid4vp-ble' doesn't seem to be linked. Make sure: \n\n` +
+  `The package 'react-native-tuvali' doesn't seem to be linked. Make sure: \n\n` +
   Platform.select({ ios: "- You have run 'pod install'\n", default: '' }) +
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';

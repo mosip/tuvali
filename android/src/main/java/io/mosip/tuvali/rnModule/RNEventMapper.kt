@@ -46,11 +46,7 @@ class RNEventMapper {
       }
     }
 
-    private fun populateProperty(
-      property: KProperty1<out Event, *>,
-      event: Event,
-      writableMap: WritableMap
-    ) {
+    private fun populateProperty(property: KProperty1<out Event, *>, event: Event, writableMap: WritableMap) {
       var propertyValue = property.getter.call(event)
 
       if (propertyValue is Enum<*>) {

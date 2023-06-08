@@ -53,9 +53,9 @@ Remember to add tests for your change if possible. Run the unit tests by:
 yarn test
 ```
 
-To edit the Objective-C or Swift files, open `example/ios/Openid4vpBleExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-openid4vp-ble`.
+To edit the Objective-C or Swift files, open `example/ios/TuvaliExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-tuvali`.
 
-To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `react-native-openid4vp-ble` under `Android`.
+To edit the Java or Kotlin files, open `example/android` in Android studio and find the source files at `react-native-tuvali` under `Android`.
 
 
 ### Commit message convention

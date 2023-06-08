@@ -80,7 +80,7 @@
 		0DF889842A31A2C600E369A4 /* RNVersionModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNVersionModule.swift; sourceTree = "<group>"; };
 		0DF889852A31A2C600E369A4 /* RNWalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNWalletModule.swift; sourceTree = "<group>"; };
 		0DF889862A31A2C600E369A4 /* RNEventEmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitterProtocol.swift; sourceTree = "<group>"; };
-		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		134814201AA4EA6300B7C361 /* libTuvali.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTuvali.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D069F642964466900AB61A9 /* Central.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Central.swift; sourceTree = "<group>"; };
 		8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManagerDelegate.swift; sourceTree = "<group>"; };
 		8D069F68296447D000AB61A9 /* Peripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peripheral.swift; sourceTree = "<group>"; };
@@ -100,13 +100,13 @@
 		8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxBuilder.swift; sourceTree = "<group>"; };
 		8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxImpl.swift; sourceTree = "<group>"; };
 		A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Wallet+Extension.swift"; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* Tuvali.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Tuvali.m; sourceTree = "<group>"; };
 		E223F0312977BE090042F919 /* TransferHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHandler.swift; sourceTree = "<group>"; };
 		E2399AA229D5ED140017C313 /* VerifierExceptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierExceptionHandler.swift; sourceTree = "<group>"; };
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
 		E2D682D329A494D8009E71A6 /* PeripheralCommunicatorDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralCommunicatorDelegate.swift; sourceTree = "<group>"; };
 		E2F1AFCA297176C200AC3355 /* BLEConstants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEConstants.swift; sourceTree = "<group>"; };
-		F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Openid4vpBle-Bridging-Header.h"; sourceTree = "<group>"; };
+		F4FF95D5245B92E700C19C63 /* Tuvali-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Tuvali-Bridging-Header.h"; sourceTree = "<group>"; };
 		FD494F4C29ADBE00002612C1 /* BackOffStrategy.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BackOffStrategy.swift; sourceTree = "<group>"; };
 		FDA18F3E2977B69A00290433 /* CRC16.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CRC16.swift; sourceTree = "<group>"; };
 		FDD9411D297FAA6B00FBBDD4 /* DataExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataExtension.swift; sourceTree = "<group>"; };
@@ -167,7 +167,7 @@
 		134814211AA4EA7D00B7C361 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */,
+				134814201AA4EA6300B7C361 /* libTuvali.a */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -181,8 +181,8 @@
 				8D179C82295486B500017EE5 /* crypto */,
 				8D069F5E2964369000AB61A9 /* Wallet */,
 				8D069F5F296436AD00AB61A9 /* Verifier */,
-				B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */,
-				F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */,
+				B3E7B5891CC2AC0600A0062D /* Tuvali.m */,
+				F4FF95D5245B92E700C19C63 /* Tuvali-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -330,9 +330,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		58B511DA1A9E6C8500147676 /* Openid4vpBle */ = {
+		58B511DA1A9E6C8500147676 /* Tuvali */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "Openid4vpBle" */;
+			buildConfigurationList = 58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "Tuvali" */;
 			buildPhases = (
 				58B511D71A9E6C8500147676 /* Sources */,
 				58B511D81A9E6C8500147676 /* Frameworks */,
@@ -342,9 +342,9 @@
 			);
 			dependencies = (
 			);
-			name = Openid4vpBle;
+			name = Tuvali;
 			productName = RCTDataManager;
-			productReference = 134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */;
+			productReference = 134814201AA4EA6300B7C361 /* libTuvali.a */;
 			productType = "com.apple.product-type.library.static";
 		};
 /* End PBXNativeTarget section */
@@ -361,7 +361,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "Openid4vpBle" */;
+			buildConfigurationList = 58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "Tuvali" */;
 			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 0;
@@ -374,7 +374,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				58B511DA1A9E6C8500147676 /* Openid4vpBle */,
+				58B511DA1A9E6C8500147676 /* Tuvali */,
 			);
 		};
 /* End PBXProject section */
@@ -534,9 +534,9 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = Openid4vpBle;
+				PRODUCT_NAME = Tuvali;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Openid4vpBle-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tuvali-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
 			};
@@ -553,9 +553,9 @@
 				);
 				LIBRARY_SEARCH_PATHS = "$(inherited)";
 				OTHER_LDFLAGS = "-ObjC";
-				PRODUCT_NAME = Openid4vpBle;
+				PRODUCT_NAME = Tuvali;
 				SKIP_INSTALL = YES;
-				SWIFT_OBJC_BRIDGING_HEADER = "Openid4vpBle-Bridging-Header.h";
+				SWIFT_OBJC_BRIDGING_HEADER = "Tuvali-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -563,7 +563,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "Openid4vpBle" */ = {
+		58B511D61A9E6C8500147676 /* Build configuration list for PBXProject "Tuvali" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511ED1A9E6C8500147676 /* Debug */,
@@ -572,7 +572,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "Openid4vpBle" */ = {
+		58B511EF1A9E6C8500147676 /* Build configuration list for PBXNativeTarget "Tuvali" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				58B511F01A9E6C8500147676 /* Debug */,
