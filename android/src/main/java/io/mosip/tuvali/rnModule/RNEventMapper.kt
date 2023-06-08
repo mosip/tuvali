@@ -3,6 +3,7 @@ package io.mosip.tuvali.rnModule
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableMap
 import io.mosip.tuvali.common.events.*
+import kotlin.reflect.KProperty1
 import kotlin.reflect.KVisibility
 import kotlin.reflect.full.memberProperties
 
@@ -37,12 +38,7 @@ class RNEventMapper {
       event::class.memberProperties.forEach { property ->
         if (property.visibility == KVisibility.PUBLIC) {
           try {
-            val propertyValue = property.getter.call(event)
-            if (propertyValue is Enum<*>) {
-              handleEnumProperty(property.name, propertyValue, writableMap)
-            } else {
-              writableMap.putString(property.name, propertyValue.toString())
-            }
+            populateProperty(property, event, writableMap)
           } catch (e: Exception) {
             println("Unable to populate RN event ${property.name}")
           }
@@ -50,19 +46,31 @@ class RNEventMapper {
       }
     }
 
-    private fun handleEnumProperty(propertyName: String, propertyValue: Enum<*>, writableMap: WritableMap) {
-      val valueField = propertyValue::class.memberProperties.firstOrNull { it.name == "value" }
-      when (val enumValue = valueField?.getter?.call(propertyValue)) {
+    private fun populateProperty(
+      property: KProperty1<out Event, *>,
+      event: Event,
+      writableMap: WritableMap
+    ) {
+      var propertyValue = property.getter.call(event)
+
+      if (propertyValue is Enum<*>) {
+        propertyValue = readEnumValue(propertyValue)
+      }
+
+      when (propertyValue) {
         is Int -> {
-          writableMap.putInt(propertyName, enumValue)
-        }
-        is String -> {
-          writableMap.putString(propertyName, enumValue)
+          writableMap.putInt(property.name, propertyValue)
         }
         else -> {
-          writableMap.putInt(propertyName, propertyValue.ordinal)
+          writableMap.putString(property.name, propertyValue.toString())
         }
       }
+    }
+
+    private fun readEnumValue(enumValue: Enum<*>): Any {
+      val valueField = enumValue::class.memberProperties.firstOrNull { it.name == "value" }
+
+      return valueField?.getter?.call(enumValue) ?: enumValue.ordinal
     }
   }
 }
