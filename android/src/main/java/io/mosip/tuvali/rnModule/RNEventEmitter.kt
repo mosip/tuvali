@@ -47,18 +47,33 @@ class RNEventEmitter(private val reactContext: ReactApplicationContext): IRNEven
   }
 
   private fun populateProperties(event: Event, writableMap: WritableMap) {
-    event::class.memberProperties.forEach {
-      if (it.visibility === KVisibility.PUBLIC) try {
-        val property = it.getter.call(event)
-        if(property is Enum<*>) {
-          writableMap.putInt(it.name, property.ordinal)
-        }
-        else{
-          writableMap.putString(it.name, property.toString())
+    event::class.memberProperties.forEach { property ->
+      if (property.visibility == KVisibility.PUBLIC) {
+        try {
+          val propertyValue = property.getter.call(event)
+          if (propertyValue is Enum<*>) {
+            handleEnumProperty(property.name, propertyValue, writableMap)
+          } else {
+            writableMap.putString(property.name, propertyValue.toString())
+          }
+        } catch (e: Exception) {
+          println("Unable to populate RN event ${property.name}")
         }
       }
-      catch (e: Exception){
-        println("unable to populate RN event ${it.name}")
+    }
+  }
+
+  private fun handleEnumProperty(propertyName: String, propertyValue: Enum<*>, writableMap: WritableMap) {
+    val valueField = propertyValue::class.memberProperties.firstOrNull { it.name == "value" }
+    when (val enumValue = valueField?.getter?.call(propertyValue)) {
+      is Int -> {
+        writableMap.putInt(propertyName, enumValue)
+      }
+      is String -> {
+        writableMap.putString(propertyName, enumValue)
+      }
+      else -> {
+        writableMap.putInt(propertyName, propertyValue.ordinal)
       }
     }
   }
