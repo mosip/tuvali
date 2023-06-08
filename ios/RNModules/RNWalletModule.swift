@@ -10,7 +10,7 @@ class WalletModule: RCTEventEmitter {
         super.init()
         RNEventEmitter.sharedInstance.registerEventEmitter(producer: self)
         wallet.subscribe { event in
-            RNEventEmitter.sharedInstance.emitEvent(event: event)
+            RNEventEmitter.sharedInstance.emitEvent(eventMap: RNEventMapper.toMap(event))
         }
     }
 

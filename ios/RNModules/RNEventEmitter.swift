@@ -8,38 +8,16 @@ class RNEventEmitter: RNEventEmitterProtocol {
     
     private  init() {}
     
-    func registerEventEmitter(producer: WalletModule) {
+    func emitEvent(eventMap: NSMutableDictionary) {
+        dispatch(name: EVENT_NAME, body: eventMap)
+    }
+    
+     func registerEventEmitter(producer: WalletModule) {
         RNEventEmitter.producer = producer
     }
     
-    func dispatch(name: String, body: Any?) {
+    fileprivate func dispatch(name: String, body: Any?) {
         RNEventEmitter.producer.sendEvent(withName: name, body: body)
-    }
-    
-    func emitEvent(event: Event) {
-        let writableMap = NSMutableDictionary()
-        writableMap["type"] = getEventType(event)
-        let eventMirror = Mirror(reflecting: event)
-    
-        for child in eventMirror.children {
-            writableMap[child.label ?? "invalidLabel"] = child.value
-        }
-
-        dispatch(name: EVENT_NAME, body: writableMap)
-    }
-    
-    func getEventType(_ event: Event) -> String {
-        switch event {
-        case is ConnectedEvent: return "onConnected"
-        case is SecureChannelEstablishedEvent: return "onSecureChannelEstablished"
-        case is DataSentEvent: return "onDataSent"
-        case is VerificationStatusEvent: return "onVerificationStatusReceived"
-        case is ErrorEvent: return  "onError"
-        case is DisconnectedEvent: return "onDisconnected"
-        default:
-            os_log(.error, "Invalid event type")
-            return ""
-        }
     }
     
     lazy var allEvents: [String] = {

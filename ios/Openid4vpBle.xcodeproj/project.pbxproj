@@ -75,10 +75,11 @@
 		0DF889712A2F6D1200E369A4 /* HexUtil.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HexUtil.swift; sourceTree = "<group>"; };
 		0DF889732A2F6D4000E369A4 /* WalletBleCommunicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletBleCommunicator.swift; sourceTree = "<group>"; };
 		0DF889742A2F6D4000E369A4 /* WalletProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletProtocol.swift; sourceTree = "<group>"; };
-		0DF889782A2F6D6C00E369A4 /* VersionModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VersionModule.swift; sourceTree = "<group>"; };
-		0DF889792A2F6D6C00E369A4 /* RNEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitter.swift; sourceTree = "<group>"; };
-		0DF8897A2A2F6D6C00E369A4 /* RNEventEmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitterProtocol.swift; sourceTree = "<group>"; };
-		0DF8897B2A2F6D6C00E369A4 /* WalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletModule.swift; sourceTree = "<group>"; };
+		0DF889812A31A2C600E369A4 /* RNEventMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventMapper.swift; sourceTree = "<group>"; };
+		0DF889832A31A2C600E369A4 /* RNEventEmitter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitter.swift; sourceTree = "<group>"; };
+		0DF889842A31A2C600E369A4 /* RNVersionModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNVersionModule.swift; sourceTree = "<group>"; };
+		0DF889852A31A2C600E369A4 /* RNWalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNWalletModule.swift; sourceTree = "<group>"; };
+		0DF889862A31A2C600E369A4 /* RNEventEmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitterProtocol.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D069F642964466900AB61A9 /* Central.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Central.swift; sourceTree = "<group>"; };
 		8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManagerDelegate.swift; sourceTree = "<group>"; };
@@ -151,13 +152,14 @@
 			path = events;
 			sourceTree = "<group>";
 		};
-		0DF889772A2F6D6C00E369A4 /* RNModules */ = {
+		0DF889802A31A2C600E369A4 /* RNModules */ = {
 			isa = PBXGroup;
 			children = (
-				0DF889782A2F6D6C00E369A4 /* VersionModule.swift */,
-				0DF889792A2F6D6C00E369A4 /* RNEventEmitter.swift */,
-				0DF8897A2A2F6D6C00E369A4 /* RNEventEmitterProtocol.swift */,
-				0DF8897B2A2F6D6C00E369A4 /* WalletModule.swift */,
+				0DF889812A31A2C600E369A4 /* RNEventMapper.swift */,
+				0DF889832A31A2C600E369A4 /* RNEventEmitter.swift */,
+				0DF889842A31A2C600E369A4 /* RNVersionModule.swift */,
+				0DF889852A31A2C600E369A4 /* RNWalletModule.swift */,
+				0DF889862A31A2C600E369A4 /* RNEventEmitterProtocol.swift */,
 			);
 			path = RNModules;
 			sourceTree = "<group>";
@@ -173,7 +175,7 @@
 		58B511D21A9E6C8500147676 = {
 			isa = PBXGroup;
 			children = (
-				0DF889772A2F6D6C00E369A4 /* RNModules */,
+				0DF889802A31A2C600E369A4 /* RNModules */,
 				0DF889432A28B86400E369A4 /* common */,
 				8D069F612964454700AB61A9 /* ble */,
 				8D179C82295486B500017EE5 /* crypto */,

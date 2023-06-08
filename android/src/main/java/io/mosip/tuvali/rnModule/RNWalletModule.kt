@@ -4,15 +4,14 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import io.mosip.tuvali.wallet.IWallet
-import io.mosip.tuvali.wallet.Wallet
 
-class RNWalletModule(reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
-  private val eventEmitter = RNEventEmitter(reactContext)
-  private var wallet: IWallet = Wallet(reactContext)
+class RNWalletModule(private val eventEmitter: RNEventEmitter,
+                     private val wallet: IWallet,
+                     reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
 
   init {
       wallet.subscribe {
-        eventEmitter.emitEvent(it)
+        eventEmitter.emitEvent(RNEventMapper.toMap(it))
       }
   }
 
