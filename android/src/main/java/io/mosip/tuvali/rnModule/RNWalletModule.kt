@@ -5,14 +5,16 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import io.mosip.tuvali.wallet.IWallet
 
-class RNWalletModule(private val eventEmitter: RNEventEmitter,
-                     private val wallet: IWallet,
-                     reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RNWalletModule(
+  private val eventEmitter: RNEventEmitter,
+  private val wallet: IWallet,
+  reactContext: ReactApplicationContext
+) : ReactContextBaseJavaModule(reactContext) {
 
   init {
-      wallet.subscribe {
-        eventEmitter.emitEvent(RNEventMapper.toMap(it))
-      }
+    wallet.subscribe {
+      eventEmitter.emitEvent(RNEventMapper.toMap(it))
+    }
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -27,7 +29,7 @@ class RNWalletModule(private val eventEmitter: RNEventEmitter,
 
   @ReactMethod(isBlockingSynchronousMethod = true)
   fun disconnect() {
-   wallet.disconnect()
+    wallet.disconnect()
   }
 
   override fun getName(): String {

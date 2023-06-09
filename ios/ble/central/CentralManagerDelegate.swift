@@ -12,7 +12,6 @@ extension Central {
             let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
             let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
-            print("veri pub key::", publicKeyData)
             walletBleCommunicatorDelegate?.setVeriferKeyOnSameIdentifier(payload: advertisementData, publicData: publicKeyData) {
                 peripheral.delegate = self
                 central.connect(peripheral)

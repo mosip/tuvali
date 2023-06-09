@@ -56,17 +56,4 @@ class Wallet: WalletProtocol {
         }
         return data + hexStringToData(string: String(hexPublickey.prefix(10)))
     }
-    
-    func stringToJson(jsonText: String) -> NSDictionary {
-        var dictonary: NSDictionary?
-        if let data = jsonText.data(using: String.Encoding.utf8) {
-            do {
-                dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
-            } catch let error as NSError {
-                os_log(.error, " %{public}@ ", error)
-            }
-        }
-        return dictonary!
-    }
-
 }

@@ -23,12 +23,9 @@ class Verifier(private val context: Context): IVerifier {
     Log.d(logTag, "startAdvertisement called with advIdentifier $advIdentifier at ${System.nanoTime()}")
 
     return tryExecuteSync.run {
-      if (communicator == null) {
-        initializeBLECommunicator()
-      }
-
       Log.d(logTag, "synchronized startAdvertisement called with adv identifier $advIdentifier at ${System.nanoTime()} and verifier hashcode: ${communicator.hashCode()}")
 
+      initializeBLECommunicator()
       communicator?.startAdvertisement(advIdentifier)
 
       return@run OpenId4vpURI(advIdentifier, Hex.toHexString(communicator!!.publicKey)).toString()
@@ -36,7 +33,6 @@ class Verifier(private val context: Context): IVerifier {
   }
 
   override fun disconnect() {
-    //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
     Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
     tryExecuteSync.run {
       stopBLE { eventEmitter.emitEvent(DisconnectedEvent()) }

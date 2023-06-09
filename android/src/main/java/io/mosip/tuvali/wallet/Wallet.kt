@@ -23,17 +23,15 @@ class Wallet(private val context: Context) : IWallet {
     Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
     tryExecuteSync.run {
+      Log.d(logTag, "synchronized startConnection wallet object with uri $uri at ${System.nanoTime()}")
+
       val openId4vpURI = OpenId4vpURI(uri)
 
       if(!openId4vpURI.isValid()) {
         throw InvalidURIException("Received Invalid URI: $uri")
       }
 
-      if (bleCommunicator == null) {
-        Log.d(logTag, "synchronized startConnection new wallet object with uri $uri at ${System.nanoTime()}")
-        bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
-      }
-
+      bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
       bleCommunicator?.setAdvPayload(openId4vpURI.getName(), openId4vpURI.getHexPK())
       bleCommunicator?.startScanning()
     }
