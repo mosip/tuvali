@@ -44,7 +44,7 @@ OPENID4VP://connect?name=STADONENTRY&key=8520f0098930a754748b7ddcb43ef75a0dbf3a0
 
 URI structure can be found in the spec --> https://bitbucket.org/openid/connect/src/master/openid-4-verifiable-presentations-over-ble/openid-4-verifiable-presentations-over-ble-1_0.md
 
-E.g: OPENID4VP://OVPMOSIP_<first 5 bytes of public key>
+E.g: OPENID4VP://connect?name=<CLIENT_NAME>&key=<VERIFIER_PUBLIC_KEY>
 
 
 ### Wallet
