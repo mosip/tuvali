@@ -15,7 +15,7 @@ import org.bouncycastle.util.encoders.Hex
 class Verifier(private val context: Context): IVerifier {
   private val logTag = getLogTag(javaClass.simpleName)
   private var communicator: VerifierBleCommunicator? = null
-  private var eventEmitter: EventEmitter = EventEmitter()
+  private var eventEmitter = EventEmitter()
   private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 

@@ -5,9 +5,11 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import io.mosip.tuvali.verifier.Verifier
 
-class RNVerifierModule(private val eventEmitter: RNEventEmitter,
-                       private val verifier: Verifier,
-                       reactContext: ReactApplicationContext) : ReactContextBaseJavaModule(reactContext) {
+class RNVerifierModule(
+  private val eventEmitter: RNEventEmitter,
+  private val verifier: Verifier,
+  reactContext: ReactApplicationContext
+) : ReactContextBaseJavaModule(reactContext) {
 
   init {
     verifier.subscribe {
@@ -26,8 +28,8 @@ class RNVerifierModule(private val eventEmitter: RNEventEmitter,
   }
 
   @ReactMethod
-  fun sendVerificationStatus(status: Int){
-   verifier.sendVerificationStatus(status)
+  fun sendVerificationStatus(status: Int) {
+    verifier.sendVerificationStatus(status)
   }
 
   override fun getName(): String {

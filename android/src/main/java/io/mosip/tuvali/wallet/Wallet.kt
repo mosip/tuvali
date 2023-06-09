@@ -14,7 +14,7 @@ import io.mosip.tuvali.wallet.exception.InvalidURIException
 class Wallet(private val context: Context) : IWallet {
   private val logTag = getLogTag(javaClass.simpleName)
   private var bleCommunicator: WalletBleCommunicator? = null
-  private var eventEmitter: EventEmitter = EventEmitter()
+  private var eventEmitter = EventEmitter()
   private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
   private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
