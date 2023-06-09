@@ -66,7 +66,6 @@
 		0DF889412A28B85800E369A4 /* Openid4vpBleURI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Openid4vpBleURI.swift; sourceTree = "<group>"; };
 		0DF889692A2F6CF300E369A4 /* VerificationStatusEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationStatusEvent.swift; sourceTree = "<group>"; };
 		0DF8896A2A2F6CF300E369A4 /* Event.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Event.swift; sourceTree = "<group>"; };
-		0DF8896B2A2F6CF300E369A4 /* SecureChannelEstablishedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SecureChannelEstablishedEvent.swift; sourceTree = "<group>"; };
 		0DF8896C2A2F6CF300E369A4 /* DisconnectedEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisconnectedEvent.swift; sourceTree = "<group>"; };
 		0DF8896D2A2F6CF300E369A4 /* DataSentEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataSentEvent.swift; sourceTree = "<group>"; };
 		0DF8896E2A2F6CF300E369A4 /* ErrorEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ErrorEvent.swift; sourceTree = "<group>"; };
@@ -81,6 +80,8 @@
 		0DF889852A31A2C600E369A4 /* RNWalletModule.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNWalletModule.swift; sourceTree = "<group>"; };
 		0DF889862A31A2C600E369A4 /* RNEventEmitterProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RNEventEmitterProtocol.swift; sourceTree = "<group>"; };
 		134814201AA4EA6300B7C361 /* libTuvali.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libTuvali.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		0DF8894E2A28B8A000E369A4 /* VerificationStatusEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerificationStatusEvent.swift; sourceTree = "<group>"; };
+		134814201AA4EA6300B7C361 /* libOpenid4vpBle.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libOpenid4vpBle.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D069F642964466900AB61A9 /* Central.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Central.swift; sourceTree = "<group>"; };
 		8D069F662964475A00AB61A9 /* CentralManagerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralManagerDelegate.swift; sourceTree = "<group>"; };
 		8D069F68296447D000AB61A9 /* Peripheral.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Peripheral.swift; sourceTree = "<group>"; };
