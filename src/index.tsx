@@ -1,6 +1,7 @@
 import { NativeEventEmitter, NativeModules, Platform } from 'react-native';
-import type { OpenIDBLEShare } from './types/bleshare';
+import type { Verifier, Wallet } from './types/interface';
 import { tuvaliVersion } from './tuvaliVersion';
+import { EventTypes, VerificationStatus } from './types/events';
 
 const LINKING_ERROR =
   `The package 'react-native-openid4vp-ble' doesn't seem to be linked. Make sure: \n\n` +
@@ -8,8 +9,11 @@ const LINKING_ERROR =
   '- You rebuilt the app after installing the package\n' +
   '- You are not using Expo Go\n';
 
-const Openid4vpBle: OpenIDBLEShare = NativeModules.Openid4vpBle
-  ? NativeModules.Openid4vpBle
+const VERIFIER_NOT_IMPLEMENTATED_ERROR = `Verifier is not yet implemented on IOS. Please remove Verifier usage on IOS Platform`;
+const isIOS = Platform.OS === 'ios';
+
+const wallet: Wallet = NativeModules.WalletModule
+  ? NativeModules.WalletModule
   : new Proxy(
       {},
       {
@@ -19,24 +23,26 @@ const Openid4vpBle: OpenIDBLEShare = NativeModules.Openid4vpBle
       }
     );
 
-Openid4vpBle.setTuvaliVersion(tuvaliVersion);
+// TODO: Use Actual Verifier module on IOS once Verifier is implemented
+let verifier: Verifier = NativeModules.VerifierModule
+  ? NativeModules.VerifierModule
+  : new Proxy(
+      {},
+      {
+        get() {
+          throw new Error(
+            isIOS ? VERIFIER_NOT_IMPLEMENTATED_ERROR : LINKING_ERROR
+          );
+        },
+      }
+    );
 
-if (Platform.OS === 'android') {
-  const eventEmitter = new NativeEventEmitter();
-  Openid4vpBle.handleNearbyEvents = (callback) =>
-    eventEmitter.addListener('EVENT_NEARBY', callback);
-  Openid4vpBle.handleLogEvents = (callback) =>
-    eventEmitter.addListener('EVENT_LOG', callback);
+if (!isIOS) {
+  setupModule(verifier);
 }
 
-if (Platform.OS === 'ios') {
-  console.log(`IOS PLATFORM`);
-  const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
-  Openid4vpBle.handleNearbyEvents = (callback) =>
-    eventEmitter.addListener('EVENT_NEARBY', callback);
-  Openid4vpBle.handleLogEvents = (callback) =>
-    eventEmitter.addListener('EVENT_LOG', callback);
-}
+setupModule(wallet);
+
 //
 // ErrorUtils.setGlobalHandler((error, isFatal) => {
 //   const eventEmitter = new NativeEventEmitter(NativeModules.Openid4vpBle);
@@ -53,6 +59,25 @@ if (Platform.OS === 'ios') {
 //   Openid4vpBle.destroyConnection(() => {});
 // });
 
+function setupModule(module: any) {
+  module.setTuvaliVersion(tuvaliVersion);
+
+  if (Platform.OS === 'android') {
+    const eventEmitter = new NativeEventEmitter();
+    module.handleDataEvents = (callback: (event: any) => void) =>
+      eventEmitter.addListener('DATA_EVENT', callback);
+  }
+
+  if (isIOS) {
+    const eventEmitter = new NativeEventEmitter(module);
+    module.handleDataEvents = (callback: (event: any) => void) =>
+      eventEmitter.addListener('DATA_EVENT', callback);
+  }
+}
+
 export default {
-  Openid4vpBle,
+  verifier,
+  wallet,
+  EventTypes,
+  VerificationStatus,
 };

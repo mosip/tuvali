@@ -8,7 +8,7 @@ class Wallet: NSObject {
     var central: Central?
     var secretTranslator: SecretTranslator?
     var cryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder().build()
-    var advIdentifier: String?
+    var advIdentifier: Data?
     var verifierPublicKey: Data?
     var createConnection: (() -> Void)?
     static let EXCHANGE_RECEIVER_INFO_DATA = "{\"deviceName\":\"Verifier\"}"
@@ -23,7 +23,7 @@ class Wallet: NSObject {
         resolve(["iOS Wallet"])
     }
 
-    func setAdvIdentifier(identifier: String) {
+    func setAdvIdentifier(identifier: Data) {
         self.advIdentifier = identifier
     }
 
@@ -43,34 +43,16 @@ class Wallet: NSObject {
     }
 
     func onDeviceDisconnected(){
-        EventEmitter.sharedInstance.emitNearbyEvent(event: "onDisconnected")
+        EventEmitter.sharedInstance.emitEventWithoutArgs(event: DisconnectedEvent())
     }
 
     func isSameAdvIdentifier(advertisementPayload: Data) -> Bool {
-        guard let advIdentifier = advIdentifier else {
+        guard let verifierAdvIdentifier = advIdentifier else {
             os_log(.info, "Found NO ADV Identifier")
             return false
         }
-        let advIdentifierData = hexStringToData(string: advIdentifier)
-        if advIdentifierData == advertisementPayload {
-            return true
-        }
-        return false
-    }
-
-    func hexStringToData(string: String) -> Data {
-        let stringArray = Array(string)
-        var data: Data = Data()
-        for i in stride(from: 0, to: string.count, by: 2) {
-            let pair: String = String(stringArray[i]) + String(stringArray[i+1])
-            if let byteNum = UInt8(pair, radix: 16) {
-                let byte = Data([byteNum])
-                data.append(byte)
-            } else {
-                fatalError()
-            }
-        }
-        return data
+        
+        return verifierAdvIdentifier == advertisementPayload
     }
 
     func sendData(data: String) {

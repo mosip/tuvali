@@ -6,15 +6,15 @@ protocol TransferHandlerDelegate: AnyObject {
 }
 
 extension Wallet: WalletProtocol {
-    
+
     func onDisconnect() {
         self.onDeviceDisconnected()
     }
-    
+
     func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        EventEmitter.sharedInstance.emitEventWithoutArgs(event: SecureChannelEstablishedEvent())
     }
-    
+
     func onDisconnectStatusChange(data: Data?) {
         print("Handling notification for disconnect handle")
         if let data {
@@ -23,16 +23,16 @@ extension Wallet: WalletProtocol {
                 print("con statusid:", connStatusID)
                 handleDestroyConnection(isSelfDisconnect: false)
             }
-        } 
+        }
     }
-    
+
     func setVeriferKeyOnSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void)) {
         if isSameAdvIdentifier(advertisementPayload: payload) {
             setVerifierPublicKey(publicKeyData: publicData)
             completion()
         }
     }
-    
+
     func createConnectionHandler() {
         createConnection?()
     }

@@ -11,7 +11,7 @@ import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.wallet.exception.WalletException
 
-class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Unit, private val stopBle: (Callback) -> Unit) {
+class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Unit, private val stopBle: (() -> Unit) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)
   private var walletExceptionHandler: WalletExceptionHandler = WalletExceptionHandler(sendError)
   private var verifierExceptionHandler: VerifierExceptionHandler = VerifierExceptionHandler(sendError)
@@ -37,10 +37,10 @@ class OpenIdBLEExceptionHandler(private val sendError: (String, ErrorCode) -> Un
       }
     }
 
-    try{
+    try {
       stopBle {}
     } catch (e: Exception) {
-      Log.d(logTag,"Failed to stop BLE connection while handling exception: $e")
+      Log.d(logTag, "Failed to stop BLE connection while handling exception: $e")
     }
   }
 

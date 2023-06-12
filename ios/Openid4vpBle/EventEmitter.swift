@@ -2,51 +2,43 @@ import Foundation
 
 @available(iOS 13.0, *)
 class EventEmitter {
-    
+
     public static var sharedInstance = EventEmitter()
-    
-    static var eventEmitter: Openid4vpBle!
-    
+    private var EVENT_NAME = "DATA_EVENT"
+    static var eventEmitter: WalletModule!
+
     private  init() {}
-    
-    func registerEventEmitter(eventEmitter: Openid4vpBle) {
+
+    func registerEventEmitter(eventEmitter: WalletModule) {
         EventEmitter.eventEmitter = eventEmitter
     }
-    
+
     func dispatch(name: String, body: Any?) {
         EventEmitter.eventEmitter.sendEvent(withName: name, body: body)
     }
-    
-    func emitNearbyEvent(event: String) {
+
+    func emitEventWithoutArgs(event: EventWithoutArgs) {
         let writableMap = NSMutableDictionary()
-        writableMap["type"] = event
-        dispatch(name: "EVENT_NEARBY", body: writableMap)
+        writableMap["type"] = event.type
+        dispatch(name: EVENT_NAME, body: writableMap)
     }
-    
-    func emitNearbyMessage(event: String, data: String) {
-        var eventData: [String: String] = [:]
-        eventData["data"] = event + "\n" + data
-        eventData["type"] = "msg"
-        
-        dispatch(name: "EVENT_NEARBY", body: eventData)
+
+    func emitEventWithArgs(event: EventWithArgs) {
+        let writableMap = NSMutableDictionary()
+        writableMap["type"] = event.type
+        writableMap.addEntries(from: event.getData())
+        dispatch(name: EVENT_NAME, body: writableMap)
     }
-    
-    func emitNearbyErrorEvent(message: String, code: String) {
+
+    func emitErrorEvent(message: String, code: String) {
         var eventData: [String: String] = [:]
         eventData["message"] = message
-        eventData["code"] = code
-        eventData["type"] = "onError"
-        
-        dispatch(name: "EVENT_NEARBY", body: eventData)
+        emitEventWithArgs(event: ErrorEvent(message: message, code: code))
     }
-    
+
     lazy var allEvents: [String] = {
         return [
-            "EVENT_NEARBY",
-            "EVENT_LOG",
-            "exchange-receiver-info",
-            "send-vc:response",
-            "onDisconnected",
+            EVENT_NAME
         ]
     }()
 }

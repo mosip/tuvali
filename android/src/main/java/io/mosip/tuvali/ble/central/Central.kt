@@ -34,8 +34,8 @@ class Central(context: Context, centralLister: ICentralListener) {
     messageSender.sendMessage(DisconnectAndCloseMessage())
   }
 
-  fun scan(serviceUuid: UUID, advIdentifier: String) {
-    val scanStartMessage = ScanStartMessage(serviceUuid, advIdentifier)
+  fun scan(serviceUuid: UUID) {
+    val scanStartMessage = ScanStartMessage(serviceUuid)
 
     messageSender.sendMessage(scanStartMessage)
   }

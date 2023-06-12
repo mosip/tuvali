@@ -10,6 +10,7 @@ import io.mosip.tuvali.ble.central.ICentralListener
 import io.mosip.tuvali.ble.central.state.message.*
 import io.mosip.tuvali.ble.exception.CentralStateHandlerException
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
+import org.bouncycastle.util.encoders.Hex
 
 class StateHandler(
   looper: Looper,
@@ -223,7 +224,7 @@ class StateHandler(
       }
       IMessage.CentralStates.NOTIFICATION_RECEIVED.ordinal -> {
         val notificationReceivedMessage = msg.obj as NotificationReceivedMessage
-        Log.d(logTag, "Received notification from ${notificationReceivedMessage.charUUID} with value: ${notificationReceivedMessage.value}")
+        Log.d(logTag, "Received notification from ${notificationReceivedMessage.charUUID} with value: ${Hex.toHexString(notificationReceivedMessage.value)}")
 
         listener.onNotificationReceived(notificationReceivedMessage.charUUID, notificationReceivedMessage.value)
       }

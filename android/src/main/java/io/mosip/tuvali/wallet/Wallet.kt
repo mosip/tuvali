@@ -7,15 +7,20 @@ import android.os.HandlerThread
 import android.os.ParcelUuid
 import android.os.Process
 import android.util.Log
-import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.ble.central.ICentralListener
+import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.WalletCryptoBox
 import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
-import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.exception.BLEException
+import io.mosip.tuvali.openid4vpble.EventEmitter
+import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.ConnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DataSentEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.SecureChannelEstablishedEvent
 import io.mosip.tuvali.transfer.TransferReport
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.verifier.GattService
@@ -34,12 +39,7 @@ import io.mosip.tuvali.wallet.exception.WalletException
 
 private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 
-class Wallet(
-  context: Context,
-  private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit,
-  private val handleException: (BLEException) -> Unit
-) : ICentralListener, ITransferListener {
+class Wallet(context: Context, private val eventEmitter: EventEmitter, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
   private val secureRandom: SecureRandom = SecureRandom()
@@ -47,7 +47,7 @@ class Wallet(
   private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
   private var secretsTranslator: SecretsTranslator? = null
 
-  private var advIdentifier: String? = null
+  private var advPayload: ByteArray? = null
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
 
@@ -60,11 +60,10 @@ class Wallet(
   private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
 
   private enum class CentralCallbacks {
-    CONNECTION_ESTABLISHED,
     ON_DESTROY_SUCCESS_CALLBACK
   }
 
-  private val callbacks = mutableMapOf<CentralCallbacks, Callback>()
+  private val callbacks = mutableMapOf<CentralCallbacks, () -> Unit>()
 
   init {
     central = Central(context, this@Wallet)
@@ -72,35 +71,24 @@ class Wallet(
     transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
   }
 
-  fun stop(onDestroy: Callback) {
+  fun stop(onDestroy: () -> Unit) {
     callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroy
     central.stop()
     handlerThread.quitSafely()
   }
 
-  fun startScanning(advIdentifier: String, connectionEstablishedCallback: Callback) {
-    callbacks[CentralCallbacks.CONNECTION_ESTABLISHED] = connectionEstablishedCallback
-    central.scan(
-      Verifier.SERVICE_UUID,
-      advIdentifier
-    )
+  fun startScanning() {
+    central.scan(Verifier.SERVICE_UUID)
   }
 
   fun writeToIdentifyRequest() {
     val publicKey = walletCryptoBox.publicKey()
     secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
     val nonce = secretsTranslator?.nonce
-    central.write(
-      Verifier.SERVICE_UUID,
-      GattService.IDENTIFY_REQUEST_CHAR_UUID,
-      nonce!! + publicKey!!
-    )
-    Log.d(
-      logTag,
-      "Started to write - generated nonce ${
-        Hex.toHexString(nonce)
-      }, Public Key of wallet: ${Hex.toHexString(publicKey)}"
-    )
+    central.write(Verifier.SERVICE_UUID, GattService.IDENTIFY_REQUEST_CHAR_UUID, nonce!! + publicKey!!)
+    Log.d(logTag, "Started to write - generated nonce ${
+      Hex.toHexString(nonce)
+    }, Public Key of wallet: ${Hex.toHexString(publicKey)}")
   }
 
   override fun onScanStartedFailed(errorCode: Int) {
@@ -109,34 +97,29 @@ class Wallet(
   }
 
   private val connectionMutex = Object()
-  @Volatile private var connectionState = VerifierConnectionState.NOT_CONNECTED
+
+  @Volatile
+  private var connectionState = VerifierConnectionState.NOT_CONNECTED
 
   private enum class VerifierConnectionState {
-    NOT_CONNECTED,
-    CONNECTING,
-    CONNECTED
+    NOT_CONNECTED, CONNECTING, CONNECTED
   }
 
   override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
     synchronized(connectionMutex) {
       if (connectionState != VerifierConnectionState.NOT_CONNECTED) {
-        Log.d(
-          logTag, "Device found is ignored $device"
-        )
+        Log.d(logTag, "Device found is ignored $device")
         return
       }
-      val scanResponsePayload =
-        scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
+      val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
       val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
-      if (advertisementPayload != null && isSameAdvIdentifier(advertisementPayload) && scanResponsePayload != null) {
+      if (advertisementPayload != null && isSameAdvPayload(advertisementPayload) && scanResponsePayload != null) {
         setVerifierPK(advertisementPayload, scanResponsePayload)
         central.connect(device)
         connectionState = VerifierConnectionState.CONNECTING
       } else {
-        Log.d(
-          logTag, "AdvIdentifier($advIdentifier) is not matching with peripheral device adv"
-        )
+        Log.d(logTag, "AdvIdentifier($advPayload) is not matching with peripheral device adv")
       }
     }
   }
@@ -148,9 +131,9 @@ class Wallet(
     Log.d(logTag, "Public Key of Verifier: ${Hex.toHexString(verifierPK)}")
   }
 
-  private fun isSameAdvIdentifier(advertisementPayload: ByteArray): Boolean {
-    this.advIdentifier?.let {
-      return Hex.decode(it) contentEquals advertisementPayload
+  private fun isSameAdvPayload(advertisementPayload: ByteArray): Boolean {
+    this.advPayload?.let {
+      return it contentEquals advertisementPayload
     }
     return false
   }
@@ -178,6 +161,7 @@ class Wallet(
       retryServiceDiscovery()
     }
   }
+
   override fun onServicesDiscoveryFailed(errorCode: Int) {
     Log.d(logTag, "onServicesDiscoveryFailed retrying to find the services")
     retryServiceDiscovery()
@@ -196,19 +180,14 @@ class Wallet(
   override fun onRequestMTUSuccess(mtu: Int) {
     Log.d(logTag, "onRequestMTUSuccess")
     maxDataBytes = mtu
-    val connectionEstablishedCallBack = callbacks[CentralCallbacks.CONNECTION_ESTABLISHED]
     central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
-
-    connectionEstablishedCallBack?.let {
-      it()
-      //TODO: Why this is getting called multiple times?. (Calling callback multiple times raises a exception)
-      callbacks.remove(CentralCallbacks.CONNECTION_ESTABLISHED)
-    }
+    eventEmitter.emitEventWithoutArgs(ConnectedEvent())
+    writeToIdentifyRequest()
   }
 
   override fun onRequestMTUFailure(errorCode: Int) {
     //TODO: Handle onRequest MTU failure
-    throw  MTUNegotiationFailedException("MTU negotiation failed even after multiple retries  with error code: $errorCode.")
+    throw MTUNegotiationFailedException("MTU negotiation failed even after multiple retries  with error code: $errorCode.")
   }
 
   override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
@@ -229,7 +208,7 @@ class Wallet(
     synchronized(connectionMutex) {
       connectionState = VerifierConnectionState.NOT_CONNECTED
       if (!isManualDisconnect) {
-        eventResponseListener("onDisconnected")
+          eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
       }
     }
   }
@@ -237,13 +216,13 @@ class Wallet(
   override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
 
-    when(charUUID) {
+    when (charUUID) {
       GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
         //TODO: implement a retry strategy similar to ios if the transfer report request write fails
-      transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
+        transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
       }
     }
   }
@@ -254,7 +233,7 @@ class Wallet(
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_RECEIVER_INFO.value, "{\"deviceName\": \"Verifier\"}")
+        eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
       }
       GattService.RESPONSE_SIZE_CHAR_UUID -> {
         transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
@@ -270,7 +249,7 @@ class Wallet(
   }
 
   override fun onResponseSent() {
-    messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.RECEIVED.value)
+    eventEmitter.emitEventWithoutArgs(DataSentEvent())
   }
 
   override fun onResponseSendFailure(errorMsg: String) {
@@ -286,10 +265,10 @@ class Wallet(
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
-        if(status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.ACCEPTED.value)
+        if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
+          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
         } else {
-          messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC_RESPONSE.value, Openid4vpBleModule.VCResponseStates.REJECTED.value)
+          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
         }
 
         central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
@@ -298,7 +277,7 @@ class Wallet(
       GattService.DISCONNECT_CHAR_UUID -> {
         val status = value?.get(0)?.toInt()
 
-        if(status != null && status == DISCONNECT_STATUS) {
+        if (status != null && status == DISCONNECT_STATUS) {
           central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
           central.disconnectAndClose()
         }
@@ -322,8 +301,8 @@ class Wallet(
     }
   }
 
-  fun setAdvIdentifier(advIdentifier: String) {
-    this.advIdentifier = advIdentifier
+  fun setAdvPayload(advIdentifier: String, verifierPK: String) {
+    this.advPayload = AdvertisementPayload.getAdvPayload(advIdentifier, verifierPK)
   }
 
   fun sendData(data: String) {
@@ -337,12 +316,10 @@ class Wallet(
         //Log.i(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
         transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
       } else {
-        Log.e(
-          logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}"
-        )
+        Log.e(logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}")
       }
     } catch (e: Exception) {
-        Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+      Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
     }
   }
 }

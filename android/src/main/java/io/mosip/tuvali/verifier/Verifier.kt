@@ -4,14 +4,18 @@ import android.content.Context
 import android.os.HandlerThread
 import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
-import com.facebook.react.bridge.Callback
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
+import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.cryptography.SecretsTranslator
 import io.mosip.tuvali.cryptography.VerifierCryptoBox
 import io.mosip.tuvali.cryptography.VerifierCryptoBoxBuilder
-import io.mosip.tuvali.openid4vpble.Openid4vpBleModule
 import io.mosip.tuvali.exception.BLEException
+import io.mosip.tuvali.openid4vpble.EventEmitter
+import io.mosip.tuvali.openid4vpble.events.withArgs.DataReceivedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.ConnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
+import io.mosip.tuvali.openid4vpble.events.withoutArgs.SecureChannelEstablishedEvent
 import io.mosip.tuvali.transfer.ByteCount.FourBytes
 import io.mosip.tuvali.transfer.TransferReportRequest
 import io.mosip.tuvali.transfer.Util
@@ -20,7 +24,6 @@ import io.mosip.tuvali.verifier.exception.UnsupportedMTUSizeException
 import io.mosip.tuvali.verifier.exception.VerifierException
 import io.mosip.tuvali.verifier.transfer.ITransferListener
 import io.mosip.tuvali.verifier.transfer.TransferHandler
-import io.mosip.tuvali.verifier.transfer.message.InitTransferMessage
 import io.mosip.tuvali.verifier.transfer.message.RemoteRequestedTransferReportMessage
 import io.mosip.tuvali.verifier.transfer.message.ResponseChunkReceivedMessage
 import io.mosip.tuvali.verifier.transfer.message.ResponseSizeReadSuccessMessage
@@ -32,14 +35,13 @@ private const val MIN_MTU_REQUIRED = 64
 
 class Verifier(
   context: Context,
-  private val messageResponseListener: (String, String) -> Unit,
-  private val eventResponseListener: (String) -> Unit,
+  private val eventEmitter: EventEmitter,
   private val handleException: (BLEException) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
   private var secretsTranslator: SecretsTranslator? = null
   private val logTag = getLogTag(javaClass.simpleName)
-  private var publicKey: ByteArray = byteArrayOf()
+  var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var nonce: ByteArray
   private var secureRandom: SecureRandom = SecureRandom()
@@ -48,7 +50,6 @@ class Verifier(
   private var transferHandler: TransferHandler
   private val handlerThread = HandlerThread("TransferHandlerThread", THREAD_PRIORITY_DEFAULT)
   private var maxDataBytes = 20
-
   //TODO: Update UUIDs as per specification
   companion object {
     val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
@@ -57,14 +58,10 @@ class Verifier(
   }
 
   private enum class PeripheralCallbacks {
-    ADV_SUCCESS_CALLBACK,
-    ADV_FAILURE_CALLBACK,
-    DEVICE_CONNECTED_CALLBACK,
-    RESPONSE_RECEIVE_SUCCESS_CALLBACK,
     ON_DESTROY_SUCCESS_CALLBACK
   }
 
-  private val callbacks = mutableMapOf<PeripheralCallbacks, Callback>()
+  private val callbacks = mutableMapOf<PeripheralCallbacks, () -> Unit>()
 
   init {
     handlerThread.start()
@@ -74,8 +71,8 @@ class Verifier(
     transferHandler = TransferHandler(handlerThread.looper, peripheral, this@Verifier, SERVICE_UUID)
   }
 
-  fun stop(onDestroySuccessCallback: Callback) {
-    callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroySuccessCallback
+  fun stop(callback: () -> Unit) {
+    callbacks[PeripheralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = callback
     peripheral.stop(SERVICE_UUID)
     handlerThread.quitSafely()
   }
@@ -86,8 +83,7 @@ class Verifier(
     Log.i(logTag, "Verifier public key: ${Hex.toHexString(publicKey)}")
   }
 
-  fun startAdvertisement(advIdentifier: String, successCallback: Callback) {
-    callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK] = successCallback
+  fun startAdvertisement(advIdentifier: String) {
     peripheral.start(
       SERVICE_UUID,
       SCAN_RESPONSE_SERVICE_UUID,
@@ -96,13 +92,8 @@ class Verifier(
     )
   }
 
-  fun sendRequest(request: String, responseReceivedCallback: Callback) {
-    callbacks[PeripheralCallbacks.RESPONSE_RECEIVE_SUCCESS_CALLBACK] = responseReceivedCallback
-    transferHandler.sendMessage(InitTransferMessage(request.toByteArray()))
-  }
-
   fun notifyVerificationStatus(accepted: Boolean) {
-    if(accepted) {
+    if (accepted) {
       peripheral.sendData(SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID,
         byteArrayOf(io.mosip.tuvali.wallet.transfer.TransferHandler.VerificationStates.ACCEPTED.ordinal.toByte()))
     } else {
@@ -113,11 +104,6 @@ class Verifier(
 
   override fun onAdvertisementStartSuccessful() {
     Log.d(logTag, "onAdvertisementStartSuccess")
-    // Avoid spurious device connected events to be sent to higher layer before advertisement starts successfully
-    val successCallback = callbacks[PeripheralCallbacks.ADV_SUCCESS_CALLBACK]
-    successCallback?.let {
-      callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK] = it
-    }
   }
 
   override fun onAdvertisementStartFailed(errorCode: Int) {
@@ -148,10 +134,9 @@ class Verifier(
             }"
           )
           secretsTranslator = verifierCryptoBox.buildSecretsTranslator(nonce, walletPubKey)
-          // TODO: Validate pub key, how to handle if not valid?
-          messageResponseListener(Openid4vpBleModule.NearbyEvents.EXCHANGE_SENDER_INFO.value, "{\"deviceName\": \"Wallet\"}")
           peripheral.enableCommunication()
           peripheral.stopAdvertisement()
+          eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
         }
       }
       GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
@@ -194,7 +179,7 @@ class Verifier(
       }
       GattService.VERIFICATION_STATUS_CHAR_UUID -> {
         if (transferHandler.getCurrentState() == TransferHandler.States.TransferComplete) {
-          if (!isSent){
+          if (!isSent) {
             Log.e(logTag, "onSendDataFail: Failed to notify verification status to wallet about")
           }
         }
@@ -220,18 +205,16 @@ class Verifier(
 
   override fun onDeviceConnected() {
     Log.d(logTag, "onDeviceConnected: sending event")
-    val deviceConnectedCallback = callbacks[PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK]
-
-    deviceConnectedCallback?.let {
-      it()
-      callbacks.remove(PeripheralCallbacks.DEVICE_CONNECTED_CALLBACK)
+    // Avoid spurious device connected events to be sent to higher layer before advertisement starts successfully
+    if (peripheral.isAdvertisementStarted()) {
+      eventEmitter.emitEventWithoutArgs(ConnectedEvent())
     }
   }
 
   override fun onMTUChanged(mtu: Int) {
     Log.d(logTag, "maxDataBytes: $mtu bytes")
 
-    if(mtu < MIN_MTU_REQUIRED){
+    if (mtu < MIN_MTU_REQUIRED) {
       throw UnsupportedMTUSizeException("Minimum $MIN_MTU_REQUIRED MTU is required for VC transfer")
     }
 
@@ -240,8 +223,8 @@ class Verifier(
 
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
-    if(!isManualDisconnect && isConnected) {
-      eventResponseListener("onDisconnected")
+    if (!isManualDisconnect && isConnected) {
+      eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
     }
   }
 
@@ -253,15 +236,15 @@ class Verifier(
         Log.d(logTag, "decryptedData size: ${decryptedData.size}")
         val decompressedData = Util.decompress(decryptedData)
         Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-        messageResponseListener(Openid4vpBleModule.NearbyEvents.SEND_VC.value, String(decompressedData!!))
+        eventEmitter.emitEventWithArgs(DataReceivedEvent(String(decompressedData!!)))
       } else {
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error
       }
     } catch (e: Exception) {
-        Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
-        //Re-Throwing for the exception handler to handle this again and let Higher layer know.
-        throw e
+      Log.e(logTag, "failed to decrypt data of size ${data.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+      //Re-Throwing for the exception handler to handle this again and let Higher layer know.
+      throw e
     }
   }
 
@@ -270,17 +253,12 @@ class Verifier(
     // TODO: Handle error
   }
 
-  fun getAdvIdentifier(identifier: String): String {
-    // 5 bytes, since it's in hex it'd be twice
-    return Hex.toHexString("${identifier}_".toByteArray() + publicKey.copyOfRange(0, 5))
-  }
-
   private fun getAdvPayload(advIdentifier: String): ByteArray {
     // Readable Identifier from higher layer + _ + first 5 bytes of public key
-    return advIdentifier.toByteArray() + "_".toByteArray() + publicKey.copyOfRange(0, 5)
+    return AdvertisementPayload.getAdvPayload(advIdentifier, publicKey)
   }
 
   private fun getScanRespPayload(): ByteArray {
-    return publicKey.copyOfRange(5, 32) // should contain 27 bytes
+    return AdvertisementPayload.getScanRespPayload(publicKey) // should contain 27 bytes
   }
 }
