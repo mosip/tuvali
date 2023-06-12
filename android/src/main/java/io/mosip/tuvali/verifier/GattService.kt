@@ -20,7 +20,7 @@ class GattService {
 
   fun create(): BluetoothGattService {
     val service = BluetoothGattService(
-      Verifier.SERVICE_UUID,
+      VerifierBleCommunicator.SERVICE_UUID,
       BluetoothGattService.SERVICE_TYPE_PRIMARY
     )
 

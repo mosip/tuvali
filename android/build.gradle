@@ -1,6 +1,6 @@
 buildscript {
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
-  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Openid4vpBle_kotlinVersion']
+  def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Tuvali_kotlinVersion']
 
   repositories {
       google()
@@ -26,11 +26,11 @@ if (isNewArchitectureEnabled()) {
 }
 
 def getExtOrDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Openid4vpBle_' + name]
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : project.properties['Tuvali_' + name]
 }
 
 def getExtOrIntegerDefault(name) {
-  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['Openid4vpBle_' + name]).toInteger()
+  return rootProject.ext.has(name) ? rootProject.ext.get(name) : (project.properties['Tuvali_' + name]).toInteger()
 }
 
 android {
@@ -139,7 +139,7 @@ dependencies {
   implementation 'org.bouncycastle:bcpkix-jdk15to18:1.68'
   implementation 'org.bouncycastle:bcprov-jdk15to18:1.68'
   implementation 'com.github.snksoft:crc:1.1.0'
-
+  implementation "org.jetbrains.kotlin:kotlin-reflect:1.7.0"
 
 // From node_modules
 }
@@ -147,8 +147,8 @@ dependencies {
 if (isNewArchitectureEnabled()) {
   react {
     jsRootDir = file("../src/")
-    libraryName = "Openid4vpBle"
-    codegenJavaPackageName = "io.mosip.tuvali.openid4vpble"
+    libraryName = "Tuvali"
+    codegenJavaPackageName = "io.mosip.tuvali.rnModule"
   }
 }
 

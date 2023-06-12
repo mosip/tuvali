@@ -1,325 +1,92 @@
 package io.mosip.tuvali.wallet
 
-import android.bluetooth.BluetoothDevice
-import android.bluetooth.le.ScanRecord
 import android.content.Context
-import android.os.HandlerThread
-import android.os.ParcelUuid
-import android.os.Process
 import android.util.Log
-import io.mosip.tuvali.ble.central.Central
-import io.mosip.tuvali.ble.central.ICentralListener
-import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
-import io.mosip.tuvali.cryptography.SecretsTranslator
-import io.mosip.tuvali.cryptography.WalletCryptoBox
-import io.mosip.tuvali.cryptography.WalletCryptoBoxBuilder
-import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
-import io.mosip.tuvali.exception.BLEException
-import io.mosip.tuvali.openid4vpble.EventEmitter
-import io.mosip.tuvali.openid4vpble.events.withArgs.VerificationStatusEvent
-import io.mosip.tuvali.openid4vpble.events.withoutArgs.ConnectedEvent
-import io.mosip.tuvali.openid4vpble.events.withoutArgs.DataSentEvent
-import io.mosip.tuvali.openid4vpble.events.withoutArgs.DisconnectedEvent
-import io.mosip.tuvali.openid4vpble.events.withoutArgs.SecureChannelEstablishedEvent
-import io.mosip.tuvali.transfer.TransferReport
-import io.mosip.tuvali.transfer.Util
-import io.mosip.tuvali.verifier.GattService
-import io.mosip.tuvali.verifier.Verifier
-import io.mosip.tuvali.verifier.Verifier.Companion.DISCONNECT_STATUS
-import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
-import io.mosip.tuvali.wallet.transfer.ITransferListener
-import io.mosip.tuvali.wallet.transfer.TransferHandler
-import io.mosip.tuvali.wallet.transfer.message.*
-import org.bouncycastle.util.encoders.Hex
-import java.security.SecureRandom
-import java.util.*
+import io.mosip.tuvali.common.events.DisconnectedEvent
+import io.mosip.tuvali.common.events.Event
+import io.mosip.tuvali.common.events.EventEmitter
+import io.mosip.tuvali.common.safeExecute.TryExecuteSync
+import io.mosip.tuvali.common.uri.OpenId4vpURI
+import io.mosip.tuvali.exception.handlers.ExceptionHandler
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
-import io.mosip.tuvali.wallet.exception.TransferFailedException
-import io.mosip.tuvali.wallet.exception.WalletException
+import io.mosip.tuvali.wallet.exception.InvalidURIException
 
-private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
-
-class Wallet(context: Context, private val eventEmitter: EventEmitter, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
+class Wallet(private val context: Context) : IWallet {
   private val logTag = getLogTag(javaClass.simpleName)
+  private var bleCommunicator: WalletBleCommunicator? = null
+  private var eventEmitter = EventEmitter()
+  private var bleExceptionHandler = ExceptionHandler(eventEmitter::emitErrorEvent, this::stopBLE)
+  private val tryExecuteSync = TryExecuteSync(bleExceptionHandler)
 
-  private val secureRandom: SecureRandom = SecureRandom()
-  private lateinit var verifierPK: ByteArray
-  private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
-  private var secretsTranslator: SecretsTranslator? = null
 
-  private var advPayload: ByteArray? = null
-  private var transferHandler: TransferHandler
-  private val handlerThread = HandlerThread("TransferHandlerThread", Process.THREAD_PRIORITY_DEFAULT)
+  override fun startConnection( uri: String) {
+    Log.d(logTag, "startConnection with firstPartOfVerifierPK $uri at ${System.nanoTime()}")
 
-  private var central: Central
+    tryExecuteSync.run {
+      Log.d(logTag, "synchronized startConnection wallet object with uri $uri at ${System.nanoTime()}")
 
-  //default mtu is 23 bytes and the allowed data bytes is 20 bytes
-  private var maxDataBytes = 20
-  private val mtuValues = arrayOf(512, 185, 100)
+      val openId4vpURI = OpenId4vpURI(uri)
 
-  private val retryDiscoverServices = BackOffStrategy(maxRetryLimit = 5)
-
-  private enum class CentralCallbacks {
-    ON_DESTROY_SUCCESS_CALLBACK
-  }
-
-  private val callbacks = mutableMapOf<CentralCallbacks, () -> Unit>()
-
-  init {
-    central = Central(context, this@Wallet)
-    handlerThread.start()
-    transferHandler = TransferHandler(handlerThread.looper, central, Verifier.SERVICE_UUID, this@Wallet)
-  }
-
-  fun stop(onDestroy: () -> Unit) {
-    callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = onDestroy
-    central.stop()
-    handlerThread.quitSafely()
-  }
-
-  fun startScanning() {
-    central.scan(Verifier.SERVICE_UUID)
-  }
-
-  fun writeToIdentifyRequest() {
-    val publicKey = walletCryptoBox.publicKey()
-    secretsTranslator = walletCryptoBox.buildSecretsTranslator(verifierPK)
-    val nonce = secretsTranslator?.nonce
-    central.write(Verifier.SERVICE_UUID, GattService.IDENTIFY_REQUEST_CHAR_UUID, nonce!! + publicKey!!)
-    Log.d(logTag, "Started to write - generated nonce ${
-      Hex.toHexString(nonce)
-    }, Public Key of wallet: ${Hex.toHexString(publicKey)}")
-  }
-
-  override fun onScanStartedFailed(errorCode: Int) {
-    Log.d(logTag, "onScanStartedFailed: $errorCode")
-    //TODO: Handle error
-  }
-
-  private val connectionMutex = Object()
-
-  @Volatile
-  private var connectionState = VerifierConnectionState.NOT_CONNECTED
-
-  private enum class VerifierConnectionState {
-    NOT_CONNECTED, CONNECTING, CONNECTED
-  }
-
-  override fun onDeviceFound(device: BluetoothDevice, scanRecord: ScanRecord?) {
-    synchronized(connectionMutex) {
-      if (connectionState != VerifierConnectionState.NOT_CONNECTED) {
-        Log.d(logTag, "Device found is ignored $device")
-        return
+      if(!openId4vpURI.isValid()) {
+        throw InvalidURIException("Received Invalid URI: $uri")
       }
-      val scanResponsePayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SCAN_RESPONSE_SERVICE_UUID))
-      val advertisementPayload = scanRecord?.getServiceData(ParcelUuid(Verifier.SERVICE_UUID))
 
-      if (advertisementPayload != null && isSameAdvPayload(advertisementPayload) && scanResponsePayload != null) {
-        setVerifierPK(advertisementPayload, scanResponsePayload)
-        central.connect(device)
-        connectionState = VerifierConnectionState.CONNECTING
-      } else {
-        Log.d(logTag, "AdvIdentifier($advPayload) is not matching with peripheral device adv")
+      bleCommunicator = WalletBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
+      bleCommunicator?.setAdvPayload(openId4vpURI.getName(), openId4vpURI.getHexPK())
+      bleCommunicator?.startScanning()
+    }
+  }
+
+  override fun sendData(payload: String) {
+    Log.d(logTag, "send: message $payload at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      bleCommunicator?.sendData(payload)
+    }
+  }
+
+  override fun disconnect() {
+    //TODO: Make sure callback can be called only once[Can be done once wallet and verifier split into different modules]
+    Log.d(logTag, "destroyConnection called at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      stopBLE {
+        eventEmitter.emitEvent(DisconnectedEvent())
       }
     }
   }
 
-  private fun setVerifierPK(advertisementPayload: ByteArray, scanResponsePayload: ByteArray) {
-    val first5BytesOfPkFromBLE = advertisementPayload.takeLast(5).toByteArray()
-    this.verifierPK = first5BytesOfPkFromBLE + scanResponsePayload
-
-    Log.d(logTag, "Public Key of Verifier: ${Hex.toHexString(verifierPK)}")
-  }
-
-  private fun isSameAdvPayload(advertisementPayload: ByteArray): Boolean {
-    this.advPayload?.let {
-      return it contentEquals advertisementPayload
-    }
-    return false
-  }
-
-  override fun onDeviceConnected(device: BluetoothDevice) {
-    synchronized(connectionMutex) {
-      Log.d(logTag, "on Verifier device connected")
-      connectionState = VerifierConnectionState.CONNECTED
-
-      Log.d(logTag, "stopping scan for verifiers")
-      central.stopScan()
-
-      walletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
-      central.discoverServices()
+  override fun subscribe(listener: (Event) -> Unit) {
+    Log.d(logTag, "got subscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventEmitter.addListener(listener)
     }
   }
 
-  override fun onServicesDiscovered(serviceUuids: List<UUID>) {
+  override fun unSubscribe() {
+    Log.d(logTag, "got unsubscribe at ${System.nanoTime()}")
+    tryExecuteSync.run {
+      eventEmitter.removeListeners()
+    }
+  }
 
-    if (serviceUuids.contains(Verifier.SERVICE_UUID)) {
-      retryDiscoverServices.reset()
-      Log.d(logTag, "onServicesDiscovered with services - $serviceUuids")
-      central.requestMTU(mtuValues, MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS)
+  private fun stopBLE(callback: () -> Unit) {
+    if (bleCommunicator == null) {
+      callback()
     } else {
-      retryServiceDiscovery()
+      Log.d(logTag, "synchronized destroyConnection called for wallet at ${System.nanoTime()}")
+      stopWallet { callback() }
     }
   }
 
-  override fun onServicesDiscoveryFailed(errorCode: Int) {
-    Log.d(logTag, "onServicesDiscoveryFailed retrying to find the services")
-    retryServiceDiscovery()
-  }
-
-  private fun retryServiceDiscovery() {
-    if (retryDiscoverServices.shouldRetry()) {
-      central.discoverServicesDelayed(retryDiscoverServices.getWaitTime())
-    } else {
-      //TODO: Send service discovery failure to inji layer
-      Log.d(logTag, "Retrying to find the services failed after multiple attempts")
-      retryDiscoverServices.reset()
-    }
-  }
-
-  override fun onRequestMTUSuccess(mtu: Int) {
-    Log.d(logTag, "onRequestMTUSuccess")
-    maxDataBytes = mtu
-    central.subscribe(Verifier.SERVICE_UUID, GattService.DISCONNECT_CHAR_UUID)
-    eventEmitter.emitEventWithoutArgs(ConnectedEvent())
-    writeToIdentifyRequest()
-  }
-
-  override fun onRequestMTUFailure(errorCode: Int) {
-    //TODO: Handle onRequest MTU failure
-    throw MTUNegotiationFailedException("MTU negotiation failed even after multiple retries  with error code: $errorCode.")
-  }
-
-  override fun onReadSuccess(charUUID: UUID, value: ByteArray?) {
-    Log.d(logTag, "Read from $charUUID successfully and value is $value")
-  }
-
-  override fun onReadFailure(charUUID: UUID?, err: Int) {}
-
-  override fun onSubscriptionSuccess(charUUID: UUID) {
-    // Do nothing
-  }
-
-  override fun onSubscriptionFailure(charUUID: UUID, err: Int) {
-    //TODO: Close and send event to higher layer
-  }
-
-  override fun onDeviceDisconnected(isManualDisconnect: Boolean) {
-    synchronized(connectionMutex) {
-      connectionState = VerifierConnectionState.NOT_CONNECTED
-      if (!isManualDisconnect) {
-          eventEmitter.emitEventWithoutArgs(DisconnectedEvent())
-      }
-    }
-  }
-
-  override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
-    Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
-
-    when (charUUID) {
-      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
-        transferHandler.sendMessage(ResponseChunkWriteFailureMessage(err))
-      }
-      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
-        //TODO: implement a retry strategy similar to ios if the transfer report request write fails
-        transferHandler.sendMessage(ResponseTransferFailureMessage("Failed to request report with err: $err"))
-      }
-    }
-  }
-
-  // TODO: move all subscriptions and unsubscriptions to one place
-
-  override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
-    Log.d(logTag, "Wrote to $charUUID successfully")
-    when (charUUID) {
-      GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
-        eventEmitter.emitEventWithoutArgs(SecureChannelEstablishedEvent())
-      }
-      GattService.RESPONSE_SIZE_CHAR_UUID -> {
-        transferHandler.sendMessage(ResponseSizeWriteSuccessMessage())
-      }
-      GattService.SUBMIT_RESPONSE_CHAR_UUID -> {
-        transferHandler.sendMessage(ResponseChunkWriteSuccessMessage())
-      }
-      GattService.TRANSFER_REPORT_REQUEST_CHAR_UUID -> {
-        central.subscribe(Verifier.SERVICE_UUID, GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID)
-        central.subscribe(Verifier.SERVICE_UUID, GattService.VERIFICATION_STATUS_CHAR_UUID)
-      }
-    }
-  }
-
-  override fun onResponseSent() {
-    eventEmitter.emitEventWithoutArgs(DataSentEvent())
-  }
-
-  override fun onResponseSendFailure(errorMsg: String) {
-    throw TransferFailedException(errorMsg)
-  }
-
-  override fun onNotificationReceived(charUUID: UUID, value: ByteArray?) {
-    when (charUUID) {
-      GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID -> {
-        value?.let {
-          transferHandler.sendMessage(HandleTransmissionReportMessage(TransferReport(it)))
-        }
-      }
-      GattService.VERIFICATION_STATUS_CHAR_UUID -> {
-        val status = value?.get(0)?.toInt()
-        if (status != null && status == TransferHandler.VerificationStates.ACCEPTED.ordinal) {
-          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.ACCEPTED))
-        } else {
-          eventEmitter.emitEventWithArgs(VerificationStatusEvent(VerificationStatusEvent.VerificationStatus.REJECTED))
-        }
-
-        central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-        central.disconnectAndClose()
-      }
-      GattService.DISCONNECT_CHAR_UUID -> {
-        val status = value?.get(0)?.toInt()
-
-        if (status != null && status == DISCONNECT_STATUS) {
-          central.unsubscribe(Verifier.SERVICE_UUID, charUUID)
-          central.disconnectAndClose()
-        }
-      }
-    }
-  }
-
-  override fun onException(exception: BLEException) {
-    handleException(WalletException("Exception in Wallet", exception))
-  }
-
-  override fun onClosed() {
-    Log.d(logTag, "onClosed")
-    central.quitHandler()
-    val onClosedCallback = callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK]
-
-    onClosedCallback?.let {
-      Log.d(logTag, "calling onDestroy callback")
-      it()
-      callbacks.remove(CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK)
-    }
-  }
-
-  fun setAdvPayload(advIdentifier: String, verifierPK: String) {
-    this.advPayload = AdvertisementPayload.getAdvPayload(advIdentifier, verifierPK)
-  }
-
-  fun sendData(data: String) {
-    val dataInBytes = data.toByteArray()
-    Log.d(logTag, "dataInBytes size: ${dataInBytes.size}")
-    val compressedBytes = Util.compress(dataInBytes)
-    Log.d(logTag, "compression before: ${dataInBytes.size} and after: ${compressedBytes?.size}")
+  private fun stopWallet(onDestroy: () -> Unit) {
     try {
-      val encryptedData = secretsTranslator?.encryptToSend(compressedBytes)
-      if (encryptedData != null) {
-        //Log.i(logTag, "Sha256 of Encrypted Data: ${Util.getSha256(encryptedData)}")
-        transferHandler.sendMessage(InitResponseTransferMessage(encryptedData, maxDataBytes))
-      } else {
-        Log.e(logTag, "encrypted data is null, with size: ${dataInBytes.size} and compressed size: ${compressedBytes?.size}")
-      }
+      bleCommunicator?.stop(onDestroy)
     } catch (e: Exception) {
-      Log.e(logTag, "failed to encrypt with size: ${dataInBytes.size} and compressed size ${compressedBytes?.size}, with exception: ${e.message}, stacktrace: ${e.stackTraceToString()}")
+      Log.e(logTag, "stopWallet: exception: ${e.message}")
+      Log.e(logTag, "stopWallet: exception: ${e.stackTrace}")
+      Log.e(logTag, "stopWallet: exception: $e")
+    } finally {
+      Log.d(logTag, "stopWallet: setting to null")
+      bleCommunicator = null
     }
   }
 }

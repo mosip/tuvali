@@ -92,7 +92,7 @@ class TransferHandler {
 
         if (r.type == .SUCCESS) {
             currentState = States.TransferVerified
-            EventEmitter.sharedInstance.emitEventWithoutArgs(event: DataSentEvent())
+            EventEmitter.sharedInstance.emitEvent(DataSentEvent())
             failureFrameRetryCounter = 0
             os_log(.info, "Emitting VC RECEIVED message")
         } else if r.type == .MISSING_CHUNKS {
@@ -195,9 +195,9 @@ extension TransferHandler: PeripheralCommunicatorProtocol {
         if let value =  value {
             let status = Int(value[0])
             if status == 0 {
-                EventEmitter.sharedInstance.emitEventWithArgs(event: VerificationStatusEvent(status: .ACCEPTED))
+                EventEmitter.sharedInstance.emitEvent(VerificationStatusEvent(status: .ACCEPTED))
             } else if status == 1 {
-                EventEmitter.sharedInstance.emitEventWithArgs(event: VerificationStatusEvent(status: .REJECTED))
+                EventEmitter.sharedInstance.emitEvent(VerificationStatusEvent(status: .REJECTED))
             }
             destroyConnection?()
         }

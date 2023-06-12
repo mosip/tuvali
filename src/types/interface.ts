@@ -5,7 +5,6 @@ import type { VerificationStatus } from './events';
 interface TuvaliModule {
   noop: () => void;
   disconnect: () => void;
-  setTuvaliVersion: (version: string) => void;
 }
 
 export interface Verifier extends TuvaliModule {
@@ -22,4 +21,8 @@ export interface Wallet extends TuvaliModule {
   handleDataEvents: (
     callback: (events: WalletDataEvent) => void
   ) => EmitterSubscription;
+}
+
+export interface VersionModule {
+  setTuvaliVersion: (version: string) => void;
 }

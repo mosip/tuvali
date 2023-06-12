@@ -5,14 +5,14 @@ protocol TransferHandlerDelegate: AnyObject {
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data, withResponse: Bool)
 }
 
-extension Wallet: WalletProtocol {
+extension WalletBleCommunicator: WalletBleCommunicatorProtocol {
 
     func onDisconnect() {
         self.onDeviceDisconnected()
     }
 
     func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitEventWithoutArgs(event: SecureChannelEstablishedEvent())
+        EventEmitter.sharedInstance.emitEvent(SecureChannelEstablishedEvent())
     }
 
     func onDisconnectStatusChange(data: Data?) {
@@ -38,7 +38,7 @@ extension Wallet: WalletProtocol {
     }
 }
 
-extension Wallet: TransferHandlerDelegate {
+extension WalletBleCommunicator: TransferHandlerDelegate {
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data, withResponse: Bool) {
         if withResponse {
             central?.writeWithResponse(serviceUuid: serviceUuid, charUUID: charUUID, data: data)
