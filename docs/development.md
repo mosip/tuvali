@@ -16,12 +16,12 @@ Something to keep note of is to maintain the consistency between the interfaces 
 The way the native module is setup is it contains 3 primary parts.
 
  - Swift files - These contain the primary business logic being exposed.
- - Bridging Header (Openid4vpBle-Bridging-Header.h) - A obj-C bridging header that is needeed to use swift inside a objective-C project.
- - Objective-C module file (Openid4vpBle.m) - This file exposes the modules to React Native via macros.
+ - Bridging Header (Tuvali-Bridging-Header.h) - A obj-C bridging header that is needeed to use swift inside a objective-C project.
+ - Objective-C module file (Tuvali.m) - This file exposes the modules to React Native via macros.
 
 Whenever new functions are being added to the modules, the corresponding functions need to be exposed via the interface failing which the functions/methods will not be available on the react native side.
 
-For installing dependencies for the ios module, install the required dependencies in the `react-native-openid4vp-ble.podspec` file.
+For installing dependencies for the ios module, install the required dependencies in the `react-native-tuvali.podspec` file.
 Eg -
 ```
 pod.dependency 'Tink'
@@ -42,7 +42,7 @@ The android module is written in kotlin. The primary way of exposing functionali
 
 There is one module that is exposed as part of the package
 ```
-Openid4vpBleModule
+TuvaliModule
 ```
 
 For installing dependencies for the android module, add the required dependencies in the `build.gradle` file.
@@ -77,7 +77,7 @@ We use an npm package called `yalc` to publish changes to a local repository for
 2. Public Tuvali to local Yalc repo with `yalc publish`
 
 ### On Inji repo
-1. Add locally published Tuvali repo to INJI with `yalc add react-native-openid4vp-ble`
+1. Add locally published Tuvali repo to INJI with `yalc add react-native-tuvali`
 2. `npm install`
 3. Open app from CLI `npm run android:mosip`. Optionally can run from Android studio as well.
 

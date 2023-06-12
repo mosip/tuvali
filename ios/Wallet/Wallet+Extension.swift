@@ -5,16 +5,16 @@ protocol TransferHandlerDelegate: AnyObject {
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data, withResponse: Bool)
 }
 
-extension Wallet: WalletProtocol {
-    
+extension WalletBleCommunicator: WalletBleCommunicatorProtocol {
+
     func onDisconnect() {
         self.onDeviceDisconnected()
     }
-    
+
     func onIdentifyWriteSuccess() {
-        EventEmitter.sharedInstance.emitNearbyMessage(event: "exchange-receiver-info", data: Self.EXCHANGE_RECEIVER_INFO_DATA)
+        EventEmitter.sharedInstance.emitEvent(SecureChannelEstablishedEvent())
     }
-    
+
     func onDisconnectStatusChange(data: Data?) {
         print("Handling notification for disconnect handle")
         if let data {
@@ -23,22 +23,22 @@ extension Wallet: WalletProtocol {
                 print("con statusid:", connStatusID)
                 handleDestroyConnection(isSelfDisconnect: false)
             }
-        } 
+        }
     }
-    
+
     func setVeriferKeyOnSameIdentifier(payload: Data, publicData: Data, completion: (() -> Void)) {
         if isSameAdvIdentifier(advertisementPayload: payload) {
             setVerifierPublicKey(publicKeyData: publicData)
             completion()
         }
     }
-    
+
     func createConnectionHandler() {
         createConnection?()
     }
 }
 
-extension Wallet: TransferHandlerDelegate {
+extension WalletBleCommunicator: TransferHandlerDelegate {
     func write(serviceUuid: CBUUID, charUUID: CBUUID, data: Data, withResponse: Bool) {
         if withResponse {
             central?.writeWithResponse(serviceUuid: serviceUuid, charUUID: charUUID, data: data)

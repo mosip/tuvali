@@ -55,7 +55,7 @@ extension Central: CBPeripheralDelegate {
                 peripheral.setNotifyValue(true, for: characteristic)
             }
         }
-        walletDelegate?.createConnectionHandler()
+        walletBleCommunicatorDelegate?.createConnectionHandler()
     }
 
 
@@ -117,7 +117,7 @@ extension Central: CBPeripheralDelegate {
             delegate?.onVerificationStatusChange(data: verificationStatus)
         } else if characteristic.uuid == NetworkCharNums.DISCONNECT_CHAR_UUID {
             let disconnectStatus = characteristic.value as Data?
-            walletDelegate?.onDisconnectStatusChange(data: disconnectStatus)
+            walletBleCommunicatorDelegate?.onDisconnectStatusChange(data: disconnectStatus)
             peripheral.setNotifyValue(false, for: characteristic)
         }
     }
@@ -131,7 +131,7 @@ extension Central: CBPeripheralDelegate {
             return
         }
         if characteristic.uuid == NetworkCharNums.IDENTIFY_REQUEST_CHAR_UUID {
-            walletDelegate?.onIdentifyWriteSuccess()
+            walletBleCommunicatorDelegate?.onIdentifyWriteSuccess()
         } else if characteristic.uuid == NetworkCharNums.RESPONSE_SIZE_CHAR_UUID {
             delegate?.onResponseSizeWriteSuccess()
         }

@@ -8,7 +8,7 @@ protocol PeripheralCommunicatorProtocol: AnyObject {
     func onFailedToSendTransferReportRequest()
 }
 
-protocol WalletProtocol: AnyObject {
+protocol WalletBleCommunicatorProtocol: AnyObject {
     func onIdentifyWriteSuccess()
     func onDisconnectStatusChange(data: Data?)
     func createConnectionHandler()

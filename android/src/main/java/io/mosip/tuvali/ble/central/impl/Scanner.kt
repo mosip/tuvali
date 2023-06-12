@@ -11,7 +11,6 @@ import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 
 class Scanner(context: Context) {
   private val logTag =  getLogTag(javaClass.simpleName)
-  private lateinit var advPayload: String
   private lateinit var onScanStartFailure: (Int) -> Unit
   private lateinit var onDeviceFound: (ScanResult) -> Unit
   private var bluetoothLeScanner: BluetoothLeScanner
@@ -38,13 +37,11 @@ class Scanner(context: Context) {
   @SuppressLint("MissingPermission")
   fun start(
     serviceUUID: UUID,
-    advPayload: String,
     onDeviceFound: (ScanResult) -> Unit,
     onScanStartFailure: (Int) -> Unit
   ) {
     this.onDeviceFound = onDeviceFound;
     this.onScanStartFailure = onScanStartFailure;
-    this.advPayload = advPayload;
 
     val filter = ScanFilter.Builder()
       .setServiceUuid(ParcelUuid(serviceUUID))

@@ -1,6 +1,6 @@
 {
-  "name": "react-native-openid4vp-ble",
-  "version": "0.4.0",
+  "name": "react-native-tuvali",
+  "version": "0.4.1",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -32,7 +32,8 @@
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "release": "release-it",
     "clean": "del-cli android/build",
-    "bootstrap": "yarn install"
+    "bootstrap": "yarn install",
+    "prepare": "bob build"
   },
   "keywords": [
     "react-native",
