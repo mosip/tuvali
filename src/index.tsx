@@ -69,7 +69,6 @@ function setupModule(module: any) {
   }
 
   if (isIOS) {
-    console.log(`IOS PLATFORM`);
     const eventEmitter = new NativeEventEmitter(module);
     module.handleDataEvents = (callback: (event: any) => void) =>
       eventEmitter.addListener('DATA_EVENT', callback);
