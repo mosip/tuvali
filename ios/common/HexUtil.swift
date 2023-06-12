@@ -14,3 +14,15 @@ func hexStringToData(string: String) -> Data {
     }
     return data
 }
+
+func stringToJson(jsonText: String) -> NSDictionary {
+    var dictonary: NSDictionary?
+    if let data = jsonText.data(using: String.Encoding.utf8) {
+        do {
+            dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
+        } catch let error as NSError {
+            os_log(.error, " %{public}@ ", error)
+        }
+    }
+    return dictonary!
+}

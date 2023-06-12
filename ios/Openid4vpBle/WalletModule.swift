@@ -33,18 +33,6 @@ class WalletModule: RCTEventEmitter {
         }
     }
 
-    func stringToJson(jsonText: String) -> NSDictionary {
-        var dictonary: NSDictionary?
-        if let data = jsonText.data(using: String.Encoding.utf8) {
-            do {
-                dictonary = try JSONSerialization.jsonObject(with: data, options: []) as? [String:AnyObject] as NSDictionary?
-            } catch let error as NSError {
-                os_log(.error, " %{public}@ ", error)
-            }
-        }
-        return dictonary!
-    }
-
 
     @objc func setTuvaliVersion(_ version: String) -> String{
         tuvaliVersion = version
