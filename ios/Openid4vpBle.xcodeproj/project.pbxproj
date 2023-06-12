@@ -95,7 +95,7 @@
 		8D31C3FD2956B2650073B710 /* WalletCryptoBoxBuilder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxBuilder.swift; sourceTree = "<group>"; };
 		8D31C4012956B3EF0073B710 /* WalletCryptoBoxImpl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WalletCryptoBoxImpl.swift; sourceTree = "<group>"; };
 		A7A42E4029A8CCF10026167C /* Wallet+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Wallet+Extension.swift"; sourceTree = "<group>"; };
-		B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Openid4vpBle.m; sourceTree = "<group>"; };
+		B3E7B5891CC2AC0600A0062D /* WalletModule.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WalletModule.m; sourceTree = "<group>"; };
 		E223F0312977BE090042F919 /* TransferHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferHandler.swift; sourceTree = "<group>"; };
 		E2399AA229D5ED140017C313 /* VerifierExceptionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VerifierExceptionHandler.swift; sourceTree = "<group>"; };
 		E25800A32976BF8700968EA0 /* chunker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = chunker.swift; sourceTree = "<group>"; };
@@ -183,7 +183,7 @@
 				8D069F60296436C400AB61A9 /* Openid4vpBle */,
 				8D069F5E2964369000AB61A9 /* Wallet */,
 				8D069F5F296436AD00AB61A9 /* Verifier */,
-				B3E7B5891CC2AC0600A0062D /* Openid4vpBle.m */,
+				B3E7B5891CC2AC0600A0062D /* WalletModule.m */,
 				F4FF95D5245B92E700C19C63 /* Openid4vpBle-Bridging-Header.h */,
 				134814211AA4EA7D00B7C361 /* Products */,
 			);
