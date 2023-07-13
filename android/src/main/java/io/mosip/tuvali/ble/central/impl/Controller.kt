@@ -159,10 +159,12 @@ class Controller(val context: Context) {
     messageSender.sendMessage(failedMessage)
   }
 
-  private fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
-    val writeSuccessMessage = WriteSuccessMessage(device, charUUID)
 
-    messageSender.sendMessage(writeSuccessMessage)
+  private fun onWriteSuccess(device: BluetoothDevice?, charUUID: UUID) {
+    peripheralDevice?.let {
+      val writeSuccessMessage = WriteSuccessMessage(it, charUUID)
+      messageSender.sendMessage(writeSuccessMessage)
+    }
   }
 
   private fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, errorCode: Int) {

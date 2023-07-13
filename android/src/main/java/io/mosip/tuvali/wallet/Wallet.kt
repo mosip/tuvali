@@ -86,7 +86,7 @@ class Wallet(private val context: Context) : IWallet {
       Log.e(logTag, "stopWallet: exception: $e")
     } finally {
       Log.d(logTag, "stopWallet: setting to null")
-      bleCommunicator = null
+      bleCommunicator = null //TODO : set this after VC transfer
     }
   }
 }

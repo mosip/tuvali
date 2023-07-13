@@ -114,7 +114,7 @@ class StateHandler(
         currentState = States.Connected
       }
       IMessage.CentralStates.DEVICE_DISCONNECTED.ordinal -> {
-        Log.d(logTag, "device got disconnected.")
+        Log.d(logTag, "device got disconnected. Current state: $currentState")
 
         if(currentState == States.Closing) {
           this.sendMessage(CloseMessage())
@@ -241,14 +241,18 @@ class StateHandler(
         Log.d(logTag, "Unsubscribed successfully to ${unsubscribeSuccessMessage.charUUID}")
 
         listener.onSubscriptionSuccess(unsubscribeSuccessMessage.charUUID)
-        currentState = States.Connected
+        if(currentState == States.Unsubscribing) {
+          currentState = States.Connected
+        }
       }
       IMessage.CentralStates.UNSUBSCRIBE_FAILURE.ordinal -> {
         val unsubscribeFailureMessage = msg.obj as UnsubscribeFailureMessage
         Log.d(logTag, "Failed to unsubscribe ${unsubscribeFailureMessage.charUUID} with err: ${unsubscribeFailureMessage.err}")
 
         listener.onSubscriptionFailure(unsubscribeFailureMessage.charUUID, unsubscribeFailureMessage.err)
-        currentState = States.Connected
+        if(currentState == States.Unsubscribing) {
+          currentState = States.Connected
+        }
       }
     }
   }

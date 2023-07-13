@@ -118,7 +118,7 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
         central.connect(device)
         connectionState = VerifierConnectionState.CONNECTING
       } else {
-        Log.d(logTag, "AdvIdentifier($advPayload) is not matching with peripheral device adv")
+       Log.d(logTag, "AdvIdentifier($advPayload) is not matching with peripheral device adv")
       }
     }
   }
