@@ -19,6 +19,7 @@ enum class ErrorCode(val value: String) {
 
   InvalidURIException("TVW_CON_001"),
   MTUNegotiationException("TVW_CON_002"),
+  ServiceNotFoundException("TVW_CON_003"),
   //TODO: Create specific error codes for the below exception
   TransferFailedException("TVW_REP_001"),
 

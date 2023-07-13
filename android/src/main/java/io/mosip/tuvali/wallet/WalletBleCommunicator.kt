@@ -28,6 +28,7 @@ import io.mosip.tuvali.verifier.GattService
 import io.mosip.tuvali.verifier.VerifierBleCommunicator
 import io.mosip.tuvali.verifier.VerifierBleCommunicator.Companion.DISCONNECT_STATUS
 import io.mosip.tuvali.wallet.exception.MTUNegotiationFailedException
+import io.mosip.tuvali.wallet.exception.ServiceNotFoundException
 import io.mosip.tuvali.wallet.exception.TransferFailedException
 import io.mosip.tuvali.wallet.exception.WalletException
 import io.mosip.tuvali.wallet.transfer.ITransferListener
@@ -173,6 +174,7 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
       //TODO: Send service discovery failure to inji layer
       Log.d(logTag, "Retrying to find the services failed after multiple attempts")
       retryDiscoverServices.reset()
+      throw ServiceNotFoundException("Services discovery failed even after multiple retries.")
     }
   }
 

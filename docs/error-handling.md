@@ -34,10 +34,11 @@
   These Errors code gets reported when a known error case happens where Tuvali can't proceed.
 1. `TVW_CON_001` - Wallet received a Invalid URI.
 2. `TVW_CON_002` - Wallet failed negotiate MTU with a Verifier.
-3. `TVW_REP_001` - Wallet received a max failure frame retry limit or failed to request transfer report or received invalid transfer report summary from Verifier.
-4. `TVV_CON_001` - MTU negotiated is not supported by the Verifier.
-5. `TVV_TRA_001` - Verifier received corrupted response size from Wallet.
-6. `TVV_TRA_002` - Verifier received more corrupted/missing chunks than tolerable limit of 70% from Wallet.
+3. `TVW_CON_003` - Wallet failed to discover the services even after multiple retries.
+4. `TVW_REP_001` - Wallet received a max failure frame retry limit or failed to request transfer report or received invalid transfer report summary from Verifier.
+5. `TVV_CON_001` - MTU negotiated is not supported by the Verifier.
+6. `TVV_TRA_001` - Verifier received corrupted response size from Wallet.
+7. `TVV_TRA_002` - Verifier received more corrupted/missing chunks than tolerable limit of 70% from Wallet.
 
 ### Unknown Stage Error Codes
   These Errors code gets reported when internal exception is thrown by the platform
