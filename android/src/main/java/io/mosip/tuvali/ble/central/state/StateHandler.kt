@@ -234,25 +234,18 @@ class StateHandler(
         Log.d(logTag, "Unsubscribing to ${unsubscribeMessage.charUUID}")
 
         controller.unsubscribe(unsubscribeMessage)
-        currentState = States.Unsubscribing
       }
       IMessage.CentralStates.UNSUBSCRIBE_SUCCESS.ordinal -> {
         val unsubscribeSuccessMessage = msg.obj as UnsubscribeSuccessMessage
         Log.d(logTag, "Unsubscribed successfully to ${unsubscribeSuccessMessage.charUUID}")
 
         listener.onSubscriptionSuccess(unsubscribeSuccessMessage.charUUID)
-        if(currentState == States.Unsubscribing) {
-          currentState = States.Connected
-        }
       }
       IMessage.CentralStates.UNSUBSCRIBE_FAILURE.ordinal -> {
         val unsubscribeFailureMessage = msg.obj as UnsubscribeFailureMessage
         Log.d(logTag, "Failed to unsubscribe ${unsubscribeFailureMessage.charUUID} with err: ${unsubscribeFailureMessage.err}")
 
         listener.onSubscriptionFailure(unsubscribeFailureMessage.charUUID, unsubscribeFailureMessage.err)
-        if(currentState == States.Unsubscribing) {
-          currentState = States.Connected
-        }
       }
     }
   }
