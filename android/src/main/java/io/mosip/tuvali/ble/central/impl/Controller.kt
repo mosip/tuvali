@@ -55,7 +55,6 @@ class Controller(val context: Context) {
     //TODO: handle no device case
     peripheralDevice?.let {
       gattClient?.write(
-        it,
         writeMessage.serviceUUID,
         writeMessage.charUUID,
         writeMessage.data,
@@ -160,15 +159,13 @@ class Controller(val context: Context) {
   }
 
 
-  private fun onWriteSuccess(device: BluetoothDevice?, charUUID: UUID) {
-    peripheralDevice?.let {
-      val writeSuccessMessage = WriteSuccessMessage(it, charUUID)
-      messageSender.sendMessage(writeSuccessMessage)
-    }
+  private fun onWriteSuccess(charUUID: UUID) {
+    val writeSuccessMessage = WriteSuccessMessage(peripheralDevice, charUUID)
+    messageSender.sendMessage(writeSuccessMessage)
   }
 
-  private fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, errorCode: Int) {
-    val writeFailureMessage = WriteFailureMessage(device, charUUID, errorCode)
+  private fun onWriteFailed(charUUID: UUID, errorCode: Int) {
+    val writeFailureMessage = WriteFailureMessage(peripheralDevice, charUUID, errorCode)
 
     messageSender.sendMessage(writeFailureMessage)
   }

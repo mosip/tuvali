@@ -20,8 +20,8 @@ class GattClient(var context: Context) {
   private lateinit var onRequestMTUFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscoveryFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscovered: (List<UUID>) -> Unit
-  private lateinit var onWriteFailed: (BluetoothDevice, UUID, Int) -> Unit
-  private lateinit var onWriteSuccess: (BluetoothDevice?, UUID) -> Unit
+  private lateinit var onWriteFailed: (UUID, Int) -> Unit
+  private lateinit var onWriteSuccess: (UUID) -> Unit
   private lateinit var onDeviceDisconnected: () -> Unit
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit
   private var peripheral: BluetoothDevice? = null
@@ -47,15 +47,14 @@ class GattClient(var context: Context) {
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
-        peripheral?.let {
-          characteristic?.uuid?.let { uuid ->
-            onWriteFailed(it, uuid, status)
-          }
+        characteristic?.uuid?.let { uuid ->
+          onWriteFailed(uuid, status)
         }
         return
       }
+
       characteristic?.let {
-        onWriteSuccess(peripheral,it.uuid)
+        onWriteSuccess(it.uuid)
       }
     }
 
@@ -173,15 +172,14 @@ class GattClient(var context: Context) {
 
   @SuppressLint("MissingPermission")
   fun write(
-    device: BluetoothDevice,
     serviceUuid: UUID,
     charUUID: UUID,
     data: ByteArray,
-    onSuccess: (BluetoothDevice?, UUID) -> Unit,
-    onFailed: (BluetoothDevice, UUID, Int) -> Unit
+    onSuccess: (UUID) -> Unit,
+    onFailed: (UUID, Int) -> Unit
   ) {
     if (bluetoothGatt == null) {
-      return onFailed(device, charUUID, GATT_FAILURE)
+      return onFailed(charUUID, GATT_FAILURE)
     }
     Log.i(logTag, "Initiating write to peripheral char: $charUUID")
 
@@ -194,7 +192,7 @@ class GattClient(var context: Context) {
     val status = bluetoothGatt?.writeCharacteristic(writeChar)
 
     if (status == false) {
-      return onFailed(device, charUUID, GATT_FAILURE)
+      return onFailed(charUUID, GATT_FAILURE)
     }
   }
 

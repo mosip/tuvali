@@ -214,7 +214,7 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
     }
   }
 
-  override fun onWriteFailed(device: BluetoothDevice, charUUID: UUID, err: Int) {
+  override fun onWriteFailed(device: BluetoothDevice?, charUUID: UUID, err: Int) {
     Log.d(logTag, "Failed to write char: $charUUID with error code: $err")
 
     when (charUUID) {
@@ -230,7 +230,7 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
 
   // TODO: move all subscriptions and unsubscriptions to one place
 
-  override fun onWriteSuccess(device: BluetoothDevice, charUUID: UUID) {
+  override fun onWriteSuccess(device: BluetoothDevice?, charUUID: UUID) {
     Log.d(logTag, "Wrote to $charUUID successfully")
     when (charUUID) {
       GattService.IDENTIFY_REQUEST_CHAR_UUID -> {
