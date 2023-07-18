@@ -20,8 +20,8 @@ class GattClient(var context: Context) {
   private lateinit var onRequestMTUFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscoveryFailure: (err: Int) -> Unit
   private lateinit var onServicesDiscovered: (List<UUID>) -> Unit
-  private lateinit var onWriteFailed: (BluetoothDevice, UUID, Int) -> Unit
-  private lateinit var onWriteSuccess: (BluetoothDevice, UUID) -> Unit
+  private lateinit var onWriteFailed: (BluetoothDevice?, UUID, Int) -> Unit
+  private lateinit var onWriteSuccess: (BluetoothDevice?, UUID) -> Unit
   private lateinit var onDeviceDisconnected: () -> Unit
   private lateinit var onDeviceConnected: (BluetoothDevice) -> Unit
   private var peripheral: BluetoothDevice? = null
@@ -47,17 +47,14 @@ class GattClient(var context: Context) {
       if (status != GATT_SUCCESS) {
         Log.i(logTag, "Failed to send message to peripheral")
 
-        peripheral?.let {
-          characteristic?.uuid?.let { uuid ->
-            onWriteFailed(it, uuid, status)
-          }
+        characteristic?.uuid?.let { uuid ->
+          onWriteFailed(peripheral, uuid, status)
         }
-
         return
       }
 
-      peripheral?.let {
-        characteristic?.let { char -> onWriteSuccess(it, char.uuid) }
+      characteristic?.let {
+        onWriteSuccess(peripheral,it.uuid)
       }
     }
 
@@ -179,8 +176,8 @@ class GattClient(var context: Context) {
     serviceUuid: UUID,
     charUUID: UUID,
     data: ByteArray,
-    onSuccess: (BluetoothDevice, UUID) -> Unit,
-    onFailed: (BluetoothDevice, UUID, Int) -> Unit
+    onSuccess: (BluetoothDevice?, UUID) -> Unit,
+    onFailed: (BluetoothDevice?, UUID, Int) -> Unit
   ) {
     if (bluetoothGatt == null) {
       return onFailed(device, charUUID, GATT_FAILURE)
@@ -191,14 +188,13 @@ class GattClient(var context: Context) {
     val writeChar = service?.getCharacteristic(charUUID)
     writeChar?.value = data
     writeChar?.writeType = BluetoothGattCharacteristic.WRITE_TYPE_NO_RESPONSE
+    this.onWriteSuccess = onSuccess
+    this.onWriteFailed = onFailed
     val status = bluetoothGatt?.writeCharacteristic(writeChar)
 
     if (status == false) {
       return onFailed(device, charUUID, GATT_FAILURE)
     }
-
-    this.onWriteSuccess = onSuccess
-    this.onWriteFailed = onFailed
   }
 
   @SuppressLint("MissingPermission")
