@@ -3,7 +3,6 @@ package io.mosip.tuvali.ble.peripheral.impl
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
-import android.os.Build
 import android.util.Log
 import java.util.UUID
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
@@ -61,6 +60,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   }
 
   override fun onServiceAdded(status: Int, service: BluetoothGattService?) {
+    //Calling getServices() to fix issue of empty services during service discovery.
+    Log.d(logTag, "List of services: ${gattServer.services.map { it.uuid }}")
     onServiceAddedCallback(status)
   }
 
