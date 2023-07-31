@@ -224,7 +224,7 @@ class VerifierBleCommunicator(
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if (!isManualDisconnect && isConnected) {
-      eventEmitter.emitEvent(DisconnectedEvent())
+      stop { eventEmitter.emitEvent(DisconnectedEvent()) }
     }
   }
 
