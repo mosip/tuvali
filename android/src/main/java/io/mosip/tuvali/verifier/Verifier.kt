@@ -63,7 +63,7 @@ class Verifier(private val context: Context): IVerifier {
 
   private fun initializeBLECommunicator() {
     Log.d(logTag, "Initializing new verifier object at ${System.nanoTime()}")
-    communicator = VerifierBleCommunicator(context, eventEmitter, bleExceptionHandler::handleException)
+    communicator = VerifierBleCommunicator(context, eventEmitter, this::stopBLE, bleExceptionHandler::handleException)
     communicator?.generateKeyPair()
   }
 
