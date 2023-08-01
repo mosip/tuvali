@@ -36,6 +36,7 @@ private const val MIN_MTU_REQUIRED = 64
 class VerifierBleCommunicator(
   context: Context,
   private val eventEmitter: EventEmitter,
+  private val onDeviceDisconnected: (()-> Unit) -> Unit,
   private val handleException: (BLEException) -> Unit
 ) :
   IPeripheralListener, ITransferListener {
@@ -224,7 +225,7 @@ class VerifierBleCommunicator(
   override fun onDeviceNotConnected(isManualDisconnect: Boolean, isConnected: Boolean) {
     Log.d(logTag, "Disconnect and is it manual: $isManualDisconnect and isConnected $isConnected")
     if (!isManualDisconnect && isConnected) {
-      eventEmitter.emitEvent(DisconnectedEvent())
+      onDeviceDisconnected { eventEmitter.emitEvent(DisconnectedEvent()) }
     }
   }
 
