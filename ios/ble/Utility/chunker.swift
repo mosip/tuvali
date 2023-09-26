@@ -43,7 +43,7 @@ class Chunker {
 
     func getTotalChunkCount(dataSize: Int) -> Double {
         var totalChunkCount = Double(dataSize)/Double(effectivePayloadSize)
-        return Double(ceill(totalChunkCount))
+        return Double(ceil(totalChunkCount))
     }
 
     var lastChunkByteCount: Int {
