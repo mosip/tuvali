@@ -1,5 +1,0 @@
-[bindings.kotlin]
-cdylib_name = "rustylib_binding"
-
-[bindings.swift]
-cdylib_name = "rustylib_binding"
