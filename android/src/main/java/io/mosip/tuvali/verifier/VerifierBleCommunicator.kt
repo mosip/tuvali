@@ -6,6 +6,7 @@ import android.os.Process.THREAD_PRIORITY_DEFAULT
 import android.util.Log
 import io.mosip.tuvali.ble.peripheral.IPeripheralListener
 import io.mosip.tuvali.ble.peripheral.Peripheral
+import io.mosip.tuvali.common.Utils
 import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.common.events.EventEmitter
 import io.mosip.tuvali.cryptography.SecretsTranslator
@@ -45,7 +46,7 @@ class VerifierBleCommunicator(
   var publicKey: ByteArray = byteArrayOf()
   private lateinit var walletPubKey: ByteArray
   private lateinit var nonce: ByteArray
-  private var secureRandom: SecureRandom = SecureRandom()
+  private var secureRandom: SecureRandom = SecureRandom(Utils.longToBytes(System.nanoTime()))
   private var verifierCryptoBox: VerifierCryptoBox = VerifierCryptoBoxBuilder.build(secureRandom)
   private var peripheral: Peripheral
   private var transferHandler: TransferHandler

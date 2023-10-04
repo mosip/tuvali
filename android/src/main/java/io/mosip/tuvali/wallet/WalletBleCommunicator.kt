@@ -9,6 +9,7 @@ import android.os.Process
 import android.util.Log
 import io.mosip.tuvali.ble.central.Central
 import io.mosip.tuvali.ble.central.ICentralListener
+import io.mosip.tuvali.common.Utils
 import io.mosip.tuvali.common.advertisementPayload.AdvertisementPayload
 import io.mosip.tuvali.common.retrymechanism.BackOffStrategy
 import io.mosip.tuvali.cryptography.SecretsTranslator
@@ -43,7 +44,7 @@ private const val MTU_REQUEST_RETRY_DELAY_TIME_IN_MILLIS = 500L
 class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmitter, private val handleException: (BLEException) -> Unit) : ICentralListener, ITransferListener {
   private val logTag = getLogTag(javaClass.simpleName)
 
-  private val secureRandom: SecureRandom = SecureRandom()
+  private val secureRandom: SecureRandom = SecureRandom(Utils.longToBytes(System.nanoTime()))
   private lateinit var verifierPK: ByteArray
   private var walletCryptoBox: WalletCryptoBox = WalletCryptoBoxBuilder.build(secureRandom)
   private var secretsTranslator: SecretsTranslator? = null
