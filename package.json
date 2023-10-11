@@ -28,12 +28,14 @@
   ],
   "scripts": {
     "test": "jest",
+    "jetify": "jetify",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "release": "release-it",
     "clean": "del-cli android/build",
     "bootstrap": "yarn install",
-    "prepare": "bob build"
+    "prepare": "bob build",
+    "postinstall": "yarn jetify && sh tools/talisman/talisman-precommit.sh"
   },
   "keywords": [
     "react-native",
