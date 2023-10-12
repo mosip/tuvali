@@ -35,7 +35,7 @@
     "clean": "del-cli android/build",
     "bootstrap": "yarn install",
     "prepare": "bob build",
-    "postinstall": "yarn jetify && sh tools/talisman/talisman-precommit.sh"
+    "postinstall": "npm run jetify && sh tools/talisman/talisman-precommit.sh"
   },
   "keywords": [
     "react-native",
