@@ -50,7 +50,8 @@
   },
   "homepage": "https://github.com/mosip/tuvali#readme",
   "publishConfig": {
-    "registry": "https://registry.npmjs.org/"
+    "registry": "https://registry.npmjs.org/",
+    "private": false
   },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.7",
