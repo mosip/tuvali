@@ -1,6 +1,6 @@
 {
-  "name": "@mosip/react-native-tuvali",
-  "version": "0.4.6",
+  "name": "mosip-react-native-tuvali",
+  "version": "0.4.7",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -51,7 +51,6 @@
   "homepage": "https://github.com/mosip/tuvali#readme",
   "publishConfig": {
     "registry": "https://registry.npmjs.org/",
-    "private": false
   },
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.7",
