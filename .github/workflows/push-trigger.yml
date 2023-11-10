@@ -30,7 +30,7 @@ jobs:
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
   publish-tuvali-to-npm-registry:
-    if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' }}"
+    if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}"
     needs: build-tuvali
     uses: mosip/kattu/.github/workflows/npm-publish-to-npm-registry.yml@master
     with:
