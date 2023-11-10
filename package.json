@@ -1,6 +1,6 @@
 {
-  "name": "react-native-tuvali",
-  "version": "0.4.6",
+  "name": "mosip-react-native-tuvali",
+  "version": "0.4.7",
   "description": "test",
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
@@ -27,6 +27,8 @@
     "!**/.*"
   ],
   "scripts": {
+    "verify": "npm run verify:android",
+    "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "test": "jest",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
