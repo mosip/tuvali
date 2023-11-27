@@ -38,4 +38,4 @@ complex design decision or a controversial PR.
 
 * Sasikumar - Maintainer. geo=Bangalore, India; github=gsasikumar
 * Chandra - Maintainer for Build Scripts. geo=Patna, India; github=ckm007
-* Swati - Maintaner. geo=Bangalore, India; github=swatigoel
+* Swati - Maintaner. geo=Pune, India; github=swatigoel
