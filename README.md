@@ -10,12 +10,12 @@ This contains the source code for the ios, android modules as well as a sample a
 
 ```bash
 # Install latest version
-npm install mosip/tuvali
+npm install @mosip/tuvali
 
 # or
 
 # Install specific version
-npm install mosip/tuvali#v0.3.7
+npm install @mosip/tuvali@v0.4.7
 ```
 
 # API documentation
@@ -29,7 +29,7 @@ For example use QR code generator to visually display URI and QR code scanner to
 The Verifier device can show a QR code with the URI. Verifier can generate URI through startAdvertisement() method. Once advertisement is started, Verifier will keep advertising with an advertisement payload derived from URI.
 
 ```typescript
-import tuvali from 'react-native-tuvali';
+import tuvali from '@mosip/tuvali';
 const { verifier } = OpenIdBle;
 
 const uri = verifier.startAdvertisement();
