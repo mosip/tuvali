@@ -1,15 +1,16 @@
 package io.mosip.tuvali.common
 
 import android.bluetooth.BluetoothAdapter
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import io.mosip.tuvali.transfer.Util
 import io.mosip.tuvali.wallet.IWallet
 
-open class BroadcastReceiver(
+open class BluetoothStateChangeReceiver(
   private val wallet: IWallet,
-) : android.content.BroadcastReceiver() {
+) : BroadcastReceiver() {
   private val logTag = Util.getLogTag(javaClass.simpleName)
   override fun onReceive(context: Context?, intent: Intent?) {
     val action = intent?.action

@@ -5,7 +5,7 @@ import android.content.IntentFilter
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
-import io.mosip.tuvali.common.BroadcastReceiver
+import io.mosip.tuvali.common.BluetoothStateChangeReceiver
 import io.mosip.tuvali.wallet.IWallet
 
 class RNWalletModule(
@@ -14,14 +14,14 @@ class RNWalletModule(
   reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
   private var intentFilter: IntentFilter = IntentFilter()
-  private val broadcastReceiver = BroadcastReceiver(wallet)
+  private val bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(wallet)
 
   init {
     wallet.subscribe {
       eventEmitter.emitEvent(RNEventMapper.toMap(it))
     }
     intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-    reactContext.registerReceiver(broadcastReceiver, intentFilter)
+    reactContext.registerReceiver(bluetoothStateChangeReceiver, intentFilter)
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)
@@ -48,6 +48,6 @@ class RNWalletModule(
   }
 
   protected fun finalize() {
-    reactApplicationContext.unregisterReceiver(broadcastReceiver)
+    reactApplicationContext.unregisterReceiver(bluetoothStateChangeReceiver)
   }
 }
