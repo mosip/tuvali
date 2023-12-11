@@ -25,8 +25,11 @@ class Central: NSObject, CBCentralManagerDelegate {
         case .poweredOn:
             os_log(.info, "Central Manager state is powered ON")
             scanForPeripherals()
-        default:
+        case .poweredOff:
             os_log(.info, "Central Manager state is powered OFF")
+            EventEmitter.sharedInstance.emitEvent(DisconnectedEvent())
+        default:
+            os_log(.info, "Central Manager state is in state - \(central.state)")
         }
     }
 
@@ -68,7 +71,7 @@ class Central: NSObject, CBCentralManagerDelegate {
             connectedPeripheral.writeValue(messageData, for: characteristic, type: .withoutResponse)
         }
     }
-    
+
     func disconnect() {
         if let connectedPeripheral = self.connectedPeripheral {
             centralManager.cancelPeripheralConnection(connectedPeripheral)
