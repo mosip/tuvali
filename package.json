@@ -1,5 +1,5 @@
 {
-  "name": "mosip-react-native-tuvali",
+  "name": "@mosip/tuvali",
   "version": "0.4.8",
   "description": "test",
   "main": "lib/commonjs/index",
