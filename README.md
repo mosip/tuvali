@@ -15,7 +15,7 @@ npm install @mosip/tuvali
 # or
 
 # Install specific version
-npm install @mosip/tuvali@v0.4.7
+npm install @mosip/tuvali@v0.4.8
 ```
 
 # API documentation
