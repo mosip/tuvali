@@ -29,7 +29,7 @@ class Central: NSObject, CBCentralManagerDelegate {
             os_log(.info, "Central Manager state is powered OFF")
             EventEmitter.sharedInstance.emitEvent(DisconnectedEvent())
         default:
-            os_log(.info, "Central Manager state is in state - \(central.state)")
+            os_log(.debug, "Central Manager state is in state - %@",central.state as! CVarArg)
         }
     }
 
