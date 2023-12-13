@@ -13,15 +13,15 @@ class RNWalletModule(
   private val wallet: IWallet,
   reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
-  private var intentFilter: IntentFilter = IntentFilter()
+  private var bluetoothStateChangeIntentFilter: IntentFilter = IntentFilter()
   private val bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(wallet::handleDisconnect)
 
   init {
     wallet.subscribe {
       eventEmitter.emitEvent(RNEventMapper.toMap(it))
     }
-    intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-    reactContext.registerReceiver(bluetoothStateChangeReceiver, intentFilter)
+    bluetoothStateChangeIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+    reactContext.registerReceiver(bluetoothStateChangeReceiver, bluetoothStateChangeIntentFilter)
   }
 
   @ReactMethod(isBlockingSynchronousMethod = true)

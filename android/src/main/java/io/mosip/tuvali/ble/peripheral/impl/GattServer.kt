@@ -26,7 +26,7 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
   private lateinit var bluetoothStateChangeReceiver: BluetoothStateChangeReceiver
-  private var intentFilter: IntentFilter = IntentFilter()
+  private var bluetoothStateChangeIntentFilter: IntentFilter = IntentFilter()
 
   fun start(
     onDeviceConnected: (Int, Int) -> Unit,
@@ -43,8 +43,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
 
     bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(onDeviceNotConnected)
 
-    intentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
-    context.registerReceiver(bluetoothStateChangeReceiver, intentFilter)
+    bluetoothStateChangeIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+    context.registerReceiver(bluetoothStateChangeReceiver, bluetoothStateChangeIntentFilter)
     Log.i(logTag, "Device Address: ${bluetoothManager.adapter.address}")
   }
 
