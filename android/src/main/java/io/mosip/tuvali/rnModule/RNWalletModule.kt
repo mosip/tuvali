@@ -14,7 +14,7 @@ class RNWalletModule(
   reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
   private var intentFilter: IntentFilter = IntentFilter()
-  private val bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(wallet)
+  private val bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(wallet::handleDisconnect)
 
   init {
     wallet.subscribe {

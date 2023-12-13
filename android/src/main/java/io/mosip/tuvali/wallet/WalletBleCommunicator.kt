@@ -303,6 +303,10 @@ class WalletBleCommunicator(context: Context, private val eventEmitter: EventEmi
     }
   }
 
+  override fun onDestroy() {
+    callbacks[CentralCallbacks.ON_DESTROY_SUCCESS_CALLBACK] = { eventEmitter.emitEvent(DisconnectedEvent()) }
+  }
+
   fun setAdvPayload(advIdentifier: String, verifierPK: String) {
     this.advPayload = AdvertisementPayload.getAdvPayload(advIdentifier, verifierPK)
   }

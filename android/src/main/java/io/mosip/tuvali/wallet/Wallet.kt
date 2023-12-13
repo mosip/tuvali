@@ -54,7 +54,7 @@ class Wallet(private val context: Context) : IWallet {
     }
   }
 
-  override fun handleDisconnect(){
+  override fun handleDisconnect(status: Int, newState: Int) {
     bleCommunicator?.onDeviceDisconnected(false)
   }
 

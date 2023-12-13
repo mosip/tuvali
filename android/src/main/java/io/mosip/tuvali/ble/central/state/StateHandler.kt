@@ -117,6 +117,7 @@ class StateHandler(
         Log.d(logTag, "device got disconnected. Current state: $currentState")
 
         if(currentState == States.Closing) {
+          listener.onDestroy()
           this.sendMessage(CloseMessage())
         } else {
           listener.onDeviceDisconnected(currentState == States.Disconnecting)
