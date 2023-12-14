@@ -8,4 +8,5 @@ interface IWallet {
   fun disconnect()
   fun subscribe(listener: (Event) -> Unit)
   fun unSubscribe()
+  fun handleDisconnect(status: Int, newState: Int)
 }
