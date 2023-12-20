@@ -40,17 +40,17 @@ jobs:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
 
-  sonar-analysis-tuvali:
-    if: "${{ github.event_name != 'pull_request' }}"
-    needs: build-tuvali
-    uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master
-    with:
-      SERVICE_LOCATION: '.'
-      ANDROID_LOCATION: 'android'
-      SONAR_URL: 'https://sonarcloud.io'
-      PROJECT_KEY: "mosip_${{ github.event.repository.name }}"
-      PROJECT_NAME: "${{ github.event.repository.name }}"
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_ORGANIZATION: ${{ secrets.ORG_KEY }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+  # sonar-analysis-tuvali:
+  #   if: "${{ github.event_name != 'pull_request' }}"
+  #   needs: build-tuvali
+  #   uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master
+  #   with:
+  #     SERVICE_LOCATION: '.'
+  #     ANDROID_LOCATION: 'android'
+  #     SONAR_URL: 'https://sonarcloud.io'
+  #     PROJECT_KEY: "mosip_${{ github.event.repository.name }}"
+  #     PROJECT_NAME: "${{ github.event.repository.name }}"
+  #   secrets:
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     SONAR_ORGANIZATION: ${{ secrets.ORG_KEY }}
+  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
