@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": "./",
     "paths": {
-      "react-native-tuvali": ["./src/index"]
+      "tuvali": ["./src/index"]
     },
     "allowUnreachableCode": false,
     "allowUnusedLabels": false,
