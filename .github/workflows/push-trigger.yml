@@ -42,7 +42,7 @@ jobs:
 
   # sonar-analysis-tuvali:
   #   if: "${{ github.event_name != 'pull_request' }}"
-  #   needs: build-tuvali
+  #   needs: build-tuvali 
   #   uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master
   #   with:
   #     SERVICE_LOCATION: '.'
