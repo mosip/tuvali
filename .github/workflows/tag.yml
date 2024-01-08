@@ -49,5 +49,5 @@ jobs:
       BRANCH: ${{ inputs.BRANCH }}
       LATEST: ${{ inputs.LATEST }}
     secrets:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
       TOKEN: ${{ secrets.ACTION_PAT }}
