@@ -30,12 +30,14 @@
     "verify": "npm run verify:android",
     "verify:android": "cd android && ./gradlew clean build test && cd ..",
     "test": "jest",
+    "jetify": "jetify",
     "typescript": "tsc --noEmit",
     "lint": "eslint \"**/*.{js,ts,tsx}\"",
     "release": "release-it",
     "clean": "del-cli android/build",
     "bootstrap": "yarn install",
-    "prepare": "bob build"
+    "prepare": "bob build",
+    "postinstall": "npm run jetify && sh tools/talisman/talisman-precommit.sh"
   },
   "keywords": [
     "react-native",
