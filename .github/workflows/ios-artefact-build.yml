@@ -6,7 +6,7 @@ jobs:
   build:
     runs-on: macos-latest
     permissions:
-      contents: write  # Grants permission to push code and manage releases
+      contents: write  # Grants permission to push code and manage releases.
       pull-requests: write # Grants permission to write pull requests
 
     steps:
