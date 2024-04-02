@@ -1,4 +1,4 @@
-name: Android Artefact Build
+name: Android Artifact Build
 
 on: [workflow_dispatch]
 
@@ -28,24 +28,24 @@ jobs:
           java-version: '11'
           distribution: 'adopt'
 
-      - name: Build Artefact
+      - name: Build Artifact
         run: |
             cd android
             chmod +x ./gradlew
             ./gradlew assembleDebug
 
-      - name: Replace Existing Artefact
+      - name: Replace Existing Artifact
         run: |
           ls -la ./android/build/outputs/aar/
-          mkdir -p ./artefacts/kotlin-artefact/
-          cp ./android/build/outputs/aar/*.aar ./artefacts/kotlin-artefact/
+          mkdir -p ./artifacts/kotlin-artifact/
+          cp ./android/build/outputs/aar/*.aar ./artifacts/kotlin-artifact/
 
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
 
-      - name: Commit Artefacts
+      - name: Commit Artifacts
         run: |
           git add .
           git commit --allow-empty -m "chore(#890): changes in script"
