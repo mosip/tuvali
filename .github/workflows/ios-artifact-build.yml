@@ -1,4 +1,4 @@
-name: iOS Artefact Build
+name: iOS Artifact Build
 
 on:
   workflow_dispatch:
@@ -21,7 +21,7 @@ jobs:
 
       - name: Create Library Folder and Create Swift Library
         run: |
-          cd ./artefacts/swift-artefact/
+          cd ./artifacts/swift-artifact/
           rm -rf ios-tuvali-library
           mkdir ios-tuvali-library
           cd ios-tuvali-library
@@ -30,11 +30,11 @@ jobs:
 
       - name: Edit Package.swift
         run: |
-          cp ./artefacts/swift-artefact/Package.swift ./artefacts/swift-artefact/ios-tuvali-library/Package.swift
+          cp ./artifacts/swift-artifact/Package.swift ./artifacts/swift-artifact/ios-tuvali-library/Package.swift
 
       - name: Build Swift Package
         run: |
-          cd ./artefacts/swift-artefact/ios-tuvali-library
+          cd ./artifacts/swift-artifact/ios-tuvali-library
           swift package clean
           swift package update
           brew install zlib
@@ -42,10 +42,10 @@ jobs:
 
       - name: Move  required files
         run: |
-          cp -R ./ios/Wallet ./artefacts/swift-artefact/ios-tuvali-library/Sources/ios-tuvali-library
-          cp -R ./ios/ble ./artefacts/swift-artefact/ios-tuvali-library/Sources/ios-tuvali-library
-          cp -R ./ios/crypto ./artefacts/swift-artefact/ios-tuvali-library/Sources/ios-tuvali-library
-          cp -R ./ios/common ./artefacts/swift-artefact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/Wallet ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/ble ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/crypto ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/common ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
 
 
 
