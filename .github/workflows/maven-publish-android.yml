@@ -82,6 +82,7 @@ jobs:
       - name: Build check for MOSIP License
         run: |
           cd ${{ inputs.SERVICE_LOCATION }}
+          pwd
           cd android
           chmod +x ./gradlew
           ./gradlew generatePom
