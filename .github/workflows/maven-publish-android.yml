@@ -48,6 +48,16 @@ jobs:
           settings-path: ${{ github.workspace }} # location for the settings.xml file
           repository: ${{ inputs.SERVICE_LOCATION }}
 
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+
+      - name: Install npm dependencies
+        run: |
+          npm install -g yarn # Install yarn globally if you're using yarn
+          yarn install # or `npm install` if using npm
+
       - name: Cache local Maven repository
         uses: actions/cache@v3
         with:
