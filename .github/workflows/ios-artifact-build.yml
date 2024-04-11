@@ -47,8 +47,6 @@ jobs:
           cp -R ./ios/crypto ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
           cp -R ./ios/common ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
 
-
-
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"

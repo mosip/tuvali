@@ -37,10 +37,10 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
-  //getExtOrIntegerDefault('compileSdkVersion')
-  compileSdkVersion 31
+  compileSdkVersion(Integer.parseInt(findProperty("Tuvali_compileSdkVersion") as String))
 
   defaultConfig {
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
     minSdkVersion getExtOrIntegerDefault('minSdkVersion')
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()

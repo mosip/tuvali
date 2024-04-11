@@ -1,0 +1,138 @@
+name: Maven build
+
+on:
+  workflow_dispatch:
+    inputs:
+      SERVICE_LOCATION:
+        description: 'Service location'
+        required: true
+        type: string
+        default: 'https://github.com/tw-mosip/tuvali/tree/develop-artifact'
+      BUILD_ARTIFACT:
+        description: 'Build artifact'
+        required: true
+        type: string
+        default: 'artifact'
+      OSSRH_USER:
+        description: 'OSSRH username'
+        required: true
+      OSSRH_SECRET:
+        description: 'OSSRH secret'
+        required: true
+      OSSRH_TOKEN:
+        description: 'OSSRH token'
+        required: true
+      GPG_SECRET:
+        description: 'GPG secret'
+        required: true
+      SLACK_WEBHOOK_URL:
+        description: 'Slack webhook URL'
+        required: true
+  push:
+    branches:
+      - release*
+      - master
+      - develop*
+
+jobs:
+  maven-android-build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up JDK 11
+        uses: actions/setup-java@v3
+        with:
+          distribution: adopt
+          java-version: 11
+          server-id: ossrh # Value of the distributionManagement/repository/id field of the pom.xml
+          settings-path: ${{ github.workspace }} # location for the settings.xml file
+          repository: ${{ inputs.SERVICE_LOCATION }}
+
+      - name: Cache local Maven repository
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Setup branch and env
+        run: |
+          # Strip git ref prefix from version
+          echo "BRANCH_NAME=$(echo ${{ github.ref }} | sed -e 's,.*/\(.*\),\1,')" >> $GITHUB_ENV
+          echo "GPG_TTY=$(tty)" >> $GITHUB_ENV
+
+#      - name: Setup branch and GPG public key
+#        run: |
+#          # Strip git ref prefix from version
+#          echo ${{ env.BRANCH_NAME }}
+#          echo ${{ env.GPG_TTY }}
+#          sudo apt-get --yes install gnupg2
+#          gpg2 --import ./.github/keys/mosipgpgkey_pub.gpg
+#          gpg2 --quiet --batch --passphrase=${{secrets.GPG_SECRET}}  --allow-secret-key-import --import ./.github/keys/mosipgpgkey_sec.gpg
+#
+      - name: Install xmlstartlet and xmllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install xmlstarlet libxml2-utils
+
+      - name: Setup the settings file for ossrh server
+        run: echo "<settings> <servers> <server> <id>ossrh</id> <username>${{secrets.OSSRH_USER}}</username> <password>${{secrets.OSSRH_SECRET}}</password> </server> </servers> <profiles> <profile> <id>ossrh</id> <activation> <activeByDefault>true</activeByDefault> </activation> <properties> <gpg.executable>gpg2</gpg.executable> <gpg.passphrase>${{secrets.GPG_SECRET}}</gpg.passphrase> </properties> </profile> <profile> <id>allow-snapshots</id> <activation><activeByDefault>true</activeByDefault></activation> <repositories> <repository> <id>snapshots-repo</id> <url>https://oss.sonatype.org/content/repositories/snapshots</url> <releases><enabled>false</enabled></releases> <snapshots><enabled>true</enabled></snapshots> </repository> <repository> <id>releases-repo</id> <url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url> <releases><enabled>true</enabled></releases> <snapshots><enabled>false</enabled></snapshots> </repository> <repository> <id>danubetech-maven-public</id> <url>https://repo.danubetech.com/repository/maven-public/</url> </repository> </repositories> </profile> <profile> <id>sonar</id> <properties> <sonar.sources>.</sonar.sources> <sonar.host.url>https://sonarcloud.io</sonar.host.url> </properties> <activation> <activeByDefault>false</activeByDefault> </activation> </profile> </profiles> </settings>" > $GITHUB_WORKSPACE/settings.xml
+
+      - name: Build check for MOSIP License
+        run: |
+          cd ${{ inputs.SERVICE_LOCATION }}
+          cd android
+          chmod +x ./gradlew
+          ./gradlew generatePom
+          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:licenses[1]/s:license/s:name" -nl build/outputs/poms/pom-default.xml | grep -q "MIT"
+
+      - name: Build check for developer
+        run: |
+          cd ${{ inputs.SERVICE_LOCATION }}
+          cd android
+          ./gradlew generatePom
+          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:developers[1]/s:developer/s:name" -nl build/outputs/poms/pom-default.xml | grep -icq "Mosip"
+
+      - name: Build check for commit plugin
+        run: cd ${{ inputs.SERVICE_LOCATION }} && xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:build/s:plugins/s:plugin[s:groupId='pl.project13.maven']/s:artifactId" -nl pom.xml | grep -q "git-commit-id-plugin"
+#
+#      - name: Build check for sign plugin
+#        run: cd ${{ inputs.SERVICE_LOCATION }} && xmlstarlet sel -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:build/s:plugins/s:plugin[s:groupId='org.apache.maven.plugins']/s:artifactId" -nl pom.xml | grep -q "maven-gpg-plugin"
+
+      - name: Validate pom.xml & settings.xml via xmllint
+        run: |
+          find ${{ inputs.SERVICE_LOCATION }} -type f -name pom.xml | while read -r F; do
+            xmllint --xpath '/*[local-name()="project"]/*[local-name()="version"]' $F
+          done
+
+      - name: Build with Gradlew
+        run: |
+          cd ${{ inputs.SERVICE_LOCATION }}
+          cd android
+          ./gradlew assembleDebug
+
+      - name: Publish to Maven Central
+        if: |
+          contains(github.event_name, 'workflow_dispatch') &&
+          !contains(github.ref, 'master') &&
+          github.event_name != 'pull_request'
+        env:
+          OSSRH_USERNAME: ${{secrets.OSSRH_USER}}
+          OSSRH_PASSWORD: ${{secrets.OSSRH_SECRET}}
+        run: |
+          if [ "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}" == "true" ]; then
+            cd ${{ inputs.SERVICE_LOCATION }}/android
+            ./gradlew publish
+          else
+            echo "Skip Publish Step"
+          fi
+
+      - name: Publish to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,author,commit,workflow,job # selectable (default: repo,message)
+        env:
+            SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }} # required
+        if: "${{ github.event_name != 'pull_request' && failure() }}" # Pick up events even if the job fails or is canceled.
