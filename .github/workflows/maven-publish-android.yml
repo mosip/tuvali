@@ -91,24 +91,23 @@ jobs:
 
       - name: Build check for MOSIP License
         run: |
-          pwd
           cd android
           chmod +x ./gradlew
           ./gradlew generatePom
-          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:licenses[1]/s:license/s:name" -nl build/outputs/poms/pom-default.xml | grep -q "MIT"
+          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:licenses[1]/s:license/s:name" -nl build/publications/aar/pom-default.xml | grep -q "MIT"
 
       - name: Build check for developer
         run: |
-          cd ${{ inputs.SERVICE_LOCATION }}
           cd android
           ./gradlew generatePom
-          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:developers[1]/s:developer/s:name" -nl build/outputs/poms/pom-default.xml | grep -icq "Mosip"
+          xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:developers[1]/s:developer/s:name" -nl build/publications/aar/pom-default.xml | grep -icq "Mosip"
 
       - name: Build check for commit plugin
         run: cd ${{ inputs.SERVICE_LOCATION }} && xmlstarlet select -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:build/s:plugins/s:plugin[s:groupId='pl.project13.maven']/s:artifactId" -nl pom.xml | grep -q "git-commit-id-plugin"
 #
 #      - name: Build check for sign plugin
 #        run: cd ${{ inputs.SERVICE_LOCATION }} && xmlstarlet sel -N s="http://maven.apache.org/POM/4.0.0" -t -v "//s:project/s:build/s:plugins/s:plugin[s:groupId='org.apache.maven.plugins']/s:artifactId" -nl pom.xml | grep -q "maven-gpg-plugin"
+#          cd ${{ inputs.SERVICE_LOCATION }}
 
       - name: Validate pom.xml & settings.xml via xmllint
         run: |
@@ -118,7 +117,6 @@ jobs:
 
       - name: Build with Gradlew
         run: |
-          cd ${{ inputs.SERVICE_LOCATION }}
           cd android
           ./gradlew assembleDebug
 
@@ -132,7 +130,7 @@ jobs:
           OSSRH_PASSWORD: ${{secrets.OSSRH_SECRET}}
         run: |
           if [ "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}" == "true" ]; then
-            cd ${{ inputs.SERVICE_LOCATION }}/android
+            cd android
             ./gradlew publish
           else
             echo "Skip Publish Step"
