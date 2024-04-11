@@ -28,7 +28,6 @@ on:
       SLACK_WEBHOOK_URL:
         description: 'Slack webhook URL'
         required: true
-  push:
     branches:
       - release*
       - master
