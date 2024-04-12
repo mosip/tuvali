@@ -3,57 +3,15 @@ name: Android Artifact Build
 on: [workflow_dispatch]
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Grants permission to push code and manage releases
-      pull-requests: write  # Grants permission to write pull requests
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-            node-version: '16'
-
-      - name: Install npm dependencies
-        run: |
-            npm install -g yarn # Install yarn globally if you're using yarn
-            yarn install # or `npm install` if using npm
-
-      - name: Set up JDK
-        uses: actions/setup-java@v2
-        with:
-          java-version: '11'
-          distribution: 'adopt'
-
-      - name: Build Artifact
-        run: |
-            cd android
-            chmod +x ./gradlew
-            ./gradlew assembleDebug
-
-      - name: Replace Existing Artifact
-        run: |
-          ls -la ./android/build/outputs/aar/
-          mkdir -p ./artifacts/kotlin-artifact/
-          cp ./android/build/outputs/aar/*.aar ./artifacts/kotlin-artifact/
-
-      - name: Configure Git
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-
-      - name: Commit Artifacts
-        run: |
-          git add .
-          git commit --allow-empty -m "chore(#890): changes in script"
-
-      - name: Push Changes to Specific Branch
-        run: |
-              git pull origin --rebase
-              git push
-        env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+  maven-publish:
+    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@master
+    with:
+      SERVICE_LOCATION: '.'
+      ANDROID_LOCATION: 'android'
+      BUILD_ARTIFACT: tuvali
+    secrets:
+      OSSRH_USER: ${{ secrets.OSSRH_USER }}
+      OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
+      OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
+      GPG_SECRET: ${{ secrets.GPG_SECRET }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
