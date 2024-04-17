@@ -1,3 +1,8 @@
+apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
+apply plugin: 'org.sonarqube'
+apply plugin: 'maven-publish'
+
 buildscript {
   // Buildscript is evaluated before everything else so we can't use getExtOrDefault
   def kotlin_version = rootProject.ext.has('kotlinVersion') ? rootProject.ext.get('kotlinVersion') : project.properties['Tuvali_kotlinVersion']
@@ -19,10 +24,6 @@ def isNewArchitectureEnabled() {
   return rootProject.hasProperty("newArchEnabled") &&  rootProject.getProperty("newArchEnabled") == "true"
 }
 
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'org.sonarqube'
-
 if (isNewArchitectureEnabled()) {
   apply plugin: 'com.facebook.react'
 }
@@ -36,9 +37,10 @@ def getExtOrIntegerDefault(name) {
 }
 
 android {
-  compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
+  compileSdkVersion(Integer.parseInt(findProperty("Tuvali_compileSdkVersion") as String))
 
   defaultConfig {
+    compileSdkVersion getExtOrIntegerDefault('compileSdkVersion')
     minSdkVersion getExtOrIntegerDefault('minSdkVersion')
     targetSdkVersion getExtOrIntegerDefault('targetSdkVersion')
     buildConfigField "boolean", "IS_NEW_ARCHITECTURE_ENABLED", isNewArchitectureEnabled().toString()
@@ -154,3 +156,4 @@ if (isNewArchitectureEnabled()) {
   }
 }
 
+apply from: "publish-artifact.gradle"
