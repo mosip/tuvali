@@ -141,3 +141,4 @@ The device on which app is running can destroy the connection by calling disconn
 ```typescript
 wallet/verifier.disconnect();
 ```
+
