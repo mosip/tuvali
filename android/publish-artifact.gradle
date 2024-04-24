@@ -1,14 +1,15 @@
-def username = System.getenv("OSSRH_USER")
-def password = System.getenv("OSSRH_SECRET")
-def url = System.getenv("OSSRH_URL")
+def usernameValue = System.getenv("OSSRH_USER")
+def passwordValue = System.getenv("OSSRH_SECRET")
+def urlValue = System.getenv("OSSRH_URL")
+println("URL Value: $urlValue")
 publishing {
   repositories {
     maven {
-      url = url
+      url = urlValue
       name = "tuvali"
       credentials {
-        username = username
-        password = password
+        username = usernameValue
+        password = passwordValue
       }
     }
   }
