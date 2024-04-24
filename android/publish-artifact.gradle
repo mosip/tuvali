@@ -1,6 +1,6 @@
-def username = project.OSSRH_USER
-def password = project.OSSRH_SECRET
-def url = project.OSSRH_URL
+def username = System.getenv("OSSRH_USER")
+def password = System.getenv("OSSRH_SECRET")
+def url = System.getenv("OSSRH_URL")
 publishing {
   repositories {
     maven {
