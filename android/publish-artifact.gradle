@@ -81,8 +81,8 @@ publishing {
       }
       groupId = "io.mosip"
       artifactId = "tuvali"
-      version = "1.0"
-      artifact("build/outputs/aar/android-release.aar")
+      version = "1.0-SNAPSHOT"
+      artifact("build/outputs/aar/android-debug.aar")
     }
   }
 }
