@@ -1,5 +1,5 @@
 import Foundation
-import os
+
 class WalletExceptionHandler {
 
     private var onError: ((_ message: String, _ code: String) -> Void)?

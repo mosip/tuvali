@@ -1,14 +1,14 @@
 import Foundation
-import os
-public class Wallet: WalletProtocol {
+
+class Wallet: WalletProtocol {
 
     var bleCommunicator: WalletBleCommunicator?
 
-    public init() {
+    init() {
        ErrorHandler.sharedInstance.setOnError(onError: self.handleError)
    }
 
-    public func startConnection(_ uri: String) {
+    func startConnection(_ uri: String) {
         print("startConnection->uri::\(uri)")
         let openId4VpURI = OpenId4vpURI(uri: uri)
 
@@ -26,21 +26,21 @@ public class Wallet: WalletProtocol {
         }
     }
 
-    public func disconnect(){
+    func disconnect(){
         bleCommunicator?.handleDestroyConnection(isSelfDisconnect: true)
         bleCommunicator = nil
     }
 
-    public func send(_ payload: String) {
+    func send(_ payload: String) {
         bleCommunicator?.send(payload)
         os_log(.info, ">> raw message size : %{public}d", payload.count)
     }
 
-     public func subscribe( _  listener: @escaping (Event) -> Void) {
+     func subscribe( _  listener: @escaping (Event) -> Void) {
         EventEmitter.sharedInstance.addListener(listener: listener)
     }
 
-    public func unsubscribe() {
+    func unsubscribe() {
         EventEmitter.sharedInstance.removeListeners()
     }
 

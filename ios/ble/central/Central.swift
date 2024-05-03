@@ -1,6 +1,7 @@
 import Foundation
 import CoreBluetooth
 import os
+import React
 
 
 @available(iOS 13.0, *)

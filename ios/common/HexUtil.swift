@@ -1,5 +1,5 @@
 import Foundation
-import os
+
 func hexStringToData(string: String) -> Data {
     let stringArray = Array(string)
     var data: Data = Data()
