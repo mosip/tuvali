@@ -2,7 +2,6 @@ publishing {
   repositories {
     maven {
       url = System.getenv("OSSRH_URL")
-      println("URL Value: $url")
       name = "tuvali"
       credentials {
         username = System.getenv("OSSRH_USER")
@@ -82,7 +81,12 @@ publishing {
       groupId = "io.mosip"
       artifactId = "tuvali"
       version = "1.0-SNAPSHOT"
-      artifact("build/outputs/aar/android-debug.aar")
+      artifacts {
+        aar {
+          archivesBaseName = "${artifactId}-${version}"
+        }
+      }
+      artifact("build/outputs/aar/${artifactId}-${version}-release.aar")
     }
   }
 }
