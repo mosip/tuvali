@@ -86,7 +86,7 @@ publishing {
           archivesBaseName = "${artifactId}-${version}"
         }
       }
-      artifact("build/outputs/aar/${artifactId}-${version}-release.aar")
+      artifact("build/outputs/aar/${archivesBaseName}-release.aar")
     }
   }
 }
