@@ -13,7 +13,6 @@ publishing {
     aar(MavenPublication) {
       pom {
         withXml {
-          //add license node ; add Developer Node
           def dependenciesNode = asNode().appendNode('dependencies')
           project.configurations.implementation.allDependencies.each {
             def dependencyNode = dependenciesNode.appendNode('dependency')
@@ -81,9 +80,11 @@ publishing {
       groupId = "io.mosip"
       artifactId = "tuvali"
       version = "1.0-SNAPSHOT"
-      artifacts {
-        aar {
-          archivesBaseName = "${artifactId}-${version}"
+      if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
+        artifacts {
+          aar {
+            archivesBaseName = "${artifactId}-${version}"
+          }
         }
       }
       artifact("build/outputs/aar/${archivesBaseName}-release.aar")
