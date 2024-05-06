@@ -54,8 +54,8 @@ class VerifierBleCommunicator(
   private var maxDataBytes = 20
   //TODO: Update UUIDs as per specification
   companion object {
-    val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
-    val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
+    val SERVICE_UUID: UUID = UUID.fromString("00000001-0000-1000-8000-00805f9b34fb")
+    val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("00000002-0000-1000-8000-00805f9b34fb")
     const val DISCONNECT_STATUS = 1
   }
 

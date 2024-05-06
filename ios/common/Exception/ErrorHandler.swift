@@ -1,5 +1,5 @@
 import Foundation
-import os
+
 class ErrorHandler {
     public static var sharedInstance = ErrorHandler()
     private var walletExceptionHandler: WalletExceptionHandler?
