@@ -20,10 +20,7 @@ class VerifierExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
       "CRCFailureCount:$crcFailureCount TotalChunkCount:$totalChunkCount -"
     else ""
 
-    val errorMessage = if (e.message != null)
-      crcErrorLogString + e.message
-    else
-      crcErrorLogString + "Something went wrong in Verifier: $rootCause"
+    val errorMessage = crcErrorLogString + (e.message ?: "Something went wrong in Verifier: $rootCause")
     sendError(
       errorMessage,
       rootCause.errorCode
