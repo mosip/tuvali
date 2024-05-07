@@ -190,7 +190,7 @@ class VerifierBleCommunicator(
   }
 
   override fun onException(exception: BLEException) {
-    handleException(VerifierException("Exception in Verifier", exception))
+    handleException(VerifierException("Exception in Verifier", exception, exception.crcFailureCount, exception.totalChunkCount))
   }
 
   override fun onClosed() {
@@ -230,7 +230,7 @@ class VerifierBleCommunicator(
     }
   }
 
-  override fun onResponseReceived(data: ByteArray) {
+  override fun onResponseReceived(data: ByteArray, crcFailureCount: Int, totalChunkCount: Int) {
     //Log.i(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
     try {
       val decryptedData = secretsTranslator?.decryptUponReceive(data)
@@ -238,7 +238,13 @@ class VerifierBleCommunicator(
         Log.d(logTag, "decryptedData size: ${decryptedData.size}")
         val decompressedData = Util.decompress(decryptedData)
         Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-        eventEmitter.emitEvent(DataReceivedEvent(String(decompressedData!!)))
+        eventEmitter.emitEvent(
+          DataReceivedEvent(
+            String(decompressedData!!),
+            crcFailureCount,
+            totalChunkCount
+          )
+        )
       } else {
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error
