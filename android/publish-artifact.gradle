@@ -87,7 +87,7 @@ publishing {
           }
         }
       }
-      artifact("build/outputs/aar/${archivesBaseName}-release.aar")
+      artifact("build/outputs/aar/${artifactId}-${version}-release.aar")
     }
   }
 }
