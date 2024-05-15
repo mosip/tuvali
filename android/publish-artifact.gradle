@@ -2,7 +2,6 @@ publishing {
   repositories {
     maven {
       url = System.getenv("OSSRH_URL")
-      println("URL Value: $url")
       name = "tuvali"
       credentials {
         username = System.getenv("OSSRH_USER")
@@ -14,7 +13,6 @@ publishing {
     aar(MavenPublication) {
       pom {
         withXml {
-          //add license node ; add Developer Node
           def dependenciesNode = asNode().appendNode('dependencies')
           project.configurations.implementation.allDependencies.each {
             def dependencyNode = dependenciesNode.appendNode('dependency')
@@ -81,8 +79,15 @@ publishing {
       }
       groupId = "io.mosip"
       artifactId = "tuvali"
-      version = "1.0"
-      artifact("build/outputs/aar/android-release.aar")
+      version = "1.0-SNAPSHOT"
+      if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
+        artifacts {
+          aar {
+            archivesBaseName = "${artifactId}-${version}"
+          }
+        }
+      }
+      artifact("build/outputs/aar/${archivesBaseName}-release.aar")
     }
   }
 }
