@@ -23,4 +23,5 @@ interface ICentralListener {
   fun onNotificationReceived(charUUID: UUID, value: ByteArray?)
   fun onClosed()
   fun onException(exception: BLEException)
+  fun onDestroy()
 }

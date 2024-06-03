@@ -3,7 +3,9 @@ package io.mosip.tuvali.ble.peripheral.impl
 import android.annotation.SuppressLint
 import android.bluetooth.*
 import android.content.Context
+import android.content.IntentFilter
 import android.util.Log
+import io.mosip.tuvali.common.BluetoothStateChangeReceiver
 import java.util.UUID
 import io.mosip.tuvali.transfer.Util.Companion.getLogTag
 import kotlin.math.min
@@ -23,6 +25,8 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
   private lateinit var onDeviceConnectedCallback: (Int, Int) -> Unit
   private lateinit var onDeviceNotConnectedCallback: (Int, Int) -> Unit
   private lateinit var onReceivedWriteCallback: (BluetoothGattCharacteristic?, ByteArray?) -> Unit
+  private lateinit var bluetoothStateChangeReceiver: BluetoothStateChangeReceiver
+  private var bluetoothStateChangeIntentFilter: IntentFilter = IntentFilter()
 
   fun start(
     onDeviceConnected: (Int, Int) -> Unit,
@@ -36,10 +40,16 @@ class GattServer(private val context: Context) : BluetoothGattServerCallback() {
     onMTUChangedCallback = onMTUChanged
     val bluetoothManager: BluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
     gattServer = bluetoothManager.openGattServer(context, this@GattServer)
+
+    bluetoothStateChangeReceiver = BluetoothStateChangeReceiver(onDeviceNotConnected)
+
+    bluetoothStateChangeIntentFilter.addAction(BluetoothAdapter.ACTION_STATE_CHANGED)
+    context.registerReceiver(bluetoothStateChangeReceiver, bluetoothStateChangeIntentFilter)
     Log.i(logTag, "Device Address: ${bluetoothManager.adapter.address}")
   }
 
   fun close() {
+    context.unregisterReceiver(bluetoothStateChangeReceiver)
     gattServer.close()
   }
 

@@ -1,13 +1,45 @@
 
 > Warning: The library is under active development and no major version is released yet. Please anticipate non-backward compatible changes to the API and functional behavior in the upcoming releases.
 
-# Tuvali - React native module library
-This is the React native module for the [OpenID for Verifiable Presentations over BLE](https://tlodderstedt.github.io/openid-for-verifiable-presentations-offline-1_0-00.html) implementation to support sending vc/vp using Bluetooth Low Energy local channel.
+# Tuvali - A library to send vc/vp using BLE.
+This is the module for the [OpenID for Verifiable Presentations over BLE](https://tlodderstedt.github.io/openid-for-verifiable-presentations-offline-1_0-00.html) implementation to support sending vc/vp using Bluetooth Low Energy local channel.
 
 This contains the source code for the ios, android modules as well as a sample app under `example/` folder. The sample app can be used for testing the modules being worked on in case it is needed.
 
-## Installing this library as a dependency
+## Usage as a Kotlin library (for native android)
+The Tuvali kotlin artifact (.aar) has been published to Maven.
+#### Adding as a Maven dependency.
+- In settings.gradle.kts of your app modify the following:
+  ```
+      dependencyResolutionManagement {
+      repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+      repositories {
+        google()
+        mavenCentral()
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+      }
+    }
+  ```
+- In build.gradle.kts add the following:
+  ```kotlin
+    dependencies {
+        implementation("io.mosip:tuvali:1.0-SNAPSHOT")
+    }
+   ```
+The kotlin library has been added to your project.
 
+## Usage as a Swift library (for native ios)
+
+- Download swift artifact (ios-tuvali-library) from the repository.
+- Open your project in XCode.
+- Goto File > Add Package Dependencies.
+- Select Add Local option.
+- Add the artifact folder.
+
+The swift library has been added to your project.
+
+## Usage as a React-Native wrapper
+### Installing this library as a dependency
 ```bash
 # Install latest version
 npm install @mosip/tuvali
@@ -15,7 +47,7 @@ npm install @mosip/tuvali
 # or
 
 # Install specific version
-npm install @mosip/tuvali@v0.4.8
+npm install @mosip/tuvali@v0.4.9
 ```
 
 # API documentation
@@ -141,4 +173,3 @@ The device on which app is running can destroy the connection by calling disconn
 ```typescript
 wallet/verifier.disconnect();
 ```
-

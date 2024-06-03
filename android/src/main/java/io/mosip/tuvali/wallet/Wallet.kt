@@ -54,6 +54,10 @@ class Wallet(private val context: Context) : IWallet {
     }
   }
 
+  override fun handleDisconnect(status: Int, newState: Int) {
+    bleCommunicator?.onDeviceDisconnected(false)
+  }
+
   override fun subscribe(listener: (Event) -> Unit) {
     Log.d(logTag, "got subscribe at ${System.nanoTime()}")
     tryExecuteSync.run {

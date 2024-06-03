@@ -1,0 +1,93 @@
+publishing {
+  repositories {
+    maven {
+      url = System.getenv("OSSRH_URL")
+      name = "tuvali"
+      credentials {
+        username = System.getenv("OSSRH_USER")
+        password = System.getenv("OSSRH_SECRET")
+      }
+    }
+  }
+  publications {
+    aar(MavenPublication) {
+      pom {
+        withXml {
+          def dependenciesNode = asNode().appendNode('dependencies')
+          project.configurations.implementation.allDependencies.each {
+            def dependencyNode = dependenciesNode.appendNode('dependency')
+            dependencyNode.appendNode('groupId', it.group)
+            dependencyNode.appendNode('artifactId', it.name)
+            dependencyNode.appendNode('version', it.version)
+          }
+
+          asNode().appendNode('licenses').appendNode('license').with {
+            appendNode('name', 'MIT')
+            appendNode('url', 'https://www.mit.edu/~amini/LICENSE.md')
+          }
+
+          asNode().appendNode('developers').appendNode('developer').with {
+            appendNode('id', 'Your developer ID')
+            appendNode('name', 'Mosip')
+            appendNode('email', 'mosip.emailnotifier@gmail.com')
+            appendNode('organization', 'io.mosip')
+            appendNode('organizationUrl', 'https://github.com/mosip/tuvali')
+          }
+
+          def pluginsNode = asNode().appendNode('build').appendNode('plugins')
+
+          def pluginNode = pluginsNode.appendNode('plugin')
+          pluginNode.appendNode('groupId', 'pl.project13.maven')
+          pluginNode.appendNode('artifactId', 'git-commit-id-plugin')
+          pluginNode.appendNode('version', '3.0.1')
+
+          def executionsNode = pluginNode.appendNode('executions')
+          def executionNode = executionsNode.appendNode('execution')
+          executionNode.appendNode('id', 'get-the-git-infos')
+          def goalsNode = executionNode.appendNode('goals')
+          goalsNode.appendNode('goal', 'revision')
+          executionNode.appendNode('phase', 'validate')
+
+          def configurationNode = pluginNode.appendNode('configuration')
+          configurationNode.appendNode('generateGitPropertiesFile', 'true')
+          configurationNode.appendNode('generateGitPropertiesFilename', '${project.build.outputDirectory}/git.properties')
+
+          def includeOnlyPropertiesNode = configurationNode.appendNode('includeOnlyProperties')
+          includeOnlyPropertiesNode.appendNode('includeOnlyProperty', '^git.build.(time|version)$')
+          includeOnlyPropertiesNode.appendNode('includeOnlyProperty', '^git.commit.id.(abbrev|full)$')
+
+          configurationNode.appendNode('commitIdGenerationMode', 'full')
+          configurationNode.appendNode('dotGitDirectory', '${project.basedir}/.git')
+
+          def gpgPluginNode = pluginsNode.appendNode('plugin')
+          gpgPluginNode.appendNode('groupId', 'org.apache.maven.plugins')
+          gpgPluginNode.appendNode('artifactId', 'maven-gpg-plugin')
+          gpgPluginNode.appendNode('version', '1.5')
+
+          def gpgExecutionsNode = gpgPluginNode.appendNode('executions')
+          def gpgExecutionNode = gpgExecutionsNode.appendNode('execution')
+          gpgExecutionNode.appendNode('id', 'sign-artifacts')
+          gpgExecutionNode.appendNode('phase', 'verify')
+          def gpgGoalsNode = gpgExecutionNode.appendNode('goals')
+          gpgGoalsNode.appendNode('goal', 'sign')
+
+          def gpgConfigurationNode = gpgExecutionNode.appendNode('configuration')
+          def gpgArgumentsNode = gpgConfigurationNode.appendNode('gpgArguments')
+          gpgArgumentsNode.appendNode('arg', '--pinentry-mode')
+          gpgArgumentsNode.appendNode('arg', 'loopback')
+        }
+      }
+      groupId = "io.mosip"
+      artifactId = "tuvali"
+      version = "1.0-SNAPSHOT"
+      if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
+        artifacts {
+          aar {
+            archivesBaseName = "${artifactId}-${version}"
+          }
+        }
+      }
+      artifact("build/outputs/aar/${artifactId}-${version}-release.aar")
+    }
+  }
+}

@@ -27,7 +27,7 @@ jobs:
       ANDROID_LOCATION: 'android'
       BUILD_ARTIFACT: tuvali
     secrets:
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
 
   publish-tuvali-to-npm-registry:
     if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}"
@@ -38,19 +38,19 @@ jobs:
       ANDROID_LOCATION: 'android'
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
 
-  sonar-analysis-tuvali:
-    if: "${{ github.event_name != 'pull_request' }}"
-    needs: build-tuvali
-    uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master
-    with:
-      SERVICE_LOCATION: '.'
-      ANDROID_LOCATION: 'android'
-      SONAR_URL: 'https://sonarcloud.io'
-      PROJECT_KEY: "mosip_${{ github.event.repository.name }}"
-      PROJECT_NAME: "${{ github.event.repository.name }}"
-    secrets:
-      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-      SONAR_ORGANIZATION: ${{ secrets.ORG_KEY }}
-      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+  # sonar-analysis-tuvali:
+  #   if: "${{ github.event_name != 'pull_request' }}"
+  #   needs: build-tuvali
+  #   uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master
+  #   with:
+  #     SERVICE_LOCATION: '.'
+  #     ANDROID_LOCATION: 'android'
+  #     SONAR_URL: 'https://sonarcloud.io'
+  #     PROJECT_KEY: "mosip_${{ github.event.repository.name }}"
+  #     PROJECT_NAME: "${{ github.event.repository.name }}"
+  #   secrets:
+  #     SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+  #     SONAR_ORGANIZATION: ${{ secrets.ORG_KEY }}
+  #     SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}

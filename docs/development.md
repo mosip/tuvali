@@ -21,7 +21,7 @@ The way the native module is setup is it contains 3 primary parts.
 
 Whenever new functions are being added to the modules, the corresponding functions need to be exposed via the interface failing which the functions/methods will not be available on the react native side.
 
-For installing dependencies for the ios module, install the required dependencies in the `react-native-tuvali.podspec` file.
+For installing dependencies for the ios module, install the required dependencies in the `tuvali.podspec` file.
 Eg -
 ```
 pod.dependency 'Tink'
@@ -77,7 +77,7 @@ We use an npm package called `yalc` to publish changes to a local repository for
 2. Public Tuvali to local Yalc repo with `yalc publish`
 
 ### On Inji repo
-1. Add locally published Tuvali repo to INJI with `yalc add react-native-tuvali`
+1. Add locally published Tuvali repo to INJI with `yalc add @mosip/tuvali`
 2. `npm install`
 3. Open app from CLI `npm run android:mosip`. Optionally can run from Android studio as well.
 
