@@ -1,0 +1,70 @@
+name: iOS Artifact Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      message:
+        description: 'Message for manually triggering'
+        required: false
+        default: 'Triggered for Updates'
+        type: string
+    push:
+      branches:
+        - release*
+        - master
+        - develop*
+
+jobs:
+  build:
+    runs-on: macos-latest
+    permissions:
+      contents: write  # Grants permission to push code and manage releases
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Create Library Folder and Create Swift Library
+        run: |
+          cd ./artifacts/swift-artifact/
+          rm -rf ios-tuvali-library
+          mkdir ios-tuvali-library
+          cd ios-tuvali-library
+          swift package init --type library
+          rm -rf /ios-tuvali-library
+
+      - name: Edit Package.swift
+        run: |
+          cp ./artifacts/swift-artifact/Package.swift ./artifacts/swift-artifact/ios-tuvali-library/Package.swift
+
+      - name: Build Swift Package
+        run: |
+          cd ./artifacts/swift-artifact/ios-tuvali-library
+          swift package clean
+          swift package update
+          brew install zlib
+          swift build -c debug -Xlinker -L/usr/local/lib
+
+      - name: Move  required files
+        run: |
+          cp -R ./ios/Wallet ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/ble ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/crypto ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+          cp -R ./ios/common ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
+
+      - name: Configure Git
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+
+      - name: Commit Artifacts
+        run: |
+          git add .
+          git commit --allow-empty -m "chore(#891): changes in script"
+
+      - name: Push Changes to Specific Branch
+        run: |
+          git pull origin --rebase
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
