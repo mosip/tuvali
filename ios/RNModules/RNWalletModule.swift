@@ -1,7 +1,7 @@
 import Foundation
 
 @available(iOS 13.0, *)
-@objc(WalletModule)
+
 class WalletModule: RCTEventEmitter {
     var wallet: WalletProtocol = Wallet()
     var tuvaliVersion: String = "unknown"
