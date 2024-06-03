@@ -8,14 +8,10 @@ on:
         required: false
         default: 'Triggered for Updates'
         type: string
-    push:
-      branches:
-        - release*
-        - master
-        - develop*
 
 jobs:
   build:
+    if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}"
     runs-on: macos-latest
     permissions:
       contents: write  # Grants permission to push code and manage releases
