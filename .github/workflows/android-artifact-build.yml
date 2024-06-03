@@ -8,11 +8,6 @@ on:
         required: false
         default: 'Triggered for Updates'
         type: string
-  push:
-    branches:
-      - release*
-      - master
-      - develop*
 
 jobs:
   maven-publish:
