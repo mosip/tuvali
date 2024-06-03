@@ -54,8 +54,8 @@ class VerifierBleCommunicator(
   private var maxDataBytes = 20
   //TODO: Update UUIDs as per specification
   companion object {
-    val SERVICE_UUID: UUID = UUID.fromString("00000001-0000-1000-8000-00805f9b34fb")
-    val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("00000002-0000-1000-8000-00805f9b34fb")
+    val SERVICE_UUID: UUID = UUID.fromString("0000AB29-0000-1000-8000-00805f9b34fb")
+    val SCAN_RESPONSE_SERVICE_UUID: UUID = UUID.fromString("0000AB2A-0000-1000-8000-00805f9b34fb")
     const val DISCONNECT_STATUS = 1
   }
 
@@ -190,7 +190,7 @@ class VerifierBleCommunicator(
   }
 
   override fun onException(exception: BLEException) {
-    handleException(VerifierException("Exception in Verifier", exception, exception.crcFailureCount, exception.totalChunkCount))
+    handleException(VerifierException("Exception in Verifier", exception))
   }
 
   override fun onClosed() {
@@ -230,7 +230,7 @@ class VerifierBleCommunicator(
     }
   }
 
-  override fun onResponseReceived(data: ByteArray, crcFailureCount: Int, totalChunkCount: Int) {
+  override fun onResponseReceived(data: ByteArray) {
     //Log.i(logTag, "Sha256 of complete encrypted data: ${Util.getSha256(data)}")
     try {
       val decryptedData = secretsTranslator?.decryptUponReceive(data)
@@ -238,13 +238,7 @@ class VerifierBleCommunicator(
         Log.d(logTag, "decryptedData size: ${decryptedData.size}")
         val decompressedData = Util.decompress(decryptedData)
         Log.d(logTag, "decompression before: ${decryptedData.size} and after: ${decompressedData?.size}")
-        eventEmitter.emitEvent(
-          DataReceivedEvent(
-            String(decompressedData!!),
-            crcFailureCount,
-            totalChunkCount
-          )
-        )
+        eventEmitter.emitEvent(DataReceivedEvent(String(decompressedData!!)))
       } else {
         Log.e(logTag, "decryptedData is null, data with size: ${data.size}")
         // TODO: Handle error

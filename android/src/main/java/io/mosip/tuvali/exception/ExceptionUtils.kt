@@ -9,12 +9,5 @@ class ExceptionUtils {
       }
       return cause
     }
-
-    fun getCRCFailureCount(e: BLEException): Int? {
-      return e.crcFailureCount
-    }
-    fun getTotalChunkCount(e: BLEException): Int? {
-      return e.totalChunkCount
-    }
   }
 }
