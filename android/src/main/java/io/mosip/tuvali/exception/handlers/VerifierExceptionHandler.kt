@@ -9,21 +9,10 @@ import io.mosip.tuvali.verifier.exception.VerifierException
 class VerifierExceptionHandler(val sendError: (String, ErrorCode) -> Unit) {
   private val logTag = Util.getLogTag(javaClass.simpleName)
 
-  fun handleException(e: VerifierException) {
+  fun handleException(e: VerifierException){
     val rootCause = ExceptionUtils.getRootBLECause(e)
-    val crcFailureCount = ExceptionUtils.getCRCFailureCount(e)
-    val totalChunkCount = ExceptionUtils.getTotalChunkCount(e)
 
     Log.e(logTag, "Handling Verifier Exception: ", e)
-
-    val crcErrorLogString = if (crcFailureCount != null)
-      "CRCFailureCount:$crcFailureCount TotalChunkCount:$totalChunkCount -"
-    else ""
-
-    val errorMessage = crcErrorLogString + (e.message ?: "Something went wrong in Verifier: $rootCause")
-    sendError(
-      errorMessage,
-      rootCause.errorCode
-    )
+    sendError(e.message ?: "Something went wrong in Verifier: $rootCause", rootCause.errorCode)
   }
 }

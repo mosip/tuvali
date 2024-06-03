@@ -13,7 +13,6 @@ class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(max
   val totalChunkCount = getTotalChunkCount(totalSize)
   private var chunkReceivedMarker = ByteArray(totalChunkCount.toInt())
   private val chunkReceivedMarkerByte: Byte = 1
-  var crcFailureCount: Int = 0
 
   init {
     Log.i(logTag, "expected total chunk size: $totalSize")
@@ -39,7 +38,6 @@ class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(max
       return seqNumberInMeta
     }
     if(crcReceivedIsNotEqualToCrcCalculated(chunkData.copyOfRange(4, chunkData.size), crcReceived)){
-      crcFailureCount += 1
       return seqNumberInMeta
     }
     lastReadSeqNumber = seqNumberInMeta
@@ -80,6 +78,4 @@ class Assembler(totalSize: Int, private val maxDataBytes: Int ): ChunkerBase(max
   fun data(): ByteArray {
     return data
   }
-
-  fun getTotalChunkCount(): Int = totalChunkCount.toInt()
 }
