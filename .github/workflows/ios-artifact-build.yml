@@ -2,22 +2,27 @@ name: iOS Artifact Build
 
 on:
   workflow_dispatch:
+    inputs:
+      message:
+        description: 'Message for manually triggering'
+        required: false
+        default: 'Triggered for Updates'
+        type: string
+    push:
+      branches:
+        - release*
+        - master
+        - develop*
 
 jobs:
   build:
     runs-on: macos-latest
     permissions:
       contents: write  # Grants permission to push code and manage releases
-      pull-requests: write # Grants permission to write pull requests
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '16'
 
       - name: Create Library Folder and Create Swift Library
         run: |
