@@ -62,7 +62,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5.0.2
         with:
           commit-message: creating swift artifact
-          title: Release changes
+          title: creating swift artifact
           body: Automated PR for swift artifact build.
           branch: "update-ios-artifact"
           delete-branch: true
