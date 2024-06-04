@@ -47,7 +47,7 @@ jobs:
           cp -R ./ios/ble ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
           cp -R ./ios/crypto ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
           cp -R ./ios/common ./artifacts/swift-artifact/ios-tuvali-library/Sources/ios-tuvali-library
-
+          
       - name: Configure Git
         run: |
           git config --local user.email "action@github.com"
@@ -58,9 +58,23 @@ jobs:
           git add .
           git commit --allow-empty -m "chore(#891): changes in script"
 
-      - name: Push Changes to Specific Branch
-        run: |
-          git pull origin --rebase
-          git push
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5.0.2
+        with:
+          commit-message: creating swift artifact
+          title: Release changes
+          body: Automated PR for swift artifact build.
+          branch: "update-ios-artifact"
+          delete-branch: true
+          base:${{ github.head_ref }}
+          token: ${{ secrets.ACTION_PAT }}
+          signoff: true
+
+      - uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,author,commit,workflow,job # selectable (default: repo,message)
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
+        if: "${{ github.event_name != 'pull_request' && failure() }}"
+  
