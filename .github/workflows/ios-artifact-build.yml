@@ -66,7 +66,7 @@ jobs:
           body: Automated PR for swift artifact build.
           branch: "update-ios-artifact"
           delete-branch: true
-          base:${{ github.head_ref }}
+          base: ${{ github.head_ref }}
           token: ${{ secrets.ACTION_PAT }}
           signoff: true
 
