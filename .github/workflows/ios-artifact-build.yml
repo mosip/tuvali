@@ -64,7 +64,7 @@ jobs:
           commit-message: creating swift artifact
           title: creating swift artifact
           body: Automated PR for swift artifact build.
-          branch: "update-ios-artifact"
+          branch: "swift-ios-artifact-trigger"
           delete-branch: true
           base: ${{ github.head_ref }}
           token: ${{ secrets.ACTION_PAT }}
