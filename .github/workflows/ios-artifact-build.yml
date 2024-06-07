@@ -56,7 +56,7 @@ jobs:
       - name: Commit Artifacts
         run: |
           git add .
-          git commit --allow-empty -m "chore(#891): changes in script"
+          git commit --allow-empty -s -m "[INJIMOB-891]: changes in script"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
@@ -64,7 +64,7 @@ jobs:
           commit-message: creating swift artifact
           title: creating swift artifact
           body: Automated PR for swift artifact build.
-          branch: "update-ios-artifact"
+          branch: "swift-ios-artifact-trigger"
           delete-branch: true
           base: ${{ github.head_ref }}
           token: ${{ secrets.ACTION_PAT }}
