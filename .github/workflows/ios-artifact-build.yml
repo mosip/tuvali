@@ -56,7 +56,7 @@ jobs:
       - name: Commit Artifacts
         run: |
           git add .
-          git commit --allow-empty -m "chore(#891): changes in script"
+          git commit --allow-empty -s -m "[INJIMOB-891]: changes in script"
 
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v5.0.2
