@@ -1,6 +1,6 @@
 import Foundation
 import Gzip
-import os
+
 @objc(Wallet)
 @available(iOS 13.0, *)
 class WalletBleCommunicator: NSObject {
@@ -18,7 +18,10 @@ class WalletBleCommunicator: NSObject {
         central = Central()
     }
 
-
+    @objc(getModuleName:withRejecter:)
+    func getModuleName(resolve: RCTPromiseResolveBlock, reject: RCTPromiseRejectBlock) -> Void {
+        resolve(["iOS Wallet"])
+    }
 
     func setAdvIdentifier(identifier: Data) {
         self.advIdentifier = identifier

@@ -8,9 +8,9 @@ extension Central {
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
 
         let dataDict = advertisementData["kCBAdvDataServiceData"] as? [CBUUID: Any?]
-        if let uuidDict = dataDict, let data = uuidDict[CBUUID(string: "AB2A")], let data = data {
-            let scanResponseData = dataDict?[CBUUID(string: "AB2A")]  as! Data
-            let advertisementData = dataDict?[CBUUID(string: "AB29")]  as! Data
+        if let uuidDict = dataDict, let data = uuidDict[CBUUID(string: "00000002-0000-1000-8000-00805f9b34fb")], let data = data {
+            let scanResponseData = dataDict?[CBUUID(string: "00000002-0000-1000-8000-00805f9b34fb")]  as! Data
+            let advertisementData = dataDict?[CBUUID(string: "00000001-0000-1000-8000-00805f9b34fb")]  as! Data
             let publicKeyData =  advertisementData.subdata(in: advertisementData.count-5..<advertisementData.count) + scanResponseData
             walletBleCommunicatorDelegate?.setVeriferKeyOnSameIdentifier(payload: advertisementData, publicData: publicKeyData) {
                 peripheral.delegate = self
