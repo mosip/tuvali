@@ -25,38 +25,38 @@ struct CBcharatcteristic {
 // TODO: Add conn status change everywhere
 
 enum CharacteristicIds: String, CaseIterable {
-    case IDENTIFY_REQUEST_CHAR_UUID = "00002030-0000-1000-8000-00805f9b34fb"
-    case REQUEST_SIZE_CHAR_UUID = "00002031-0000-1000-8000-00805f9b34fb"
-    case REQUEST_CHAR_UUID = "00002032-0000-1000-8000-00805f9b34fb"
-    case RESPONSE_SIZE_CHAR_UUID = "00002033-0000-1000-8000-00805f9b34fb"
-    case SUBMIT_RESPONSE_CHAR_UUID = "00002034-0000-1000-8000-00805f9b34fb"
-    case TRANSFER_REPORT_REQUEST_CHAR_UUID = "00002035-0000-1000-8000-00805f9b34fb"
-    case TRANSFER_REPORT_RESPONSE_CHAR_UUID = "00002036-0000-1000-8000-00805f9b34fb"
+    case IDENTIFY_REQUEST_CHAR_UUID = "00000006-5026-444A-9E0E-D6F2450F3A77"
+    case REQUEST_SIZE_CHAR_UUID = "00000004-5026-444A-9E0E-D6F2450F3A77"
+    case REQUEST_CHAR_UUID = "00000005-5026-444A-9E0E-D6F2450F3A77"
+    case RESPONSE_SIZE_CHAR_UUID = "00000007-5026-444A-9E0E-D6F2450F3A77"
+    case SUBMIT_RESPONSE_CHAR_UUID = "00000008-5026-444A-9E0E-D6F2450F3A77"
+    case TRANSFER_REPORT_REQUEST_CHAR_UUID = "00000009-5026-444A-9E0E-D6F2450F3A77"
+    case TRANSFER_REPORT_RESPONSE_CHAR_UUID = "0000000A-5026-444A-9E0E-D6F2450F3A77"
     case VERIFICATION_STATUS_CHAR_UUID = "00002037-0000-1000-8000-00805f9b34fb"
-    case DISCONNECT_CHAR_UUID = "00002038-0000-1000-8000-00805f9b34fb"
+    case DISCONNECT_CHAR_UUID = "0000000B-5026-444A-9E0E-D6F2450F3A77"
 }
 
 let characteristicsMap: [String: CharacteristicTuple] = [
-    "00002030-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
-    "00002031-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
-    "00002032-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
-    "00002033-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
-    "00002034-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
-    "00002035-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
-    "00002036-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
+    "00000006-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
+    "00000004-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
+    "00000005-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.read, .indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
+    "00000007-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
+    "00000008-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
+    "00000009-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.writeWithoutResponse, .write]), permissions: CBAttributePermissions([.writeable]), value: nil),
+    "0000000A-5026-444A-9E0E-D6F2450F3A77": (properties: CBCharacteristicProperties([.indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
     "00002037-0000-1000-8000-00805f9b34fb": (properties: CBCharacteristicProperties([.indicate]), permissions: CBAttributePermissions([.readable]), value: nil),
 ]
 
 struct NetworkCharNums {
-    static let IDENTIFY_REQUEST_CHAR_UUID = CBUUID(string: "2030")
-    static let REQUEST_SIZE_CHAR_UUID = CBUUID(string: "2031")
-    static let REQUEST_CHAR_UUID = CBUUID(string: "2032")
-    static let RESPONSE_SIZE_CHAR_UUID = CBUUID(string: "2033")
-    static let SUBMIT_RESPONSE_CHAR_UUID = CBUUID(string: "2034")
-    static let TRANSFER_REPORT_REQUEST_CHAR_UUID = CBUUID(string: "2035")
-    static let TRANSFER_REPORT_RESPONSE_CHAR_UUID = CBUUID(string: "2036")
-    static let VERIFICATION_STATUS_CHAR_UUID = CBUUID(string: "2037")
-    static let DISCONNECT_CHAR_UUID = CBUUID(string: "2038")
+    static let IDENTIFY_REQUEST_CHAR_UUID = CBUUID(string: "00000006-5026-444A-9E0E-D6F2450F3A77")
+    static let REQUEST_SIZE_CHAR_UUID = CBUUID(string: "00000004-5026-444A-9E0E-D6F2450F3A77")
+    static let REQUEST_CHAR_UUID = CBUUID(string: "00000005-5026-444A-9E0E-D6F2450F3A77")
+    static let RESPONSE_SIZE_CHAR_UUID = CBUUID(string: "00000007-5026-444A-9E0E-D6F2450F3A77")
+    static let SUBMIT_RESPONSE_CHAR_UUID = CBUUID(string: "00000008-5026-444A-9E0E-D6F2450F3A77")
+    static let TRANSFER_REPORT_REQUEST_CHAR_UUID = CBUUID(string: "00000009-5026-444A-9E0E-D6F2450F3A77")
+    static let TRANSFER_REPORT_RESPONSE_CHAR_UUID = CBUUID(string: "0000000A-5026-444A-9E0E-D6F2450F3A77")
+    static let VERIFICATION_STATUS_CHAR_UUID = CBUUID(string: "00002037-0000-1000-8000-00805f9b34fb")
+    static let DISCONNECT_CHAR_UUID = CBUUID(string: "0000000B-5026-444A-9E0E-D6F2450F3A77")
 }
 
 enum NotificationEvent: String {

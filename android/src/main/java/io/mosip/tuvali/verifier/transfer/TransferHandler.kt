@@ -73,7 +73,7 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_COMPLETE.ordinal -> {
         Log.i(logTag, "response transfer complete in ${System.currentTimeMillis() - responseStartTimeInMillis}ms")
         val responseTransferCompleteMessage = msg.obj as ResponseTransferCompleteMessage
-        transferListener.onResponseReceived(responseTransferCompleteMessage.data)
+        transferListener.onResponseReceived(responseTransferCompleteMessage.data, responseTransferCompleteMessage.crcFailureCount, responseTransferCompleteMessage.totalChunkCount)
         currentState = States.TransferComplete
       }
       IMessage.TransferMessageTypes.RESPONSE_TRANSFER_FAILED.ordinal -> {
@@ -93,7 +93,13 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
         GattService.TRANSFER_REPORT_RESPONSE_CHAR_UUID,
         transferReport.toByteArray()
       )
-      this.sendMessage(ResponseTransferCompleteMessage(assembler?.data()!!))
+      this.sendMessage(
+        ResponseTransferCompleteMessage(
+          assembler?.data()!!,
+          assembler?.crcFailureCount!!,
+          assembler?.getTotalChunkCount()!!
+        )
+      )
       return
     }
 
@@ -101,7 +107,11 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     val missedCount = missedSequenceNumbers?.size
 
     if(assembler != null && missedCount!! > (0.7 * assembler!!.totalChunkCount)) {
-      throw TooManyFailureChunksException("Failing VC transfer as failure chunks are more than 70% of total chunks")
+      throw TooManyFailureChunksException(
+        "Failing VC transfer as failure chunks are more than 70% of total chunks",
+        assembler?.crcFailureCount!!,
+        assembler?.getTotalChunkCount()!!
+      )
     }
 
     val transferReport =TransferReport(
@@ -128,7 +138,14 @@ class TransferHandler(looper: Looper, private val peripheral: Peripheral, privat
     try {
       super.dispatchMessage(msg)
     } catch (e: Exception) {
-      transferListener.onException(VerifierTransferHandlerException("Exception in Verifier Transfer Handler", e))
+      transferListener.onException(
+        VerifierTransferHandlerException(
+          "Exception in Verifier Transfer Handler",
+          e,
+          assembler?.crcFailureCount!!,
+          assembler?.getTotalChunkCount()!!
+        )
+      )
       Log.e(logTag, "dispatchMessage " + e.message)
     }
   }
