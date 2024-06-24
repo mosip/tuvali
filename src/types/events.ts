@@ -25,6 +25,8 @@ export type SecureChannelEstablished = {
 export type DataReceivedEvent = {
   type: EventTypes.onDataReceived;
   data: string;
+  crcFailureCount: number;
+  totalChunkCount: number;
 };
 
 export type DataSentEvent = {
