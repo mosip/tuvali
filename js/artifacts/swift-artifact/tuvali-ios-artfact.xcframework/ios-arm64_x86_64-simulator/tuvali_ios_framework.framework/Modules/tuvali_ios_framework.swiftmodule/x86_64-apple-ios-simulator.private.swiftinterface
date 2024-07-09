@@ -1,0 +1,33 @@
+// swift-interface-format-version: 1.0
+// swift-compiler-version: Apple Swift version 5.10 (swiftlang-5.10.0.13 clang-1500.3.9.4)
+// swift-module-flags: -target x86_64-apple-ios17.4-simulator -enable-objc-interop -enable-library-evolution -swift-version 5 -enforce-exclusivity=checked -O -enable-bare-slash-regex -module-name tuvali_ios_framework
+import CommonCrypto
+import CoreBluetooth
+import CrcSwift
+import CryptoKit
+import Foundation
+import Gzip
+import Swift
+import _Concurrency
+import _StringProcessing
+import _SwiftConcurrencyShims
+import os
+@_exported import tuvali_ios_framework
+extension Foundation.Data {
+  public func sha256() -> Swift.String
+  public func toInt() -> Swift.Int
+}
+extension Swift.String {
+  public func sha256() -> Swift.String
+}
+public protocol Event {
+}
+public class Wallet {
+  public init()
+  public func startConnection(_ uri: Swift.String)
+  public func disconnect()
+  public func send(_ payload: Swift.String)
+  public func subscribe(_ listener: @escaping (any tuvali_ios_framework.Event) -> Swift.Void)
+  public func unsubscribe()
+  @objc deinit
+}

@@ -23,7 +23,7 @@ jobs:
   build-tuvali:
     uses: mosip/kattu/.github/workflows/npm-android-build.yml@master
     with:
-      SERVICE_LOCATION: '.'
+      SERVICE_LOCATION: 'js'
       ANDROID_LOCATION: 'android'
       BUILD_ARTIFACT: tuvali
     secrets:
@@ -34,7 +34,7 @@ jobs:
     needs: build-tuvali
     uses: mosip/kattu/.github/workflows/npm-publish-to-npm-registry.yml@master
     with:
-      SERVICE_LOCATION: '.'
+      SERVICE_LOCATION: 'js'
       ANDROID_LOCATION: 'android'
     secrets:
       NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}

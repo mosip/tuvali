@@ -1,0 +1,2606 @@
+{
+  "ABIRoot": {
+    "kind": "Root",
+    "name": "TopLevel",
+    "printedName": "TopLevel",
+    "children": [
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CrcSwift",
+        "printedName": "CrcSwift",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CommonCrypto",
+        "printedName": "CommonCrypto",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Event",
+        "printedName": "Event",
+        "declKind": "Protocol",
+        "usr": "s:20tuvali_ios_framework5EventP",
+        "mangledName": "$s20tuvali_ios_framework5EventP",
+        "moduleName": "tuvali_ios_framework",
+        "declAttributes": [
+          "AccessControl"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Gzip",
+        "printedName": "Gzip",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CryptoKit",
+        "printedName": "CryptoKit",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Wallet",
+        "printedName": "Wallet",
+        "children": [
+          {
+            "kind": "Constructor",
+            "name": "init",
+            "printedName": "init()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Wallet",
+                "printedName": "tuvali_ios_framework.Wallet",
+                "usr": "s:20tuvali_ios_framework6WalletC"
+              }
+            ],
+            "declKind": "Constructor",
+            "usr": "s:20tuvali_ios_framework6WalletCACycfc",
+            "mangledName": "$s20tuvali_ios_framework6WalletCACycfc",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "init_kind": "Designated"
+          },
+          {
+            "kind": "Function",
+            "name": "startConnection",
+            "printedName": "startConnection(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:20tuvali_ios_framework6WalletC15startConnectionyySSF",
+            "mangledName": "$s20tuvali_ios_framework6WalletC15startConnectionyySSF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "disconnect",
+            "printedName": "disconnect()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:20tuvali_ios_framework6WalletC10disconnectyyF",
+            "mangledName": "$s20tuvali_ios_framework6WalletC10disconnectyyF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "send",
+            "printedName": "send(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:20tuvali_ios_framework6WalletC4sendyySSF",
+            "mangledName": "$s20tuvali_ios_framework6WalletC4sendyySSF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "subscribe",
+            "printedName": "subscribe(_:)",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              },
+              {
+                "kind": "TypeFunc",
+                "name": "Function",
+                "printedName": "(any tuvali_ios_framework.Event) -> ()",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Void",
+                    "printedName": "()"
+                  },
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Event",
+                    "printedName": "any tuvali_ios_framework.Event",
+                    "usr": "s:20tuvali_ios_framework5EventP"
+                  }
+                ]
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:20tuvali_ios_framework6WalletC9subscribeyyyAA5Event_pcF",
+            "mangledName": "$s20tuvali_ios_framework6WalletC9subscribeyyyAA5Event_pcF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "unsubscribe",
+            "printedName": "unsubscribe()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Void",
+                "printedName": "()"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:20tuvali_ios_framework6WalletC11unsubscribeyyF",
+            "mangledName": "$s20tuvali_ios_framework6WalletC11unsubscribeyyF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Class",
+        "usr": "s:20tuvali_ios_framework6WalletC",
+        "mangledName": "$s20tuvali_ios_framework6WalletC",
+        "moduleName": "tuvali_ios_framework",
+        "declAttributes": [
+          "AccessControl"
+        ]
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "Foundation",
+        "printedName": "Foundation",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "CoreBluetooth",
+        "printedName": "CoreBluetooth",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "Import",
+        "name": "os",
+        "printedName": "os",
+        "declKind": "Import",
+        "moduleName": "tuvali_ios_framework"
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "Data",
+        "printedName": "Data",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "sha256",
+            "printedName": "sha256()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:10Foundation4DataV20tuvali_ios_frameworkE6sha256SSyF",
+            "mangledName": "$s10Foundation4DataV20tuvali_ios_frameworkE6sha256SSyF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          },
+          {
+            "kind": "Function",
+            "name": "toInt",
+            "printedName": "toInt()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "Int",
+                "printedName": "Swift.Int",
+                "usr": "s:Si"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:10Foundation4DataV20tuvali_ios_frameworkE5toIntSiyF",
+            "mangledName": "$s10Foundation4DataV20tuvali_ios_frameworkE5toIntSiyF",
+            "moduleName": "tuvali_ios_framework",
+            "declAttributes": [
+              "AccessControl"
+            ],
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:10Foundation4DataV",
+        "mangledName": "$s10Foundation4DataV",
+        "moduleName": "Foundation",
+        "intro_Macosx": "10.10",
+        "intro_iOS": "8.0",
+        "intro_tvOS": "9.0",
+        "intro_watchOS": "2.0",
+        "declAttributes": [
+          "Frozen",
+          "Available",
+          "Available",
+          "Available",
+          "Available"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "RandomAccessCollection",
+            "printedName": "RandomAccessCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Data",
+                    "printedName": "Foundation.Data",
+                    "usr": "s:10Foundation4DataV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Indices",
+                "printedName": "Indices",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Range",
+                    "printedName": "Swift.Range<Swift.Int>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sn"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sk",
+            "mangledName": "$sSk"
+          },
+          {
+            "kind": "Conformance",
+            "name": "MutableCollection",
+            "printedName": "MutableCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Data",
+                    "printedName": "Foundation.Data",
+                    "usr": "s:10Foundation4DataV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:SM",
+            "mangledName": "$sSM"
+          },
+          {
+            "kind": "Conformance",
+            "name": "RangeReplaceableCollection",
+            "printedName": "RangeReplaceableCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Data",
+                    "printedName": "Foundation.Data",
+                    "usr": "s:10Foundation4DataV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sm",
+            "mangledName": "$sSm"
+          },
+          {
+            "kind": "Conformance",
+            "name": "MutableDataProtocol",
+            "printedName": "MutableDataProtocol",
+            "usr": "s:10Foundation19MutableDataProtocolP",
+            "mangledName": "$s10Foundation19MutableDataProtocolP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ContiguousBytes",
+            "printedName": "ContiguousBytes",
+            "usr": "s:10Foundation15ContiguousBytesP",
+            "mangledName": "$s10Foundation15ContiguousBytesP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "BidirectionalCollection",
+            "printedName": "BidirectionalCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Data",
+                    "printedName": "Foundation.Data",
+                    "usr": "s:10Foundation4DataV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Indices",
+                "printedName": "Indices",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Range",
+                    "printedName": "Swift.Range<Swift.Int>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sn"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:SK",
+            "mangledName": "$sSK"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Collection",
+            "printedName": "Collection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Int",
+                    "printedName": "Swift.Int",
+                    "usr": "s:Si"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Iterator",
+                    "printedName": "Foundation.Data.Iterator",
+                    "usr": "s:10Foundation4DataV8IteratorV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Data",
+                    "printedName": "Foundation.Data",
+                    "usr": "s:10Foundation4DataV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Indices",
+                "printedName": "Indices",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Range",
+                    "printedName": "Swift.Range<Swift.Int>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Int",
+                        "printedName": "Swift.Int",
+                        "usr": "s:Si"
+                      }
+                    ],
+                    "usr": "s:Sn"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sl",
+            "mangledName": "$sSl"
+          },
+          {
+            "kind": "Conformance",
+            "name": "DataProtocol",
+            "printedName": "DataProtocol",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Regions",
+                "printedName": "Regions",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "CollectionOfOne",
+                    "printedName": "Swift.CollectionOfOne<Foundation.Data>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "Data",
+                        "printedName": "Foundation.Data",
+                        "usr": "s:10Foundation4DataV"
+                      }
+                    ],
+                    "usr": "s:s15CollectionOfOneV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:10Foundation12DataProtocolP",
+            "mangledName": "$s10Foundation12DataProtocolP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UInt8",
+                    "printedName": "Swift.UInt8",
+                    "usr": "s:s5UInt8V"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Iterator",
+                    "printedName": "Foundation.Data.Iterator",
+                    "usr": "s:10Foundation4DataV8IteratorV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ReferenceConvertible",
+            "printedName": "ReferenceConvertible",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "ReferenceType",
+                "printedName": "ReferenceType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSData",
+                    "printedName": "Foundation.NSData",
+                    "usr": "c:objc(cs)NSData"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:10Foundation20ReferenceConvertibleP",
+            "mangledName": "$s10Foundation20ReferenceConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_ObjectiveCBridgeable",
+            "printedName": "_ObjectiveCBridgeable",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "_ObjectiveCType",
+                "printedName": "_ObjectiveCType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSData",
+                    "printedName": "Foundation.NSData",
+                    "usr": "c:objc(cs)NSData"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s21_ObjectiveCBridgeableP",
+            "mangledName": "$ss21_ObjectiveCBridgeableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomReflectable",
+            "printedName": "CustomReflectable",
+            "usr": "s:s17CustomReflectableP",
+            "mangledName": "$ss17CustomReflectableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Decodable",
+            "printedName": "Decodable",
+            "usr": "s:Se",
+            "mangledName": "$sSe"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Encodable",
+            "printedName": "Encodable",
+            "usr": "s:SE",
+            "mangledName": "$sSE"
+          }
+        ]
+      },
+      {
+        "kind": "TypeDecl",
+        "name": "String",
+        "printedName": "String",
+        "children": [
+          {
+            "kind": "Function",
+            "name": "sha256",
+            "printedName": "sha256()",
+            "children": [
+              {
+                "kind": "TypeNominal",
+                "name": "String",
+                "printedName": "Swift.String",
+                "usr": "s:SS"
+              }
+            ],
+            "declKind": "Func",
+            "usr": "s:SS20tuvali_ios_frameworkE6sha256SSyF",
+            "mangledName": "$sSS20tuvali_ios_frameworkE6sha256SSyF",
+            "moduleName": "tuvali_ios_framework",
+            "isFromExtension": true,
+            "funcSelfKind": "NonMutating"
+          }
+        ],
+        "declKind": "Struct",
+        "usr": "s:SS",
+        "mangledName": "$sSS",
+        "moduleName": "Swift",
+        "declAttributes": [
+          "EagerMove",
+          "Frozen"
+        ],
+        "isExternal": true,
+        "conformances": [
+          {
+            "kind": "Conformance",
+            "name": "Decodable",
+            "printedName": "Decodable",
+            "usr": "s:Se",
+            "mangledName": "$sSe"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Encodable",
+            "printedName": "Encodable",
+            "usr": "s:SE",
+            "mangledName": "$sSE"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CodingKeyRepresentable",
+            "printedName": "CodingKeyRepresentable",
+            "usr": "s:s22CodingKeyRepresentableP",
+            "mangledName": "$ss22CodingKeyRepresentableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_HasContiguousBytes",
+            "printedName": "_HasContiguousBytes",
+            "usr": "s:s19_HasContiguousBytesP",
+            "mangledName": "$ss19_HasContiguousBytesP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomReflectable",
+            "printedName": "CustomReflectable",
+            "usr": "s:s17CustomReflectableP",
+            "mangledName": "$ss17CustomReflectableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_CustomPlaygroundQuickLookable",
+            "printedName": "_CustomPlaygroundQuickLookable",
+            "usr": "s:s30_CustomPlaygroundQuickLookableP",
+            "mangledName": "$ss30_CustomPlaygroundQuickLookableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "TextOutputStream",
+            "printedName": "TextOutputStream",
+            "usr": "s:s16TextOutputStreamP",
+            "mangledName": "$ss16TextOutputStreamP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "TextOutputStreamable",
+            "printedName": "TextOutputStreamable",
+            "usr": "s:s20TextOutputStreamableP",
+            "mangledName": "$ss20TextOutputStreamableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Hashable",
+            "printedName": "Hashable",
+            "usr": "s:SH",
+            "mangledName": "$sSH"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sendable",
+            "printedName": "Sendable",
+            "usr": "s:s8SendableP",
+            "mangledName": "$ss8SendableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_ExpressibleByBuiltinUnicodeScalarLiteral",
+            "printedName": "_ExpressibleByBuiltinUnicodeScalarLiteral",
+            "usr": "s:s41_ExpressibleByBuiltinUnicodeScalarLiteralP",
+            "mangledName": "$ss41_ExpressibleByBuiltinUnicodeScalarLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_ExpressibleByBuiltinExtendedGraphemeClusterLiteral",
+            "printedName": "_ExpressibleByBuiltinExtendedGraphemeClusterLiteral",
+            "usr": "s:s51_ExpressibleByBuiltinExtendedGraphemeClusterLiteralP",
+            "mangledName": "$ss51_ExpressibleByBuiltinExtendedGraphemeClusterLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_ExpressibleByBuiltinStringLiteral",
+            "printedName": "_ExpressibleByBuiltinStringLiteral",
+            "usr": "s:s34_ExpressibleByBuiltinStringLiteralP",
+            "mangledName": "$ss34_ExpressibleByBuiltinStringLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ExpressibleByStringLiteral",
+            "printedName": "ExpressibleByStringLiteral",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "StringLiteralType",
+                "printedName": "StringLiteralType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s26ExpressibleByStringLiteralP",
+            "mangledName": "$ss26ExpressibleByStringLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ExpressibleByExtendedGraphemeClusterLiteral",
+            "printedName": "ExpressibleByExtendedGraphemeClusterLiteral",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "ExtendedGraphemeClusterLiteralType",
+                "printedName": "ExtendedGraphemeClusterLiteralType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s43ExpressibleByExtendedGraphemeClusterLiteralP",
+            "mangledName": "$ss43ExpressibleByExtendedGraphemeClusterLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ExpressibleByUnicodeScalarLiteral",
+            "printedName": "ExpressibleByUnicodeScalarLiteral",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "UnicodeScalarLiteralType",
+                "printedName": "UnicodeScalarLiteralType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "String",
+                    "printedName": "Swift.String",
+                    "usr": "s:SS"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s33ExpressibleByUnicodeScalarLiteralP",
+            "mangledName": "$ss33ExpressibleByUnicodeScalarLiteralP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomDebugStringConvertible",
+            "printedName": "CustomDebugStringConvertible",
+            "usr": "s:s28CustomDebugStringConvertibleP",
+            "mangledName": "$ss28CustomDebugStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CustomStringConvertible",
+            "printedName": "CustomStringConvertible",
+            "usr": "s:s23CustomStringConvertibleP",
+            "mangledName": "$ss23CustomStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "BidirectionalCollection",
+            "printedName": "BidirectionalCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Character",
+                    "printedName": "Swift.Character",
+                    "usr": "s:SJ"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Index",
+                    "printedName": "Swift.String.Index",
+                    "usr": "s:SS5IndexV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Substring",
+                    "printedName": "Swift.Substring",
+                    "usr": "s:Ss"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Indices",
+                "printedName": "Indices",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DefaultIndices",
+                    "printedName": "Swift.DefaultIndices<Swift.String>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:SI"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:SK",
+            "mangledName": "$sSK"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Collection",
+            "printedName": "Collection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Character",
+                    "printedName": "Swift.Character",
+                    "usr": "s:SJ"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Index",
+                "printedName": "Index",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Index",
+                    "printedName": "Swift.String.Index",
+                    "usr": "s:SS5IndexV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Iterator",
+                    "printedName": "Swift.String.Iterator",
+                    "usr": "s:SS8IteratorV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Substring",
+                    "printedName": "Swift.Substring",
+                    "usr": "s:Ss"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Indices",
+                "printedName": "Indices",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DefaultIndices",
+                    "printedName": "Swift.DefaultIndices<Swift.String>",
+                    "children": [
+                      {
+                        "kind": "TypeNominal",
+                        "name": "String",
+                        "printedName": "Swift.String",
+                        "usr": "s:SS"
+                      }
+                    ],
+                    "usr": "s:SI"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sl",
+            "mangledName": "$sSl"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Sequence",
+            "printedName": "Sequence",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "Element",
+                "printedName": "Element",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Character",
+                    "printedName": "Swift.Character",
+                    "usr": "s:SJ"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "Iterator",
+                "printedName": "Iterator",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Iterator",
+                    "printedName": "Swift.String.Iterator",
+                    "usr": "s:SS8IteratorV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:ST",
+            "mangledName": "$sST"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Equatable",
+            "printedName": "Equatable",
+            "usr": "s:SQ",
+            "mangledName": "$sSQ"
+          },
+          {
+            "kind": "Conformance",
+            "name": "Comparable",
+            "printedName": "Comparable",
+            "usr": "s:SL",
+            "mangledName": "$sSL"
+          },
+          {
+            "kind": "Conformance",
+            "name": "StringProtocol",
+            "printedName": "StringProtocol",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "UTF8View",
+                "printedName": "UTF8View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTF8View",
+                    "printedName": "Swift.String.UTF8View",
+                    "usr": "s:SS8UTF8ViewV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "UTF16View",
+                "printedName": "UTF16View",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UTF16View",
+                    "printedName": "Swift.String.UTF16View",
+                    "usr": "s:SS9UTF16ViewV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "UnicodeScalarView",
+                "printedName": "UnicodeScalarView",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "UnicodeScalarView",
+                    "printedName": "Swift.String.UnicodeScalarView",
+                    "usr": "s:SS17UnicodeScalarViewV"
+                  }
+                ]
+              },
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Substring",
+                    "printedName": "Swift.Substring",
+                    "usr": "s:Ss"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sy",
+            "mangledName": "$sSy"
+          },
+          {
+            "kind": "Conformance",
+            "name": "ExpressibleByStringInterpolation",
+            "printedName": "ExpressibleByStringInterpolation",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "StringInterpolation",
+                "printedName": "StringInterpolation",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "DefaultStringInterpolation",
+                    "printedName": "Swift.DefaultStringInterpolation",
+                    "usr": "s:s26DefaultStringInterpolationV"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s32ExpressibleByStringInterpolationP",
+            "mangledName": "$ss32ExpressibleByStringInterpolationP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "LosslessStringConvertible",
+            "printedName": "LosslessStringConvertible",
+            "usr": "s:s25LosslessStringConvertibleP",
+            "mangledName": "$ss25LosslessStringConvertibleP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "RangeReplaceableCollection",
+            "printedName": "RangeReplaceableCollection",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "SubSequence",
+                "printedName": "SubSequence",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "Substring",
+                    "printedName": "Swift.Substring",
+                    "usr": "s:Ss"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:Sm",
+            "mangledName": "$sSm"
+          },
+          {
+            "kind": "Conformance",
+            "name": "MirrorPath",
+            "printedName": "MirrorPath",
+            "usr": "s:s10MirrorPathP",
+            "mangledName": "$ss10MirrorPathP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "_ObjectiveCBridgeable",
+            "printedName": "_ObjectiveCBridgeable",
+            "children": [
+              {
+                "kind": "TypeWitness",
+                "name": "_ObjectiveCType",
+                "printedName": "_ObjectiveCType",
+                "children": [
+                  {
+                    "kind": "TypeNominal",
+                    "name": "NSString",
+                    "printedName": "Foundation.NSString",
+                    "usr": "c:objc(cs)NSString"
+                  }
+                ]
+              }
+            ],
+            "usr": "s:s21_ObjectiveCBridgeableP",
+            "mangledName": "$ss21_ObjectiveCBridgeableP"
+          },
+          {
+            "kind": "Conformance",
+            "name": "CVarArg",
+            "printedName": "CVarArg",
+            "usr": "s:s7CVarArgP",
+            "mangledName": "$ss7CVarArgP"
+          }
+        ]
+      }
+    ],
+    "json_format_version": 8
+  },
+  "ConstValues": [
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/Openid4vpBleURI.swift",
+      "kind": "StringLiteral",
+      "offset": 65,
+      "length": 11,
+      "value": "\"OPENID4VP\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 51,
+      "length": 1,
+      "value": "5"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 88,
+      "length": 3,
+      "value": "100"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 132,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 163,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 222,
+      "length": 2,
+      "value": "10"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 251,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 285,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/BackOffStrategy.swift",
+      "kind": "IntegerLiteral",
+      "offset": 323,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 251,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 371,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 421,
+      "length": 2,
+      "value": "15"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7182,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7209,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7228,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7182,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7209,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7228,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7182,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7209,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferHandler.swift",
+      "kind": "IntegerLiteral",
+      "offset": 7228,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/EventEmitter.swift",
+      "kind": "Array",
+      "offset": 81,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/crypto\/Utils\/CryptoConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 81,
+      "length": 2,
+      "value": "16"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/crypto\/Utils\/CryptoConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 115,
+      "length": 2,
+      "value": "32"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/crypto\/Utils\/CryptoConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 148,
+      "length": 2,
+      "value": "12"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/crypto\/Utils\/CryptoConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 187,
+      "length": 12,
+      "value": "\"SKVerifier\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/crypto\/Utils\/CryptoConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 229,
+      "length": 10,
+      "value": "\"SKWallet\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 145,
+      "length": 1,
+      "value": "4"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 171,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 145,
+      "length": 1,
+      "value": "4"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 171,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 145,
+      "length": 1,
+      "value": "4"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Util.swift",
+      "kind": "IntegerLiteral",
+      "offset": 171,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/chunker.swift",
+      "kind": "StringLiteral",
+      "offset": 335,
+      "length": 9,
+      "value": "\"Chunker\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/chunker.swift",
+      "kind": "IntegerLiteral",
+      "offset": 386,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/chunker.swift",
+      "kind": "Array",
+      "offset": 430,
+      "length": 2,
+      "value": "[]"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 154,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 180,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 154,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 180,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 154,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/common\/events\/VerificationStatusEvent.swift",
+      "kind": "IntegerLiteral",
+      "offset": 180,
+      "length": 1,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Peripheral.swift",
+      "kind": "StringLiteral",
+      "offset": 199,
+      "length": 38,
+      "value": "\"0000AB29-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Peripheral.swift",
+      "kind": "StringLiteral",
+      "offset": 298,
+      "length": 38,
+      "value": "\"0000AB2A-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 107,
+      "length": 38,
+      "value": "\"0000AB29-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 206,
+      "length": 38,
+      "value": "\"0000AB2A-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 278,
+      "length": 2,
+      "value": "\"\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 365,
+      "length": 3,
+      "value": "512"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 412,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 451,
+      "length": 1,
+      "value": "2"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "StringLiteral",
+      "offset": 498,
+      "length": 31,
+      "value": "\"{\"deviceName\":\"Verifier\"}\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/BLEConstants.swift",
+      "kind": "IntegerLiteral",
+      "offset": 754,
+      "length": 3,
+      "value": "509"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/Wallet\/WalletBleCommunicator.swift",
+      "kind": "StringLiteral",
+      "offset": 406,
+      "length": 31,
+      "value": "\"{\"deviceName\":\"Verifier\"}\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3404,
+      "length": 38,
+      "value": "\"00002030-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3477,
+      "length": 38,
+      "value": "\"00002031-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3545,
+      "length": 38,
+      "value": "\"00002032-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3619,
+      "length": 38,
+      "value": "\"00002033-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3695,
+      "length": 38,
+      "value": "\"00002034-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3779,
+      "length": 38,
+      "value": "\"00002035-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3864,
+      "length": 38,
+      "value": "\"00002036-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3944,
+      "length": 38,
+      "value": "\"00002037-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4015,
+      "length": 38,
+      "value": "\"00002038-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3404,
+      "length": 38,
+      "value": "\"00002030-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3477,
+      "length": 38,
+      "value": "\"00002031-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3545,
+      "length": 38,
+      "value": "\"00002032-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3619,
+      "length": 38,
+      "value": "\"00002033-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3695,
+      "length": 38,
+      "value": "\"00002034-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3779,
+      "length": 38,
+      "value": "\"00002035-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3864,
+      "length": 38,
+      "value": "\"00002036-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 3944,
+      "length": 38,
+      "value": "\"00002037-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4015,
+      "length": 38,
+      "value": "\"00002038-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4119,
+      "length": 38,
+      "value": "\"00002030-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4301,
+      "length": 38,
+      "value": "\"00002031-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4469,
+      "length": 38,
+      "value": "\"00002032-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4637,
+      "length": 38,
+      "value": "\"00002033-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 4819,
+      "length": 38,
+      "value": "\"00002034-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5001,
+      "length": 38,
+      "value": "\"00002035-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5183,
+      "length": 38,
+      "value": "\"00002036-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5344,
+      "length": 38,
+      "value": "\"00002037-0000-1000-8000-00805f9b34fb\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5588,
+      "length": 6,
+      "value": "\"2030\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5651,
+      "length": 6,
+      "value": "\"2031\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5709,
+      "length": 6,
+      "value": "\"2032\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5773,
+      "length": 6,
+      "value": "\"2033\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5839,
+      "length": 6,
+      "value": "\"2034\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5913,
+      "length": 6,
+      "value": "\"2035\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 5988,
+      "length": 6,
+      "value": "\"2036\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6058,
+      "length": 6,
+      "value": "\"2037\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6119,
+      "length": 6,
+      "value": "\"2038\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6197,
+      "length": 24,
+      "value": "\"EXCHANGE_RECEIVER_INFO\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6251,
+      "length": 19,
+      "value": "\"CREATE_CONNECTION\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6310,
+      "length": 29,
+      "value": "\"RESPONSE_SIZE_WRITE_SUCCESS\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6378,
+      "length": 28,
+      "value": "\"HANDLE_TRANSMISSION_REPORT\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6447,
+      "length": 30,
+      "value": "\"INIT_RESPONSE_CHUNK_TRANSFER\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6518,
+      "length": 30,
+      "value": "\"VERIFICATION_STATUS_RESPONSE\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6585,
+      "length": 26,
+      "value": "\"DISCONNECT_STATUS_CHANGE\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6629,
+      "length": 7,
+      "value": "\"ERROR\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6197,
+      "length": 24,
+      "value": "\"EXCHANGE_RECEIVER_INFO\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6251,
+      "length": 19,
+      "value": "\"CREATE_CONNECTION\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6310,
+      "length": 29,
+      "value": "\"RESPONSE_SIZE_WRITE_SUCCESS\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6378,
+      "length": 28,
+      "value": "\"HANDLE_TRANSMISSION_REPORT\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6447,
+      "length": 30,
+      "value": "\"INIT_RESPONSE_CHUNK_TRANSFER\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6518,
+      "length": 30,
+      "value": "\"VERIFICATION_STATUS_RESPONSE\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6585,
+      "length": 26,
+      "value": "\"DISCONNECT_STATUS_CHANGE\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/peripheral\/Characteristics.swift",
+      "kind": "StringLiteral",
+      "offset": 6629,
+      "length": 7,
+      "value": "\"ERROR\""
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 764,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 767,
+      "length": 7,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 764,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 767,
+      "length": 7,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 764,
+      "length": 1,
+      "value": "0"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/Utility\/TransferReport.swift",
+      "kind": "IntegerLiteral",
+      "offset": 767,
+      "length": 7,
+      "value": "1"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/central\/Central.swift",
+      "kind": "IntegerLiteral",
+      "offset": 203,
+      "length": 2,
+      "value": "10"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/central\/Central.swift",
+      "kind": "IntegerLiteral",
+      "offset": 285,
+      "length": 1,
+      "value": "5"
+    },
+    {
+      "filePath": "\/Users\/abhishekpaul\/Documents\/tuvali\/ios\/ble\/central\/Central.swift",
+      "kind": "Dictionary",
+      "offset": 429,
+      "length": 3,
+      "value": "[]"
+    }
+  ]
+}

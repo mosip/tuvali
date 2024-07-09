@@ -1,0 +1,667 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 60;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		9C43FD142BB6AA7C001C5F6F /* ios-tuvali-library in Frameworks */ = {isa = PBXBuildFile; productRef = 9C43FD132BB6AA7C001C5F6F /* ios-tuvali-library */; };
+		9C9A70952BAAAEB600EF9D0E /* demo_app_tuvaliApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9A70942BAAAEB600EF9D0E /* demo_app_tuvaliApp.swift */; };
+		9C9A70972BAAAEB600EF9D0E /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9A70962BAAAEB600EF9D0E /* ContentView.swift */; };
+		9C9A70992BAAAEB900EF9D0E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9C9A70982BAAAEB900EF9D0E /* Assets.xcassets */; };
+		9C9A709D2BAAAEB900EF9D0E /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 9C9A709C2BAAAEB900EF9D0E /* Preview Assets.xcassets */; };
+		9C9A70A72BAAAEB900EF9D0E /* demo_app_tuvaliTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9A70A62BAAAEB900EF9D0E /* demo_app_tuvaliTests.swift */; };
+		9C9A70B12BAAAEB900EF9D0E /* demo_app_tuvaliUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9A70B02BAAAEB900EF9D0E /* demo_app_tuvaliUITests.swift */; };
+		9C9A70B32BAAAEB900EF9D0E /* demo_app_tuvaliUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9C9A70B22BAAAEB900EF9D0E /* demo_app_tuvaliUITestsLaunchTests.swift */; };
+		9CF43DEF2BB6B556008CB8B1 /* ios-tuvali-library in Frameworks */ = {isa = PBXBuildFile; productRef = 9CF43DEE2BB6B556008CB8B1 /* ios-tuvali-library */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		9C9A70A32BAAAEB900EF9D0E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C9A70892BAAAEB600EF9D0E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9C9A70902BAAAEB600EF9D0E;
+			remoteInfo = "demo-app-tuvali";
+		};
+		9C9A70AD2BAAAEB900EF9D0E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 9C9A70892BAAAEB600EF9D0E /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 9C9A70902BAAAEB600EF9D0E;
+			remoteInfo = "demo-app-tuvali";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		9C9A70CF2BAADC8800EF9D0E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A70D92BAAE40B00EF9D0E /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		9C9A70912BAAAEB600EF9D0E /* demo-app-tuvali.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "demo-app-tuvali.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C9A70942BAAAEB600EF9D0E /* demo_app_tuvaliApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = demo_app_tuvaliApp.swift; sourceTree = "<group>"; };
+		9C9A70962BAAAEB600EF9D0E /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		9C9A70982BAAAEB900EF9D0E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		9C9A709A2BAAAEB900EF9D0E /* demo_app_tuvali.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = demo_app_tuvali.entitlements; sourceTree = "<group>"; };
+		9C9A709C2BAAAEB900EF9D0E /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
+		9C9A70A22BAAAEB900EF9D0E /* demo-app-tuvaliTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "demo-app-tuvaliTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C9A70A62BAAAEB900EF9D0E /* demo_app_tuvaliTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = demo_app_tuvaliTests.swift; sourceTree = "<group>"; };
+		9C9A70AC2BAAAEB900EF9D0E /* demo-app-tuvaliUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "demo-app-tuvaliUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		9C9A70B02BAAAEB900EF9D0E /* demo_app_tuvaliUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = demo_app_tuvaliUITests.swift; sourceTree = "<group>"; };
+		9C9A70B22BAAAEB900EF9D0E /* demo_app_tuvaliUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = demo_app_tuvaliUITestsLaunchTests.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		9C9A708E2BAAAEB600EF9D0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C43FD142BB6AA7C001C5F6F /* ios-tuvali-library in Frameworks */,
+				9CF43DEF2BB6B556008CB8B1 /* ios-tuvali-library in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A709F2BAAAEB900EF9D0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A70A92BAAAEB900EF9D0E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		9C9A70882BAAAEB600EF9D0E = {
+			isa = PBXGroup;
+			children = (
+				9C9A70932BAAAEB600EF9D0E /* demo-app-tuvali */,
+				9C9A70A52BAAAEB900EF9D0E /* demo-app-tuvaliTests */,
+				9C9A70AF2BAAAEB900EF9D0E /* demo-app-tuvaliUITests */,
+				9C9A70922BAAAEB600EF9D0E /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		9C9A70922BAAAEB600EF9D0E /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				9C9A70912BAAAEB600EF9D0E /* demo-app-tuvali.app */,
+				9C9A70A22BAAAEB900EF9D0E /* demo-app-tuvaliTests.xctest */,
+				9C9A70AC2BAAAEB900EF9D0E /* demo-app-tuvaliUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		9C9A70932BAAAEB600EF9D0E /* demo-app-tuvali */ = {
+			isa = PBXGroup;
+			children = (
+				9C9A70942BAAAEB600EF9D0E /* demo_app_tuvaliApp.swift */,
+				9C9A70962BAAAEB600EF9D0E /* ContentView.swift */,
+				9C9A70982BAAAEB900EF9D0E /* Assets.xcassets */,
+				9C9A709A2BAAAEB900EF9D0E /* demo_app_tuvali.entitlements */,
+				9C9A709B2BAAAEB900EF9D0E /* Preview Content */,
+			);
+			path = "demo-app-tuvali";
+			sourceTree = "<group>";
+		};
+		9C9A709B2BAAAEB900EF9D0E /* Preview Content */ = {
+			isa = PBXGroup;
+			children = (
+				9C9A709C2BAAAEB900EF9D0E /* Preview Assets.xcassets */,
+			);
+			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		9C9A70A52BAAAEB900EF9D0E /* demo-app-tuvaliTests */ = {
+			isa = PBXGroup;
+			children = (
+				9C9A70A62BAAAEB900EF9D0E /* demo_app_tuvaliTests.swift */,
+			);
+			path = "demo-app-tuvaliTests";
+			sourceTree = "<group>";
+		};
+		9C9A70AF2BAAAEB900EF9D0E /* demo-app-tuvaliUITests */ = {
+			isa = PBXGroup;
+			children = (
+				9C9A70B02BAAAEB900EF9D0E /* demo_app_tuvaliUITests.swift */,
+				9C9A70B22BAAAEB900EF9D0E /* demo_app_tuvaliUITestsLaunchTests.swift */,
+			);
+			path = "demo-app-tuvaliUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		9C9A70902BAAAEB600EF9D0E /* demo-app-tuvali */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C9A70B62BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvali" */;
+			buildPhases = (
+				9C9A708D2BAAAEB600EF9D0E /* Sources */,
+				9C9A708E2BAAAEB600EF9D0E /* Frameworks */,
+				9C9A708F2BAAAEB600EF9D0E /* Resources */,
+				9C9A70D92BAAE40B00EF9D0E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "demo-app-tuvali";
+			packageProductDependencies = (
+				9C43FD132BB6AA7C001C5F6F /* ios-tuvali-library */,
+				9CF43DEE2BB6B556008CB8B1 /* ios-tuvali-library */,
+			);
+			productName = "demo-app-tuvali";
+			productReference = 9C9A70912BAAAEB600EF9D0E /* demo-app-tuvali.app */;
+			productType = "com.apple.product-type.application";
+		};
+		9C9A70A12BAAAEB900EF9D0E /* demo-app-tuvaliTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C9A70B92BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvaliTests" */;
+			buildPhases = (
+				9C9A709E2BAAAEB900EF9D0E /* Sources */,
+				9C9A709F2BAAAEB900EF9D0E /* Frameworks */,
+				9C9A70A02BAAAEB900EF9D0E /* Resources */,
+				9C9A70CF2BAADC8800EF9D0E /* Embed Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9C9A70A42BAAAEB900EF9D0E /* PBXTargetDependency */,
+			);
+			name = "demo-app-tuvaliTests";
+			productName = "demo-app-tuvaliTests";
+			productReference = 9C9A70A22BAAAEB900EF9D0E /* demo-app-tuvaliTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		9C9A70AB2BAAAEB900EF9D0E /* demo-app-tuvaliUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 9C9A70BC2BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvaliUITests" */;
+			buildPhases = (
+				9C9A70A82BAAAEB900EF9D0E /* Sources */,
+				9C9A70A92BAAAEB900EF9D0E /* Frameworks */,
+				9C9A70AA2BAAAEB900EF9D0E /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				9C9A70AE2BAAAEB900EF9D0E /* PBXTargetDependency */,
+			);
+			name = "demo-app-tuvaliUITests";
+			productName = "demo-app-tuvaliUITests";
+			productReference = 9C9A70AC2BAAAEB900EF9D0E /* demo-app-tuvaliUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		9C9A70892BAAAEB600EF9D0E /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1530;
+				LastUpgradeCheck = 1530;
+				TargetAttributes = {
+					9C9A70902BAAAEB600EF9D0E = {
+						CreatedOnToolsVersion = 15.3;
+					};
+					9C9A70A12BAAAEB900EF9D0E = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = 9C9A70902BAAAEB600EF9D0E;
+					};
+					9C9A70AB2BAAAEB900EF9D0E = {
+						CreatedOnToolsVersion = 15.3;
+						TestTargetID = 9C9A70902BAAAEB600EF9D0E;
+					};
+				};
+			};
+			buildConfigurationList = 9C9A708C2BAAAEB600EF9D0E /* Build configuration list for PBXProject "demo-app-tuvali" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = 9C9A70882BAAAEB600EF9D0E;
+			packageReferences = (
+				9CF43DED2BB6B556008CB8B1 /* XCLocalSwiftPackageReference "../../../../ios-tuvali-library" */,
+			);
+			productRefGroup = 9C9A70922BAAAEB600EF9D0E /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				9C9A70902BAAAEB600EF9D0E /* demo-app-tuvali */,
+				9C9A70A12BAAAEB900EF9D0E /* demo-app-tuvaliTests */,
+				9C9A70AB2BAAAEB900EF9D0E /* demo-app-tuvaliUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		9C9A708F2BAAAEB600EF9D0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9A709D2BAAAEB900EF9D0E /* Preview Assets.xcassets in Resources */,
+				9C9A70992BAAAEB900EF9D0E /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A70A02BAAAEB900EF9D0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A70AA2BAAAEB900EF9D0E /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		9C9A708D2BAAAEB600EF9D0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9A70972BAAAEB600EF9D0E /* ContentView.swift in Sources */,
+				9C9A70952BAAAEB600EF9D0E /* demo_app_tuvaliApp.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A709E2BAAAEB900EF9D0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9A70A72BAAAEB900EF9D0E /* demo_app_tuvaliTests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		9C9A70A82BAAAEB900EF9D0E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				9C9A70B32BAAAEB900EF9D0E /* demo_app_tuvaliUITestsLaunchTests.swift in Sources */,
+				9C9A70B12BAAAEB900EF9D0E /* demo_app_tuvaliUITests.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		9C9A70A42BAAAEB900EF9D0E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9C9A70902BAAAEB600EF9D0E /* demo-app-tuvali */;
+			targetProxy = 9C9A70A32BAAAEB900EF9D0E /* PBXContainerItemProxy */;
+		};
+		9C9A70AE2BAAAEB900EF9D0E /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 9C9A70902BAAAEB600EF9D0E /* demo-app-tuvali */;
+			targetProxy = 9C9A70AD2BAAAEB900EF9D0E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		9C9A70B42BAAAEB900EF9D0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				"FRAMEWORK_SEARCH_PATHS[arch=*]" = "/Users/abhishekpaul/Desktop/demo-app-tuvali";
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		9C9A70B52BAAAEB900EF9D0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		9C9A70B72BAAAEB900EF9D0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "demo-app-tuvali/demo_app_tuvali.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"demo-app-tuvali/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvali";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		9C9A70B82BAAAEB900EF9D0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = "demo-app-tuvali/demo_app_tuvali.entitlements";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_ASSET_PATHS = "\"demo-app-tuvali/Preview Content\"";
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphoneos*]" = YES;
+				"INFOPLIST_KEY_UILaunchScreen_Generation[sdk=iphonesimulator*]" = YES;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphoneos*]" = UIStatusBarStyleDefault;
+				"INFOPLIST_KEY_UIStatusBarStyle[sdk=iphonesimulator*]" = UIStatusBarStyleDefault;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				LD_RUNPATH_SEARCH_PATHS = "@executable_path/Frameworks";
+				"LD_RUNPATH_SEARCH_PATHS[sdk=macosx*]" = "@executable_path/../Frameworks";
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvali";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		9C9A70BA2BAAAEB900EF9D0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvaliTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/demo-app-tuvali.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/demo-app-tuvali";
+			};
+			name = Debug;
+		};
+		9C9A70BB2BAAAEB900EF9D0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvaliTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/demo-app-tuvali.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/demo-app-tuvali";
+			};
+			name = Release;
+		};
+		9C9A70BD2BAAAEB900EF9D0E /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvaliUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "demo-app-tuvali";
+			};
+			name = Debug;
+		};
+		9C9A70BE2BAAAEB900EF9D0E /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.4;
+				MACOSX_DEPLOYMENT_TARGET = 14.3;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "thoughtworks.demo-app-tuvaliUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = auto;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator macosx";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = "demo-app-tuvali";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		9C9A708C2BAAAEB600EF9D0E /* Build configuration list for PBXProject "demo-app-tuvali" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C9A70B42BAAAEB900EF9D0E /* Debug */,
+				9C9A70B52BAAAEB900EF9D0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9C9A70B62BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvali" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C9A70B72BAAAEB900EF9D0E /* Debug */,
+				9C9A70B82BAAAEB900EF9D0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9C9A70B92BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvaliTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C9A70BA2BAAAEB900EF9D0E /* Debug */,
+				9C9A70BB2BAAAEB900EF9D0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		9C9A70BC2BAAAEB900EF9D0E /* Build configuration list for PBXNativeTarget "demo-app-tuvaliUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				9C9A70BD2BAAAEB900EF9D0E /* Debug */,
+				9C9A70BE2BAAAEB900EF9D0E /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCLocalSwiftPackageReference section */
+		9CF43DED2BB6B556008CB8B1 /* XCLocalSwiftPackageReference "../../../../ios-tuvali-library" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "../../../../ios-tuvali-library";
+		};
+/* End XCLocalSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		9C43FD132BB6AA7C001C5F6F /* ios-tuvali-library */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "ios-tuvali-library";
+		};
+		9CF43DEE2BB6B556008CB8B1 /* ios-tuvali-library */ = {
+			isa = XCSwiftPackageProductDependency;
+			productName = "ios-tuvali-library";
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = 9C9A70892BAAAEB600EF9D0E /* Project object */;
+}

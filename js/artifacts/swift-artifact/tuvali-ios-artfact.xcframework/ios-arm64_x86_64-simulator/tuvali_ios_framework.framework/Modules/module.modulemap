@@ -1,0 +1,6 @@
+framework module tuvali_ios_framework {
+  umbrella header "tuvali_ios_framework.h"
+  export *
+
+  module * { export * }
+}

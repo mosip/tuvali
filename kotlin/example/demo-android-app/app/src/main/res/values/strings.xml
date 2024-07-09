@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Tuvali</string>
+    <string name="WALLET_BUTTON_NAME">Wallet</string>
+    <string name="VERIFIER_BUTTON_NAME">Verifier</string>
+    <string name="ScanningMessage">Scanning for verifier</string>
+    <string name="cancelButtonText">Cancel</string>
+    <string name="broadcastingMessage">Waiting for wallet to connect</string>
+    <string name="title_activity_chat">ChatActivity</string>
+    <string name="enter_message_hint">Enter Message</string>
+    <string name="request_permissions">Request Permissions</string>
+    <string name="waiting_for_data">Waiting for Data</string>
+    <string name="permission_error_message">You seem to have denied permissions required for the app, either retry requesting permissions or re-install app</string>
+    <string name="data_transfer"> Sending some random data from wallet to verifier</string>
+</resources>
