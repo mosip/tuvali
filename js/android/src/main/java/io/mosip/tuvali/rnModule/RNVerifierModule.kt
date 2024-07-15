@@ -1,14 +1,15 @@
 package io.mosip.tuvali.rnModule
 
+
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
 import io.mosip.tuvali.verifier.Verifier
 
 class RNVerifierModule(
-  private val eventEmitter: RNEventEmitter,
-  private val verifier: Verifier,
-  reactContext: ReactApplicationContext
+    private val eventEmitter: RNEventEmitter,
+    private val verifier: Verifier,
+    reactContext: ReactApplicationContext
 ) : ReactContextBaseJavaModule(reactContext) {
 
   init {

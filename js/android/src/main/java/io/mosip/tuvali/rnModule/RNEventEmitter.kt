@@ -1,13 +1,16 @@
 package io.mosip.tuvali.rnModule
 
+
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
+import io.mosip.tuvali.rnModule.IRNEventEmitter
 
 private const val EVENT_NAME = "DATA_EVENT"
 
 class RNEventEmitter(private val reactContext: ReactApplicationContext): IRNEventEmitter {
   override fun emitEvent(eventMap: WritableMap) {
-    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java).emit(EVENT_NAME, eventMap)
+    reactContext.getJSModule(DeviceEventManagerModule.RCTDeviceEventEmitter::class.java).emit(
+      EVENT_NAME, eventMap)
   }
 }
