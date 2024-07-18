@@ -21,34 +21,16 @@ The Tuvali kotlin artifact (.aar) has been published to Maven.
     }
   ```
 - In build.gradle.kts add the following:
-  ```kotlin
+  ``` kotlin
     dependencies {
-        implementation("io.mosip:tuvali:1.0-SNAPSHOT")
+        implementation("io.mosip:tuvali:0.5.0-SNAPSHOT")
     }
    ```
 The kotlin library has been added to your project.
 
 ## Usage as a Swift library (for native ios)
 
-- Download swift artifact (ios-tuvali-library) from the repository.
-- Open your project in XCode.
-- Goto File > Add Package Dependencies.
-- Select Add Local option.
-- Add the artifact folder.
-
-The swift library has been added to your project.
-
-## Usage as a React-Native wrapper
-### Installing this library as a dependency
-```bash
-# Install latest version
-npm install @mosip/tuvali
-
-# or
-
-# Install specific version
-npm install @mosip/tuvali@v0.4.9
-```
+- Visit [tuvali-ios-swift](https://github.com/mosip/tuvali-ios-swift) to get details on swift artifact.
 
 # API documentation
 Firstly, for establishing the secured connection over BLE the Verifier's URI needs to be exchanged between two devices. The exchange of URI can be accomplished, but is not limited to, by using a QR code.
@@ -60,12 +42,10 @@ For example use QR code generator to visually display URI and QR code scanner to
 ### Verifier
 The Verifier device can show a QR code with the URI. Verifier can generate URI through startAdvertisement() method. Once advertisement is started, Verifier will keep advertising with an advertisement payload derived from URI.
 
-```typescript
-import tuvali from '@mosip/tuvali';
-const { verifier } = OpenIdBle;
-
-const uri = verifier.startAdvertisement();
-console.log(uri);
+```kotlin
+var verifier = Verifier()
+var uri = verifier.startAdvertisement()
+println(uri)
 ```
 
 The URI contains:
@@ -82,8 +62,8 @@ E.g: OPENID4VP://connect?name=<CLIENT_NAME>&key=<VERIFIER_PUBLIC_KEY>
 ### Wallet
 The Wallet  device that scans the QR code will extract the URI from QR code and start scanning using startConnection() method.
 
-```typescript
-wallet.startConnection(uri);
+```kotlin
+wallet.startConnection(uri)
 ```
 
 The Wallet device will keep on scanning for a verifier that has same URI in its advertisement. If URI is matched, Wallet will initiate a connection with the Verifier and exchange Public Keys.
@@ -92,8 +72,8 @@ The Wallet device will keep on scanning for a verifier that has same URI in its 
 
 Once the connection is established, Wallet can send the data by:
 
-```typescript
-wallet.send(data);
+```kotlin
+wallet.sendData(payload)
 ```
 
 Wallet will start sending data in a secured way to the Verifier.
@@ -104,8 +84,8 @@ Note: At this moment, we currently support data transfer from Wallet to Verifier
 
 Once Data is received, Verifier can send verification status by:
 
-```typescript
-verifier.sendVerificationStatus(status);
+```kotlin
+verifier.sendVerificationStatus(status)
 ```
 
 Status can be either `ACCEPTED` or `REJECTED`. Sending verification status acts as closure for transmission and devices will start disconnecting.
@@ -117,18 +97,20 @@ Tuvali sends multiple events to propagate connection status, received data etc. 
 
 on Wallet:
 
-```typescript
-wallet.handleDataEvents((event: WalletDataEvent) => {
-  // Add the code that needs to run once data is received
-})
+```kotlin
+wallet.subscribe {
+  event  ->
+  // Add the code that needs to run once event is received
+}
 ```
 
 on Verifier:
 
-```typescript
-verifier.handleDataEvents((event: VerifierDataEvent) => {
+```kotlin
+verifier.subscribe {
+  event  ->
   // Add the code that needs to run once data is received
-})
+}
 ```
 
 
@@ -137,40 +119,33 @@ Here are the different types of events that can be received
 ### Common Events
 Events which are emitted by both Wallet and Verifier
 
-1. onConnected
-   * `{"type": "onConnected"}`
+1. ConnectedEvent
    * on BLE connection getting established between Wallet and Verifier
-2. onSecureChannelEstablished
-   * `{"type": "onSecureChannelEstablished"}`
+2. SecureChannelEstablishedEvent
    * on completion of key exchange between Wallet and Verifier
-3. onError
-   * `{"type": "onError", "message": "Something Went wrong in BLE", "code": "TVW_CON_001"}`
+3. ErrorEvent
    * on any error in Wallet or Verifier
-4. onDisconnected
-   * `{"type": "onDisconnected"}`
+4. DisconnectedEvent
    * on BLE disconnection between Wallet and Verifier
 
 
 ### Wallet Specific Events
 
-1. onDataSent
-   * `{"type": "onDataSent"}`
+1. DataSentEvent
    * on completion of Data transfer from the Wallet Side
-2. onVerificationStatusReceived
-   * `{"type": "onVerificationStatusReceived", "status": "ACCEPTED"}`
+2. VerificationStatusReceivedEvent
    * on received verification status from Verifier
 
 ### Verifier Specific Events
 
-1. onDataReceived
-  * `{"type": "onDataReceived"}`
-  * on receiving data from the Wallet Side
+1. DataReceivedEvent
+   * on receiving data from the Wallet Side
 
 ## Connection closure
 
 The device on which app is running can destroy the connection by calling disconnect() method:
 
-```typescript
-wallet/verifier.disconnect();
+```kotlin
+wallet/verifier.disconnect()
 ```
 
