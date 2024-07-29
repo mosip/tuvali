@@ -13,6 +13,10 @@ publishing {
     aar(MavenPublication) {
       pom {
         withXml {
+          asNode().appendNode('name', "Tuvali")
+          asNode().appendNode('url', "https://github.com/mosip/tuvali")
+          asNode().appendNode('description', "Kotlin Library to support sending vc/vp using local channels like ble.")
+
           def dependenciesNode = asNode().appendNode('dependencies')
           project.configurations.implementation.allDependencies.each {
             def dependencyNode = dependenciesNode.appendNode('dependency')
@@ -24,6 +28,13 @@ publishing {
           asNode().appendNode('licenses').appendNode('license').with {
             appendNode('name', 'MIT')
             appendNode('url', 'https://www.mit.edu/~amini/LICENSE.md')
+          }
+
+          asNode().appendNode('scm').with {
+            appendNode('connection', 'scm:git:git://github.com/mosip/tuvali.git')
+            appendNode('developerConnection', 'scm:git:ssh://github.com:mosip/tuvali.git')
+            appendNode('url', "https://github.com/mosip/tuvali")
+            appendNode('tag', "HEAD")
           }
 
           asNode().appendNode('developers').appendNode('developer').with {
