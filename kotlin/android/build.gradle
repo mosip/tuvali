@@ -73,4 +73,13 @@ dependencies {
 
 }
 
+sonarqube {
+  properties {
+    property "sonar.java.binaries", "build/intermediates/javac/debug"
+    property "sonar.language", "kotlin"
+    property "sonar.exclusions", "**/build/**, **/*.kt.generated, **/R.java, **/BuildConfig.java"
+    property "sonar.scm.disabled", "true"
+  }
+}
+
 apply from: "publish-artifact.gradle"
