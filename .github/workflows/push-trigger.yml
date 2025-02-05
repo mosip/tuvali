@@ -1,0 +1,37 @@
+name: Push trigger for tuvali
+
+on:
+  push:
+    branches:
+      - master
+      - develop
+      - qa-develop
+      - 'release-**'
+  pull_request:
+    types: [opened, reopened, synchronize]
+    branches:
+      - master
+      - develop
+      - qa-develop
+      - 'release-**'
+
+jobs:
+  build-kotlin:
+    uses: mosip/kattu/.github/workflows/gradle-build.yml@master
+    with:
+      SERVICE_LOCATION: kotlin/android
+      JAVA_VERSION: 11
+    secrets:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
+
+  sonar_analysis:
+    needs: build-kotlin
+    if: "${{  github.event_name != 'pull_request' }}"
+    uses: mosip/kattu/.github/workflows/gradlew-sonar-analysis.yml@master-java21
+    with:
+      SERVICE_LOCATION: kotlin/android
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+      SONAR_ORGANIZATION: ${{ secrets.ORG_KEY }}
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
+
