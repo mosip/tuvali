@@ -6,13 +6,15 @@ import android.text.TextUtils.isEmpty
 private const val URI_IDENTIFIER = "OPENID4VP"
 private const val NAME_QUERY_PARAM_NAME = "name"
 private const val KEY_QUERY_PARAM_NAME = "key"
+private const val AUTHORITY = "connect"
 
 class OpenId4vpURI {
   private var uri: Uri
 
   constructor(name: String, hexPK: String) {
     this.uri = Uri.Builder()
-      .scheme("$URI_IDENTIFIER://connect")
+      .scheme(URI_IDENTIFIER)
+      .authority(AUTHORITY)
       .appendQueryParameter(NAME_QUERY_PARAM_NAME, name)
       .appendQueryParameter(KEY_QUERY_PARAM_NAME, hexPK).build()
   }
