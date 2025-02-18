@@ -90,7 +90,7 @@ publishing {
       }
       groupId = "io.mosip"
       artifactId = "tuvali"
-      version = "0.5.2"
+      version = "0.5.2-SNAPSHOT"
       if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
         artifacts {
           aar {
