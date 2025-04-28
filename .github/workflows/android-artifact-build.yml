@@ -19,7 +19,7 @@ jobs:
       LICENSE_NAME: 'MPL-2.0'
     secrets:
       OSSRH_USER: ${{ secrets.OSSRH_USER }}
-      OSSRH_URL: ${{secrets.OSSRH_SNAPSHOT_URL }}
+      OSSRH_URL: ${{secrets.RELEASE_URL }}
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
