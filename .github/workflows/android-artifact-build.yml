@@ -8,18 +8,24 @@ on:
         required: false
         default: 'Triggered for Updates'
         type: string
+      publication_type:
+        description: 'Select artifact type to publish: aar, jar, or both'
+        required: true
+        default: both
+        type: string
 
 jobs:
   maven-publish:
     if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}"
-    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@master
+    uses: mosip/kattu/.github/workflows/maven-publish-android-download.yaml@master
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
       LICENSE_NAME: 'MPL-2.0'
+      PUBLICATION_TYPE: ${{ inputs.publication_type }}
     secrets:
       OSSRH_USER: ${{ secrets.OSSRH_USER }}
-      OSSRH_URL: ${{secrets.OSSRH_SNAPSHOT_URL }}
+      OSSRH_URL: ${{secrets.OSSRH_GRADLE_URL }}
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
