@@ -1,11 +1,18 @@
 publishing {
   repositories {
-    maven {
-      url = System.getenv("OSSRH_URL")
-      name = "tuvali"
-      credentials {
-        username = System.getenv("OSSRH_USER")
-        password = System.getenv("OSSRH_SECRET")
+    if (System.getenv("RELEASE_TYPE") == "release") {
+      maven {
+        name = "LocalMavenWithChecksums"
+        url = uri(layout.buildDirectory.dir("staging"))
+      }
+    } else {
+      maven {
+        url = System.getenv("OSSRH_URL")
+        name = "tuvali"
+        credentials {
+          username = System.getenv("OSSRH_USER")
+          password = System.getenv("OSSRH_SECRET")
+        }
       }
     }
   }
@@ -90,7 +97,7 @@ publishing {
       }
       groupId = "io.mosip"
       artifactId = "tuvali"
-      version = "0.5.1-SNAPSHOT"
+      version = "0.5.3-SNAPSHOT"
       if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
         artifacts {
           aar {
