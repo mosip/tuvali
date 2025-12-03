@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.widget.Toast
+import androidx.annotation.RequiresPermission
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import kotlin.reflect.KFunction0
@@ -48,6 +49,7 @@ class Common {
             return true
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         fun requestForRequiredPermissions(
             activity: Activity,
             context: Context,
@@ -67,6 +69,7 @@ class Common {
             startBluetooth(activity)
         }
 
+        @RequiresPermission(Manifest.permission.BLUETOOTH_CONNECT)
         private fun startBluetooth(activity: Activity) {
             val enableBtIntent = Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE)
             activity.startActivityForResult(enableBtIntent, REQUEST_ENABLE_BT)

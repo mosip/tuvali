@@ -1,99 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  android:id="@+id/rootLayout"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="vertical"
+  android:padding="20dp"
+  android:gravity="center_horizontal">
+
+  <!-- ACTIONS BUTTONS (Wallet / Verifier) -->
+  <LinearLayout
+    android:id="@+id/actionsLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal">
 
-    <LinearLayout
-        android:id="@+id/loaderLayout"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="50dp"
-        android:orientation="vertical"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.48"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+    <Button
+      android:id="@+id/walletButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Start Wallet"
+      android:layout_marginBottom="16dp" />
 
-        <ProgressBar
-            android:id="@+id/loader"
-            style="?android:attr/progressBarStyle"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:layout_gravity="center"
-            android:visibility="visible" />
-
-        <TextView
-            android:id="@+id/loadingText"
-            android:layout_width="289dp"
-            android:layout_height="54dp"
-            android:layout_gravity="center"
-            android:textAlignment="center" />
-
-        <TextView
-          android:id="@+id/qrCodeData"
-          android:layout_width="289dp"
-          android:layout_height="85dp"
-          android:layout_gravity="center"
-          android:textAlignment="center" />
-
-        <Button
-            android:id="@+id/cancelLoadingBtn"
-            android:layout_width="168dp"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="@string/cancelButtonText" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/actionsLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <Button
-            android:id="@+id/walletButton"
-            android:layout_width="168dp"
-            android:layout_height="54dp"
-            android:text="@string/WALLET_BUTTON_NAME" />
-
-        <Button
-            android:id="@+id/verifierButton"
-            android:layout_width="168dp"
-            android:layout_height="54dp"
-            android:text="@string/VERIFIER_BUTTON_NAME" />
-
-    </LinearLayout>
-
-    <LinearLayout
-        android:id="@+id/sendDataLayout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <TextView
-            android:id="@+id/transferText"
-            android:layout_width="289dp"
-            android:layout_height="54dp"
-            android:layout_gravity="center"
-            android:textAlignment="center" />
-
+    <Button
+      android:id="@+id/verifierButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Start Verifier" />
   </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+
+  <!-- QR CODE + TRANSFER TEXT -->
+  <LinearLayout
+    android:id="@+id/qrSection"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:visibility="gone"
+    android:layout_marginTop="20dp">
+
+    <TextView
+      android:id="@+id/qrCodeData"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="QR Data"
+      android:textSize="14sp"
+      android:textColor="@android:color/black"
+      android:gravity="center_horizontal"
+      android:padding="8dp" />
+
+    <ImageView
+      android:id="@+id/qrCodeImage"
+      android:layout_width="250dp"
+      android:layout_height="250dp"
+      android:layout_margin="10dp"
+      android:background="@android:color/white" />
+
+    <!-- THIS is the IMPORTANT TEXT that must always exist -->
+    <TextView
+      android:id="@+id/transferText"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:text="Waiting..."
+      android:textSize="18sp"
+      android:textColor="@android:color/holo_blue_dark"
+      android:gravity="center_horizontal"
+      android:padding="16dp"
+      android:layout_marginTop="20dp" />
+  </LinearLayout>
+
+
+  <!-- LOADING SCREEN -->
+  <LinearLayout
+    android:id="@+id/loaderLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:visibility="gone"
+    android:layout_marginTop="30dp">
+
+    <ProgressBar
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content" />
+
+    <TextView
+      android:id="@+id/loadingText"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Loading..."
+      android:layout_marginTop="12dp" />
+
+    <Button
+      android:id="@+id/cancelLoadingBtn"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:text="Cancel"
+      android:layout_marginTop="16dp" />
+  </LinearLayout>
+
+</LinearLayout>
