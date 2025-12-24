@@ -1,4 +1,3 @@
-
 > Warning: The library is under active development and no major version is released yet. Please anticipate non-backward compatible changes to the API and functional behavior in the upcoming releases.
 
 # Tuvali - A library to send vc/vp using BLE.
