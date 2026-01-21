@@ -21,7 +21,7 @@ publishing {
       pom {
         withXml {
           asNode().appendNode('name', "Tuvali")
-          asNode().appendNode('url', "https://github.com/mosip/tuvali")
+          asNode().appendNode('url', "https://github.com/inji/tuvali")
           asNode().appendNode('description', "Kotlin Library to support sending vc/vp using local channels like ble")
 
           asNode().appendNode('licenses').appendNode('license').with {
@@ -30,9 +30,9 @@ publishing {
           }
 
           asNode().appendNode('scm').with {
-            appendNode('connection', 'scm:git:git://github.com/mosip/tuvali.git')
-            appendNode('developerConnection', 'scm:git:ssh://github.com:mosip/tuvali.git')
-            appendNode('url', "https://github.com/mosip/tuvali")
+            appendNode('connection', 'scm:git:git://github.com/inji/tuvali.git')
+            appendNode('developerConnection', 'scm:git:ssh://github.com:inji/tuvali.git')
+            appendNode('url', "https://github.com/inji/tuvali")
             appendNode('tag', "HEAD")
           }
 
@@ -40,8 +40,8 @@ publishing {
             appendNode('id', 'Your developer ID')
             appendNode('name', 'Mosip')
             appendNode('email', 'mosip.emailnotifier@gmail.com')
-            appendNode('organization', 'io.mosip')
-            appendNode('organizationUrl', 'https://github.com/mosip/tuvali')
+            appendNode('organization', 'io.inji')
+            appendNode('organizationUrl', 'https://inji.io')
           }
 
           def dependenciesNode = asNode().appendNode('dependencies')
@@ -95,9 +95,9 @@ publishing {
           gpgArgumentsNode.appendNode('arg', 'loopback')
         }
       }
-      groupId = "io.mosip"
+      groupId = "io.inji"
       artifactId = "tuvali"
-      version = "0.5.3-SNAPSHOT"
+      version = "0.6.0-SNAPSHOT"
       if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
         artifacts {
           aar {
