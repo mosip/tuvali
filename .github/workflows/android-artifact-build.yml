@@ -21,6 +21,14 @@ on:
         options:
           - snapshot
           - release
+      group_path:
+        description: 'Select Maven group path'
+        required: true
+        type: choice
+        default: io/inji
+        options:
+          - io/inji
+          - io/mosip
 
 jobs:
   publish-snapshot:
@@ -29,28 +37,30 @@ jobs:
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
+      GROUP_PATH: ${{ inputs.group_path }}
       LICENSE_NAME: 'MPL-2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
     secrets:
       OSSRH_USER: ${{ secrets.OSSRH_USER }}
-      OSSRH_URL: ${{ secrets.OSSRH_CENTRAL_URL }}
+      OSSRH_URL: ${{ secrets.GRADLE_OSSRH_URL }}
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
-      
+
   publish-release:
     if: ${{ inputs.release_type == 'release' }}
     uses: mosip/kattu/.github/workflows/maven-publish-android-download.yaml@master
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
+      GROUP_PATH: ${{ inputs.group_path }}
       LICENSE_NAME: 'MPL-2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
       PUBLICATION_TYPE: ${{ inputs.publication_type }}
     secrets:
       OSSRH_USER: ${{ secrets.OSSRH_USER }}
-      OSSRH_URL: ${{ secrets.OSSRH_GRADLE_URL }}
+      OSSRH_URL: ${{ secrets.GRADLE_OSSRH_URL }}
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
