@@ -13,11 +13,12 @@ on:
       - release*
       - master
       - develop*
+      - gpg-migration
 
 jobs:
   maven-publish:
     if: "${{ !contains(github.ref, 'master') && github.event_name != 'pull_request' &&  github.event_name == 'workflow_dispatch' }}"
-    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@master
+    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@mahesh-patch-2
     with:
       SERVICE_LOCATION: '.'
       ANDROID_SERVICE_LOCATION: 'android'
