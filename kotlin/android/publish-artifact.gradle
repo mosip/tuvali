@@ -97,7 +97,7 @@ publishing {
       }
       groupId = "io.inji"
       artifactId = "tuvali"
-      version = "0.6.0-SNAPSHOT"
+      version = "1.0.0-alpha.1-SNAPSHOT"
       if (project.gradle.startParameter.taskNames.any { it.contains('assembleRelease') }) {
         artifacts {
           aar {
