@@ -25,8 +25,8 @@ publishing {
           asNode().appendNode('description', "Kotlin Library to support sending vc/vp using local channels like ble")
 
           asNode().appendNode('licenses').appendNode('license').with {
-            appendNode('name', 'MPL-2.0')
-            appendNode('url', 'https://www.mozilla.org/en-US/MPL/2.0/')
+            appendNode('name', 'Apache 2.0')
+            appendNode('url', 'https://www.apache.org/licenses/LICENSE-2.0')
           }
 
           asNode().appendNode('scm').with {
