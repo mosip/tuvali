@@ -38,6 +38,7 @@ jobs:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
       GROUP_PATH: ${{ inputs.group_path }}
+      JAVA_VERSION: 17
       LICENSE_NAME: 'Apache 2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
     secrets:
@@ -56,6 +57,7 @@ jobs:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
       GROUP_PATH: ${{ inputs.group_path }}
+      JAVA_VERSION: 17
       LICENSE_NAME: 'Apache 2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
       PUBLICATION_TYPE: ${{ inputs.publication_type }}
