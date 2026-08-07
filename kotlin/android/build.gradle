@@ -10,13 +10,14 @@ buildscript {
   repositories {
     google()
     mavenCentral()
+    gradlePluginPortal()
   }
 
   dependencies {
     classpath 'com.android.tools.build:gradle:4.2.0'
     // noinspection DifferentKotlinGradleVersion
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    classpath "org.sonarsource.scanner.gradle:sonarqube-gradle-plugin:3.3"
+    classpath "org.sonarqube:org.sonarqube.gradle.plugin:7.4.0.8496"
   }
 }
 
