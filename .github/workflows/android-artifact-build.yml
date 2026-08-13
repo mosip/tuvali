@@ -33,7 +33,7 @@ on:
 jobs:
   publish-snapshot:
     if: ${{ inputs.release_type == 'snapshot' }}
-    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@gpgupdate-masterj21
+    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@v0.0.1
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
@@ -52,7 +52,7 @@ jobs:
 
   publish-release:
     if: ${{ inputs.release_type == 'release' }}
-    uses: mosip/kattu/.github/workflows/maven-publish-android-download.yml@gpgupdate-masterj21
+    uses: mosip/kattu/.github/workflows/maven-publish-android-download.yml@v0.0.1
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'

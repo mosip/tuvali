@@ -39,7 +39,7 @@ on:
 
 jobs:
   tag-branch:
-    uses: mosip/kattu/.github/workflows/tag.yml@gpgupdate-masterj21
+    uses: mosip/kattu/.github/workflows/tag.yaml@v0.0.1
     with:
       TAG: ${{ inputs.TAG }}
       BODY: ${{ inputs.BODY }}
