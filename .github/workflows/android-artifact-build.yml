@@ -33,11 +33,12 @@ on:
 jobs:
   publish-snapshot:
     if: ${{ inputs.release_type == 'snapshot' }}
-    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@master
+    uses: mosip/kattu/.github/workflows/maven-publish-android.yml@v0.0.1
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
       GROUP_PATH: ${{ inputs.group_path }}
+      JAVA_VERSION: 17
       LICENSE_NAME: 'Apache 2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
     secrets:
@@ -46,15 +47,17 @@ jobs:
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
 
   publish-release:
     if: ${{ inputs.release_type == 'release' }}
-    uses: mosip/kattu/.github/workflows/maven-publish-android-download.yaml@master
+    uses: mosip/kattu/.github/workflows/maven-publish-android-download.yml@v0.0.1
     with:
       SERVICE_LOCATION: 'kotlin'
       ANDROID_SERVICE_LOCATION: 'android'
       GROUP_PATH: ${{ inputs.group_path }}
+      JAVA_VERSION: 17
       LICENSE_NAME: 'Apache 2.0'
       RELEASE_TYPE: ${{ inputs.release_type }}
       PUBLICATION_TYPE: ${{ inputs.publication_type }}
@@ -64,4 +67,5 @@ jobs:
       OSSRH_SECRET: ${{ secrets.OSSRH_SECRET }}
       OSSRH_TOKEN: ${{ secrets.OSSRH_TOKEN }}
       GPG_SECRET: ${{ secrets.GPG_SECRET }}
+      GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
       SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_INJI_TEAM }}
